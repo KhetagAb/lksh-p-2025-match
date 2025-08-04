@@ -1,0 +1,9 @@
+app:
+  name: "match"
+  version: "1.0.0"
+
+http:
+  port: 8080
+  read_timeout: 10s
+  write_timeout: 10s
+  shutdown_timeout: 5s
