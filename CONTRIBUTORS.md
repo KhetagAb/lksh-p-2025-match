@@ -15,5 +15,5 @@
 | **Григорьева Ирина** | [@username](https://github.com/username) |
 | **Шурыгин Егор** | [@username](https://github.com/username) |
 | **Щепарева Мария** | [@username](https://github.com/username) |
-| **Якушев Шоно** | [@username](https://github.com/username) |
+| **Якушев Шоно** | [@wrrrzr](https://github.com/wrrrzr) |
 | **Кокорев	Вадим** | [@username](https://github.com/username) |
