@@ -2,6 +2,7 @@ token=$1
 name="Шурыгин"
 
 git clone git@github.com:lksh-p/match.git
+cd match
 git switch task-1
 git switch -c task-1-$token
 grep -n $name CONTRIBUTORS.md | grep -o "[0-9]+"
