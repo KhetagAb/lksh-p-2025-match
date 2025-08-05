@@ -3,7 +3,7 @@
 ## Core team
 | Name | GitHub |
 |------|--------|
-| **Кузнецов Илья** | [@username](https://github.com/username) |
+| **Кузнецов Илья** | [@dmkjfs](https://github.com/dmkjfs) |
 | **Макаров Михаил** | [@username](https://github.com/username) |
 | **Одинцов Тимофей** | [@timodi](https://github.com/TimothyOdintsov) |
 | **Подыряка Евгений** | [@tbwanderer](https://github.com/tbwanderer) |
