@@ -13,7 +13,7 @@
 | Name | GitHub |
 |------|--------|
 | **Григорьева Ирина** | [@username](https://github.com/username) |
-| **Шурыгин Егор** | [@username](https://github.com/username) |
+| **Шурыгин Егор** | [@shuryginegor](https://github.com/shuryginegor) |
 | **Щепарева Мария** | [@username](https://github.com/username) |
 | **Якушев Шоно** | [@wrrrzr](https://github.com/wrrrzr) |
 | **Кокорев	Вадим** | [@username](https://github.com/username) |
