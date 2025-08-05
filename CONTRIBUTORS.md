@@ -6,7 +6,7 @@
 | **Кузнецов Илья** | [@username](https://github.com/username) |
 | **Макаров Михаил** | [@username](https://github.com/username) |
 | **Одинцов Тимофей** | [@username](https://github.com/username) |
-| **Подыряка Евгений** | [@username](https://github.com/username) |
+| **Подыряка Евгений** | [@tbwanderer](https://github.com/tbwanderer) |
 | **Семёнов Роман** | [@username](https://github.com/username) |
 
 ## BFF team
