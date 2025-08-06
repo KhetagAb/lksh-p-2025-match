@@ -30,7 +30,3 @@ func StartServer(server *echo.Echo) {
 		slog.Error("failed to start server", "error", err)
 	}
 }
-
-func hello(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, World!")
-}
