@@ -1,6 +1,6 @@
 build:
 	go mod tidy
-	go build cmd -o bin/
+	go build -o bin/match cmd/main.go
 
 clean: # have to be root
 	rm -rf bin/
