@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"match/internal/configs"
-	"match/internal/transport"
 	"match/pkg/logger"
 	"os"
 	"os/signal"
@@ -11,20 +10,18 @@ import (
 )
 
 func main() {
-	server := transport.GetServer()
-	transport.StartServer(server)
 	//svc, err := app.InitializeService()
 	//if err != nil {
-	//	panic(fmt.Sprintf("failed to initialize server: %v", err))
+	// panic(fmt.Sprintf("failed to initialize server: %v", err))
 	//}
 	//cfg := svc.Cfg
 	//ctx := svc.Ctx
 	//
 	//server := svc.HttpServer
 	//go func() {
-	//	if err := server.Start(ctx); err != nil {
-	//		logger.Errorf(ctx, "failed to start http server: %v", err)
-	//	}
+	// if err := server.Start(ctx); err != nil {
+	//  logger.Errorf(ctx, "failed to start http server: %v", err)
+	// }
 	//}()
 
 	//awaitGracefulShutdown(ctx, cfg)
@@ -40,7 +37,7 @@ func awaitGracefulShutdown(ctx context.Context, cfg *configs.Config) {
 	//defer cancel()
 
 	//if err := httpServer.Stop(shutdownCtx); err != nil {
-	//	logger.Fatalf(ctx, "server forced to shutdown: %v", err)
+	// logger.Fatalf(ctx, "server forced to shutdown: %v", err)
 	//}
 	logger.Info(ctx, "server exited properly")
 }
