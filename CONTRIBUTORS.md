@@ -13,7 +13,6 @@
 |------|--------|
 | **Григорьева Ирина** | [@username](https://github.com/username) |
 | **Шурыгин Егор** | [@shuryginegor](https://github.com/shuryginegor) |
-| **Щепарева Мария** | [@username](https://github.com/username) |
+| **Щепарева Мария** | [@mashashepp](https://github.com/mashashepp) |
 | **Якушев Шоно** | [@wrrrzr](https://github.com/wrrrzr) |
 | **Макаров Михаил** | [@username](https://github.com/username) |
-
