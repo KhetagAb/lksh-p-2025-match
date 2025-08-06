@@ -1,14 +1,15 @@
 from telegram import Bot, Update
 from fastapi import APIRouter, Request
+# from app.config import settings
 from telebot.async_telebot import AsyncTeleBot, Handler
 from telebot import types
 import asyncio
+import os
 
 router = APIRouter()
 
-# real_token = config.settings.telegram_token
-token = '8177210409:AAGinnUyakfNtpNsCnafzFEiXGKNaPXA_-U'
-bot = AsyncTeleBot(token)
+real_token = os.getenv("TELEGRAM_TOKEN")
+bot = AsyncTeleBot(real_token)
 
 
 # dispatcher = Dispatcher(bot, update_queue=None, workers=0, use_context=True)
@@ -37,7 +38,7 @@ def registration_person(username: str) -> None:
 
 
 def get_list_of_people_on_sport(sport: str) -> list[str]:
-    pass
+    return ['Vasya', 'Petya']
 
 
 def make_sports_buttons(pref: str):
@@ -90,9 +91,8 @@ async def answer_to_buttons(mess):
             return
         if 'list_' + sport == mess.text:
             await bot.send_message(mess.chat.id, '\n'.join(get_list_of_people_on_sport(sport)))
+            return
     await bot.send_message(mess.chat.id, "I don't understand you.")
-
-
 
 
 if __name__ == "__main__":
