@@ -2,7 +2,6 @@ package configs
 
 import (
 	"github.com/joho/godotenv"
-	//"net"
 	"strings"
 	"time"
 
@@ -15,7 +14,7 @@ type (
 		HTTP     HTTPConfig     `mapstructure:"http"`
 		Database DatabaseConfig `mapstructure:"database"`
 		Web      WebConfig      `mapstructure:"web"`
-		TgBot    TgBotConfig    `mapstructure:"tg-bot"`
+		TgBot    TgBotConfig    `mapstructure:"tg"`
 	}
 
 	DatabaseConfig struct {
