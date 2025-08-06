@@ -33,6 +33,7 @@ go.work.sum
 .env.test
 
 # Editor/IDE
+.direnv
  .idea/
  .vscode/
 /.idea
