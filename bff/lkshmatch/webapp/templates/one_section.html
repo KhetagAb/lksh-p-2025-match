@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ section_name }}</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h2>{{ section_name }}</h2>
+    <ol>
+    <div>
+        {% for player in list_of_players %}
+        <div>
+            <li><p>{{ player }}</p></li>
+        </div>
+        {% endfor %}
+    </div>
+    </ol>
+</body>
+</html>
