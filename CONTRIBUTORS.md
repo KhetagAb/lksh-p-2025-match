@@ -7,7 +7,6 @@
 | **Макаров Михаил** | [@username](https://github.com/username) |
 | **Одинцов Тимофей** | [@timodi](https://github.com/TimothyOdintsov) |
 | **Подыряка Евгений** | [@tbwanderer](https://github.com/tbwanderer) |
-| **Семёнов Роман** | [@username](https://github.com/username) |
 
 ## BFF team
 | Name | GitHub |
