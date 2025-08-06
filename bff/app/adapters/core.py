@@ -1,19 +1,30 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from os.path import extsep
 from typing import NewType
 
 PlayerId = NewType("PlayerId", int)
-SectionId = NewType("SectionId", int)
+SportSectionId = NewType("SectionId", int)
 
+class PlayerNotFound(Exception):
+    pass
+
+class AnotherError(Exception):
+    pass
 
 @dataclass
 class PlayerAddInfo:
     tg_username: str
-
+    tg_id: int
 
 @dataclass
-class Section:
-    id: SectionId
+class PlayerRegisterInfo:
+    name: str
+    id: int
+
+@dataclass
+class SportSection:
+    id: SportSectionId
     name: str
 
 
@@ -23,19 +34,29 @@ class Player:
     is_coach: bool
 
 
-class AddUser(ABC):
+class ValidateRegisterUser(ABC):
     @abstractmethod
-    async def add_user(self, user: PlayerAddInfo) -> PlayerId:
+    async def validate_register_user(self, user: PlayerAddInfo) -> str:
+        raise NotImplementedError
+
+class RegisterUser(ABC):
+    @abstractmethod
+    async def register_user(self, user: PlayerAddInfo) -> (str, PlayerId):
         raise NotImplementedError
 
 
-class GetSections(ABC):
+class GetSportSections(ABC):
     @abstractmethod
-    async def get_sections(self) -> list[Section]:
+    async def get_sections(self) -> list[SportSection]:
         raise NotImplementedError
 
 
-class ListFromSections(ABC):
+class GetPlayersBySportSections(ABC):
     @abstractmethod
-    async def list_from_sections(self, section_id: SectionId) -> list[Player]:
+    async def players_by_sport_sections(self, section_id: SportSectionId) -> list[Player]:
+        raise NotImplementedError
+
+class RegisterPlayerInSection(ABC):
+    @abstractmethod
+    async def register_player_in_sectoin(self, user: PlayerAddInfo, section_id: SportSectionId) -> str:
         raise NotImplementedError
