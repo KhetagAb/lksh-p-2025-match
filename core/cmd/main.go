@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"context"
@@ -10,6 +10,9 @@ import (
 )
 
 func main() {
+	//config, err := configs.LoadConfig("configs/config.yaml")
+	//fmt.Println(config)
+	//fmt.Println(err)
 	//svc, err := app.InitializeService()
 	//if err != nil {
 	//	panic(fmt.Sprintf("failed to initialize server: %v", err))

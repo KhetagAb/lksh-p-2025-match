@@ -2,6 +2,7 @@ package configs
 
 import (
 	"github.com/joho/godotenv"
+	//"net"
 	"strings"
 	"time"
 
@@ -10,8 +11,28 @@ import (
 
 type (
 	Config struct {
-		App  AppConfig  `mapstructure:"app"`
-		HTTP HTTPConfig `mapstructure:"http"`
+		App      AppConfig      `mapstructure:"app"`
+		HTTP     HTTPConfig     `mapstructure:"http"`
+		Database DatabaseConfig `mapstructure:"database"`
+		Web      WebConfig      `mapstructure:"web"`
+		TgBot    TgBotConfig    `mapstructure:"tg-bot"`
+	}
+
+	DatabaseConfig struct {
+		Name     string `mapstructure:"name"`
+		Username string `mapstructure:"username"`
+		Port     int32  `mapstructure:"port"`
+		Password string `mapstructure:"password"`
+		Host     string `mapstructure:"host"`
+	}
+
+	WebConfig struct {
+		Host     string `mapstructure:"host"`
+		Password string `mapstructure:"password"`
+		Port     int32  `mapstructure:"port"`
+	}
+	TgBotConfig struct {
+		Token string `mapstructure:"token"`
 	}
 
 	AppConfig struct {
@@ -29,7 +50,6 @@ type (
 
 func LoadConfig(path string) (*Config, error) {
 	_ = godotenv.Load()
-
 	viper.SetConfigFile(path)
 
 	viper.SetEnvPrefix("APP")
