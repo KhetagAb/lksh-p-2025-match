@@ -4,7 +4,7 @@
 | Name | GitHub |
 |------|--------|
 | **Кузнецов Илья** | [@dmkjfs](https://github.com/dmkjfs) |
-| **Макаров Михаил** | [@username](https://github.com/username) |
+| **Кокорев	Вадим** | [@username](https://github.com/username) |
 | **Одинцов Тимофей** | [@timodi](https://github.com/TimothyOdintsov) |
 | **Подыряка Евгений** | [@tbwanderer](https://github.com/tbwanderer) |
 
@@ -15,4 +15,5 @@
 | **Шурыгин Егор** | [@shuryginegor](https://github.com/shuryginegor) |
 | **Щепарева Мария** | [@username](https://github.com/username) |
 | **Якушев Шоно** | [@wrrrzr](https://github.com/wrrrzr) |
-| **Кокорев	Вадим** | [@username](https://github.com/username) |
+| **Макаров Михаил** | [@username](https://github.com/username) |
+
