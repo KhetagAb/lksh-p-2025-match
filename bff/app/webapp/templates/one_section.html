@@ -1,19 +1,25 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ section_name }}</title>
-    <meta charset="utf-8" />
-</head>
-<body>
-    <h2>{{ section_name }}</h2>
-    <ol>
+{% extends "basic_interface.html" %}
+
+{% block title %}
+{{ section_name }}
+{% endblock %}
+
+{% block content %}
+
+<h2>{{ section_name }}</h2>
+<div>
+    {% if username != "UU" %}
+        <button onclick="fetch('{{request.url}}/reg?username={{ username }}')">Registration</button>
+    {% endif %}
+</div>
+<ol>
+<div>
+    {% for player in list_of_players %}
     <div>
-        {% for player in list_of_players %}
-        <div>
-            <li><p>{{ player }}</p></li>
-        </div>
-        {% endfor %}
+        <li><p>{{ player.name }}</p></li>
     </div>
-    </ol>
-</body>
-</html>
+    {% endfor %}
+</div>
+</ol>
+
+{% endblock %}

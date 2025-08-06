@@ -1,19 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Виды спорта</title>
-    <meta charset="utf-8" />
-</head>
-<body>
-    <h2>Виды спорта</h2>
-    <ol>
+{% extends "basic_interface.html" %}
+
+{% block title %}
+Виды спорта
+{% endblock %}
+
+{% block content %}
+
+<h2>Виды спорта</h2>
+<ol>
+<div>
+    {% for section in list_of_sections %}
     <div>
-        {% for section in list_of_sections %}
-        <div>
-            <li><a href="sections/{{ section }}">{{ section }}</a></li>
-        </div>
-        {% endfor %}
+        <li><a href="sections/{{ section.name }}?username={{ username }}">{{ section.name }}</a></li>
     </div>
-    </ol>
-</body>
-</html>
+    {% endfor %}
+</div>
+</ol>
+
+{% endblock %}
