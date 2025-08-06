@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"match/internal/configs"
+	"match/internal/transport"
 	"match/pkg/logger"
 	"os"
 	"os/signal"
@@ -10,9 +11,8 @@ import (
 )
 
 func main() {
-	//config, err := configs.LoadConfig("configs/config.yaml")
-	//fmt.Println(config)
-	//fmt.Println(err)
+	server := transport.GetServer()
+	transport.StartServer(server)
 	//svc, err := app.InitializeService()
 	//if err != nil {
 	//	panic(fmt.Sprintf("failed to initialize server: %v", err))
