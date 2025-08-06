@@ -11,9 +11,6 @@ router = APIRouter()
 real_token = os.getenv("TELEGRAM_TOKEN")
 bot = AsyncTeleBot(real_token)
 
-
-# dispatcher = Dispatcher(bot, update_queue=None, workers=0, use_context=True)
-
 # Register handlers
 # TODO
 #
@@ -76,14 +73,14 @@ def make_sports_buttons() -> types.ReplyKeyboardMarkup:
 
 async def fuse_not_nf(mess: types.Message) -> bool:
     if get_id(mess.from_user.id) != 'nf':
-        await bot.send_message(mess.chat.id, "You was register in system later.")
+        await bot.send_message(mess.chat.id, "Вы регистрировались в системе ранее.")
         return True
     return False
 
 
 async def fuse_nf(mess: types.Message) -> bool:
     if get_id(mess.from_user.id) == 'nf':
-        await bot.send_message(mess.chat.id, "You weren't registered in the system. To register, enter /start")
+        await bot.send_message(mess.chat.id, "Вы не зарегистрированы в системе. Для регистрации введите /start")
         return True
     return False
 
@@ -99,16 +96,16 @@ async def start(mess):
     try:
         msg = validate_register_user(int(user_id), username)
     except UserNotFound:
-        msg = "Sorry, you are not in lists. Go to 4th kompovnik."
+        msg = "Извините, но вас нет в списках. Подойдите в 4ый комповник."
     except BaseException:
-        msg = "Sorry, something went wrong. Repeat later, or go to 4th kompovnik."
-    if "Sorry, " not in msg:
+        msg = "Извините, что-то пошло не так. Повторите позже или обратитесь в 4ый комповник."
+    if "Извините, " not in msg:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        button1 = types.KeyboardButton("Yes, register confirm.")
-        button2 = types.KeyboardButton("No, register cancel.")
+        button1 = types.KeyboardButton("Это я, регистрацию подтверждаю.")
+        button2 = types.KeyboardButton("Нет, это не я. Отмена регистрации.")
         markup.add(button1, button2)
         await bot.send_message(mess.chat.id,
-                               f"{msg},\nwe are find you in base. It is you? If not, got to 4th kompovnik",
+                               f"{msg},\nмы нашли Вас в базе. Это вы? Если нет, отмените регистрацию и подойдите в 4ый комповник.",
                                reply_markup=markup)
     else:
         await bot.send_message(mess.chat.id, msg)
@@ -119,12 +116,12 @@ async def register_on_sport(mess):
     if await fuse_nf(mess):
         return
     markup = make_sports_buttons()
-    await bot.send_message(mess.chat.id, "Choose a sport", reply_markup=markup)
+    await bot.send_message(mess.chat.id, "Выберите секцию", reply_markup=markup)
 
 
 @bot.message_handler(content_types=['text'])
 async def answer_to_buttons(mess):
-    if mess.text == "Yes, register confirm.":
+    if mess.text == "Это я, регистрацию подтверждаю.":
         if await fuse_not_nf(mess):
             return
         response = register_user(mess.from_user.id, mess.from_user.username)
@@ -133,15 +130,16 @@ async def answer_to_buttons(mess):
         button = types.KeyboardButton("/register_on_sport")
         markup.add(button)
         to_pin = (await bot.send_message(mess.chat.id,
-                                         "You was register in system.\n"
-                                         "To register for something sport, click /register_on_sport",
+                                         "Вы зарегистрировались в системе.\n"
+                                         "Для регистраци в какую-либо секцию, введите /register_on_sport\n"
+                                         "В случае возникновения проблем, обращайтесь в 4ый комповник.",
                                          reply_markup=markup)).message_id
         await bot.pin_chat_message(mess.chat.id, to_pin)
         return
-    if mess.text == "No, register cancel.":
+    if mess.text == "Нет, это не я. Отмена регистрации.":
         if await fuse_not_nf(mess):
             return
-        await bot.send_message(mess.chat.id, "OK, register canceled. If you want to register another, enter /start")
+        await bot.send_message(mess.chat.id, "Регистрация отменена. Если захотите зарегистрироваться вновь, введите /start")
         return
     if await fuse_nf(mess):
         return
@@ -152,26 +150,27 @@ async def answer_to_buttons(mess):
             button2 = types.KeyboardButton(f"signup_{sport}")
             markup.add(button1, button2)
             await bot.send_message(mess.chat.id,
-                                   f"You can view list of participants with button list_{sport} or sign up to sport with button signup_{sport}",
+                                   f"Вы можете посмотреть список участников секции {sport} с помощью кнопки list_{sport},"
+                                   f" или записаться в секцию по кнопке signup_{sport}",
                                    reply_markup=markup)
             return
         if f"list_{sport}" == mess.text:
             await bot.send_message(mess.chat.id, '\n'.join(get_players_by_sport_section(sport)))
             return
         if f"signup_{sport}" == mess.text:
-            msg = f"Yo're have registered on {sport}"
+            msg = f"Вы зарегистрировались в секцию {sport}"
             try:
                 register_player_sport_section(get_id(mess.from_user.id), sport)
             except RegistrationOver:
-                msg = f"Sorry, registration on {sport} section is over"
+                msg = f"Извините, но регистрация в секцию {sport} уже закончилась"
             except AlreadyRegistered:
-                msg = f"You already registered on {sport}"
+                msg = f"Вы уже зарегистрированы в секцию {sport}"
             except BaseException:
-                msg = "Sorry, something went wrong. Repeat later, or go to 4th kompovnik."
+                msg = "Извините, что-то пошло не так. Повторите позже или обратитесь в 4ый комповник."
             await bot.send_message(mess.chat.id, msg)
             return
 
-    await bot.send_message(mess.chat.id, "I don't understand you.")
+    await bot.send_message(mess.chat.id, "Я вас не понимаю.")
 
 
 if __name__ == "__main__":
