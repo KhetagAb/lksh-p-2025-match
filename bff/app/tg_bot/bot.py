@@ -33,15 +33,35 @@ def sign_up_to_sport(sport: str) -> str:
     pass
 
 
-def registration_person(username: str) -> None:
-    pass
+def add_accord(tg_id, real_id) -> None:
+    with open("accord.txt", 'a') as file:
+        file.write(str(tg_id) + ';' + str(real_id) + '\n')
+
+
+def get_id(tg_id) -> str:
+    tg_id = str(tg_id)
+    print(tg_id)
+    with open("accord.txt", 'r') as file:
+        for line in file.readlines():
+            print(line)
+            if tg_id == line.split(';')[0]:
+                return line.split(';')[1]
+        return 'nf'
+
+
+def validate_register_user(tg_id: int, username: str) -> str:
+    return "Vasya Pupkin"
+
+
+def register_user(tg_id: int, username: str) -> int:
+    return 228356789
 
 
 def get_list_of_people_on_sport(sport: str) -> list[str]:
     return ['Vasya', 'Petya']
 
 
-def make_sports_buttons(pref: str):
+def make_sports_buttons(pref: str) -> types.ReplyKeyboardMarkup:
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     buttons = []
     for sport in get_list_of_all_sports():
@@ -50,48 +70,53 @@ def make_sports_buttons(pref: str):
     return markup
 
 
+async def fuse_not_nf(mess) -> bool:
+    if get_id(mess.from_user.id) != 'nf':
+        await bot.send_message(mess.chat.id, "You was register in system later.")
+        return True
+    return False
+
+
 @bot.message_handler(commands=['start'])
 async def start(mess):
     chat_id = mess.chat.id
     user_id = mess.from_user.id
     username = mess.from_user.username
-    registration_person(username)
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton("/signup")
-    button2 = types.KeyboardButton("/list")
-    markup.add(button1, button2)
-    for_pin = (await bot.send_message(mess.chat.id,
-                           "Hello. For signing up to sports click /signup, for getting list of all users click /list",
-                           reply_markup=markup)).message_id
-    await bot.pin_chat_message(chat_id=mess.chat.id, message_id=for_pin)
-
-
-
-@bot.message_handler(commands=['signup'])
-async def signup(mess):
-    await bot.send_message(mess.chat.id, "You can sign up for these sports", reply_markup=make_sports_buttons('reg_'))
-
-
-@bot.message_handler(commands=['list'])
-async def list_(mess):
-    await bot.send_message(mess.chat.id, "To view the lists, select sports", reply_markup=make_sports_buttons('list_'))
+    msg = ''
+    if await fuse_not_nf(mess):
+        return
+    try:
+        msg = validate_register_user(int(user_id), username)
+    except UserNotFound:
+        msg = "Sorry, you are not in lists. Go to 4th kompovnik."
+    except BaseException:
+        msg = "Sorry, something went wrong. Repeat later, or go to 4th kompovnik."
+    if "Sorry, " not in msg:
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button1 = types.KeyboardButton("Yes, register confirm.")
+        button2 = types.KeyboardButton("No, register cancel.")
+        markup.add(button1, button2)
+        await bot.send_message(mess.chat.id,
+                               f"{msg},\nwe are find you in base. It is you? If not, got to 4th kompovnik",
+                               reply_markup=markup)
+    else:
+        await bot.send_message(mess.chat.id, msg)
 
 
 @bot.message_handler(content_types=['text'])
 async def answer_to_buttons(mess):
-    for sport in get_list_of_all_sports():
-        if 'reg_' + sport == mess.text:
-            ans = sign_up_to_sport(sport)
-            msg = ''
-            if ans:
-                msg = f"You are sign up to {sport}."
-            else:
-                msg = f"Sorry, something went wrong. Please repeat later."
-            await bot.send_message(mess.chat.id, msg)
+    if mess.text == "Yes, register confirm.":
+        if await fuse_not_nf(mess):
             return
-        if 'list_' + sport == mess.text:
-            await bot.send_message(mess.chat.id, '\n'.join(get_list_of_people_on_sport(sport)))
+        response = register_user(mess.from_user.id, mess.from_user.username)
+        add_accord(mess.from_user.id, response)
+        await bot.send_message(mess.chat.id, "You was register in system.")
+        return
+    if mess.text == "No, register cancel.":
+        if await fuse_not_nf(mess):
             return
+        await bot.send_message(mess.chat.id, "OK, register canceled")
+        return
     await bot.send_message(mess.chat.id, "I don't understand you.")
 
 
