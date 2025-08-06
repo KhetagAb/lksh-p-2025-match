@@ -1,15 +1,13 @@
 from fastapi import FastAPI
 from app.bot import router as bot_router
-from app.database import engine, Base
+from app.config import settings
 
-# Create all tables on startup
-async def create_tables():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+
+def print_loaded_settings():
+    print("Loaded settings:")
+    for key, value in settings.as_dict().items():
+        print(f"{key} = {value!r}")
+
 
 app = FastAPI()
-app.include_router(bot_router)
-
-@app.on_event("startup")
-async def on_startup():
-    await create_tables()
+print_loaded_settings()

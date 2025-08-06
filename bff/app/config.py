@@ -1,8 +1,10 @@
-from pydantic import BaseSettings
+from dynaconf import Dynaconf
 
-class Settings(BaseSettings):
-
-    class Config:
-        env_file = ".env"
-
-settings = Settings()
+settings = Dynaconf(
+    envvar_prefix="MATCH",
+    settings_files=['config.toml'],
+    environments=True,
+    load_dotenv=True,
+    default_env="prod",
+    env="test",
+)
