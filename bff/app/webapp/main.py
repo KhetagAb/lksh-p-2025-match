@@ -30,12 +30,16 @@ def root(request: Request):
 @app.get("/sections")
 def sections(request: Request):
     return templates.TemplateResponse(name='sections.html',
-                                      context={'request': request, 'list_of_sections': get_list_of_sections_core()})
+                                      context={'request': request,
+                                               'list_of_sections': get_list_of_sections_core()})
 
 @app.get("/sections/{section_name}")
-def get_list(section_name):
-    return get_list_in_section_core(section_name)
+def get_list(request: Request, section_name):
+    return templates.TemplateResponse(name='one_section.html',
+                                      context={'request': request,
+                                               'list_of_players': get_list_in_section_core(section_name),
+                                               'section_name': section_name})
 
 @app.get("/sections/{section_name}/reg")
 def get_list(section_name, user_name, auth):
-    return get_list_in_section_core(section_name, user_name, auth)
+    return registration_on_section(section_name, user_name, auth)

@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sections</title>
+    <title>Виды спорта</title>
     <meta charset="utf-8" />
 </head>
 <body>
     <h2>Виды спорта</h2>
+    <ol>
     <div>
         {% for section in list_of_sections %}
         <div>
-            <p>Name: {{ section }}</p>
-            <!-- Добавьте другие атрибуты по вашему усмотрению -->
+            <li><a href="sections/{{ section }}">{{ section }}</a></li>
         </div>
         {% endfor %}
     </div>
+    </ol>
 </body>
 </html>

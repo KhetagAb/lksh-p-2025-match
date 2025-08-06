@@ -33,3 +33,4 @@ go.work.sum
 
 # Direnv
 .direnv
+bff/app/webapp/__pycache__
