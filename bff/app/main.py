@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from app.bot import router as bot_router
-from app.config import settings
+from bot import router as bot_router
+from config import settings
 
 
 def print_loaded_settings():

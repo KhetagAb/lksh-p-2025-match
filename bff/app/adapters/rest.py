@@ -1,11 +1,11 @@
-from .core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
-                   PlayerAddInfo, PlayerId, SportSection, SportSectionId, RegisterPlayerInSection,
+from bff.app.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
+                   PlayerAddInfo, SportSection, SportSectionId, RegisterPlayerInSection,
                    PlayerNotFound, UnknownError, PlayerRegisterInfo)
 import aiohttp
-from ..config import settings
+from bff.app.config import settings
 import json
 
-API_URL = settings
+API_URL = settings.CORE_HOST + ':' + settings.CORE_PORT
 
 
 class PlayerNotFoundResponse(PlayerNotFound):
