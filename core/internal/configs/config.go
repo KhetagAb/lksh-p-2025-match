@@ -72,15 +72,18 @@ func LoadConfig(path string) (*Config, error) {
 }
 
 func LoadUsers(path string) (*Users, error) {
-	viper.SetDefault("users", []string{"English"})
-	viper.SetConfigFile(path)
+	v := viper.New()
+	v.SetDefault("users", []string{"English"})
+	v.SetConfigFile(path)
 
-	if err := viper.ReadInConfig(); err != nil {
+	if err := v.ReadInConfig(); err != nil {
+
 		return nil, err
 	}
 
 	var cfg Users
-	if err := viper.Unmarshal(&cfg); err != nil {
+	if err := v.Unmarshal(&cfg); err != nil {
+
 		return nil, err
 	}
 
