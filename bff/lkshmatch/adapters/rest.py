@@ -5,6 +5,7 @@ import aiohttp
 from bff.app.config import settings
 import json
 
+#TODO: Исправить, как - спросить у Хета
 API_URL = str(settings.CORE_HOST) + ':' + str(settings.CORE_PORT)
 
 
