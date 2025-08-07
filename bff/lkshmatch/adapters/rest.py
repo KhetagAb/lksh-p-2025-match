@@ -69,7 +69,7 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
 
 
 class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
-    async def register_player_in_sport_sectoin(self, section_id: SportSectionId, user_id: PlayerRegisterInfo) -> None:
+    async def register_player_in_sport_sectoin(self, section: SportSection, user_id: PlayerRegisterInfo) -> None:
         async with aiohttp.ClientSession() as session:
             response = await session.get(API_URL)
             if response.status != 200:
