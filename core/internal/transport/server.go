@@ -1,11 +1,13 @@
 package transport
 
 import (
-	"errors"
+	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"log/slog"
-	"net/http"
 )
 
 func RegisterEndpoints(server *echo.Echo) {
@@ -22,11 +24,15 @@ func GetServer() *echo.Echo {
 	return server
 }
 
-func StartServer(server *echo.Echo) {
-	// **IMPORTANT:** replace with config later
-	err := server.Start(":8080")
+func RunServer(server *echo.Echo) {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		slog.Error("failed to start server", "error", err)
-	}
+	go func() {
+		// TODO: replace port with config later
+		if err := server.Start(":8080"); err != nil {
+			panic(fmt.Sprintf("failed to initialize server: %v", err))
+		}
+	}()
+	<-quit
 }
