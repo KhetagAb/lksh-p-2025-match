@@ -26,6 +26,7 @@ class SportSection:
     name: str
     en_name: str
 
+
 class ValidateRegisterUser(ABC):
     @abstractmethod
     async def validate_register_user(self, user: PlayerAddInfo) -> str:
@@ -51,3 +52,5 @@ class GetPlayersBySportSections(ABC):
 class RegisterPlayerInSportSection(ABC):
     async def register_player_in_sport_sectoin(self, section_id: SportSection, user_id: PlayerRegisterInfo) -> None:
         raise NotImplementedError
+
+
