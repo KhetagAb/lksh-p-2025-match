@@ -1,4 +1,4 @@
-package db
+package repositories
 
 import (
 	"context"
@@ -6,9 +6,11 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var ctx = context.Background()
+type Players struct {
+	pool *pgxpool.Pool
+}
 
-func CreatePlayer(pool *pgxpool.Pool, name, username string, telegram_id int64) (*int64, error) {
+func (p *Players) CreatePlayer(ctx context.Context, name, username string, telegram_id int64) (*int64, error) {
 	query := `
         INSERT INTO players (name, username, telegram_id)
         VALUES ($1, $2)
@@ -16,7 +18,7 @@ func CreatePlayer(pool *pgxpool.Pool, name, username string, telegram_id int64) 
     `
 
 	var id int64
-	err := pool.QueryRow(ctx, query, name, username, telegram_id).Scan(&id)
+	err := p.pool.QueryRow(ctx, query, name, username, telegram_id).Scan(&id)
 	if err != nil {
 		return nil, &ErrInserting
 	}
@@ -24,7 +26,7 @@ func CreatePlayer(pool *pgxpool.Pool, name, username string, telegram_id int64) 
 	return &id, nil
 }
 
-func GetPlayerByID(pool *pgxpool.Pool, id int64) (*Player, error) {
+func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*Player, error) {
 	query := `
 		SELECT * FROM players
 		WHERE id = $1
@@ -34,7 +36,7 @@ func GetPlayerByID(pool *pgxpool.Pool, id int64) (*Player, error) {
 	var name string
 	var username string
 
-	err := pool.QueryRow(ctx, query, id).Scan(&id, &name, &username, &telegram_id)
+	err := p.pool.QueryRow(ctx, query, id).Scan(&id, &name, &username, &telegram_id)
 	if err != nil {
 		return nil, &ErrNotFound
 	}
@@ -42,13 +44,13 @@ func GetPlayerByID(pool *pgxpool.Pool, id int64) (*Player, error) {
 	return &Player{id, name, username, telegram_id}, nil
 }
 
-func DeletePlayerByID(pool *pgxpool.Pool, id int64) error {
+func (p *Players) DeletePlayerByID(ctx context.Context, id int64) error {
 	query := `
 		DELETE FROM players
 		WHERE id = $1
 	`
 
-	_, err := pool.Exec(ctx, query, id)
+	_, err := p.pool.Exec(ctx, query, id)
 	if err != nil {
 		return &ErrDeleting
 	}
