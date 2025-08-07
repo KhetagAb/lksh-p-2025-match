@@ -1,11 +1,12 @@
-from bff.app.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
-                   PlayerAddInfo, SportSection, SportSectionId, RegisterPlayerInSection,
+from bff.lkshmatch.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
+                   PlayerAddInfo, SportSection, RegisterPlayerInSportSection,
                    PlayerNotFound, UnknownError, PlayerRegisterInfo)
 import aiohttp
-from bff.app.config import settings
+from bff.lkshmatch.config import settings
 import json
 
-API_URL = settings.CORE_HOST + ':' + settings.CORE_PORT
+#TODO: Исправить, как - спросить у Хета
+API_URL = str(settings.CORE_HOST) + ':' + str(settings.CORE_PORT)
 
 
 class PlayerNotFoundResponse(PlayerNotFound):
@@ -57,7 +58,7 @@ class RestGetSportSections(GetSportSections):
 
 
 class RestGetPlayersBySportSections(GetPlayersBySportSections):
-    async def list_from_sport_sections(self, section_id: SportSectionId) -> list[Player]:
+    async def list_from_sport_sections(self, section: SportSection) -> list[Player]:
         async with aiohttp.ClientSession() as session:
             response = await session.get(API_URL)
             if response.status != 200:
@@ -65,3 +66,11 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
 
             data = await response.json()
             return data["players"]
+
+
+class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
+    async def register_player_in_sport_sectoin(self, section: SportSection, user_id: PlayerRegisterInfo) -> None:
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(API_URL)
+            if response.status != 200:
+                raise UnknownError
