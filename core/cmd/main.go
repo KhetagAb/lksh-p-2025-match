@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"match/internal/configs"
 	"match/pkg/logger"
 	"os"
@@ -10,6 +11,8 @@ import (
 )
 
 func main() {
+	cfg, er := configs.LoadUsers("configs/users.yaml")
+	fmt.Println(cfg, er)
 	//svc, err := app.InitializeService()
 	//if err != nil {
 	// panic(fmt.Sprintf("failed to initialize server: %v", err))
