@@ -22,3 +22,4 @@ class StubListFromSections(ListFromSections):
             Player(name="SigmaSlav", is_coach=False),
             Player(name="Ronaldo", is_coach=True),
         ]
+
