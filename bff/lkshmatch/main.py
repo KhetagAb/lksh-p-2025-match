@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from bot import router as bot_router
-from config import settings
+
+from lkshmatch.bot import router as bot_router
+from lkshmatch.config import settings
 
 
 def print_loaded_settings():
