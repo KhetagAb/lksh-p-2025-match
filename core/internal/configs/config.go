@@ -20,7 +20,7 @@ type (
 	DatabaseConfig struct {
 		Name     string `mapstructure:"name"`
 		Username string `mapstructure:"username"`
-		Port     int32  `mapstructure:"port"`
+		Port     int64  `mapstructure:"port"`
 		Password string `mapstructure:"password"`
 		Host     string `mapstructure:"host"`
 	}
@@ -28,7 +28,7 @@ type (
 	WebConfig struct {
 		Host     string `mapstructure:"host"`
 		Password string `mapstructure:"password"`
-		Port     int32  `mapstructure:"port"`
+		Port     int64  `mapstructure:"port"`
 	}
 	TgBotConfig struct {
 		Token string `mapstructure:"token"`
@@ -45,6 +45,10 @@ type (
 		WriteTimeout    time.Duration `mapstructure:"write_timeout"`
 		ShutdownTimeout time.Duration `mapstructure:"shutdown_timeout"`
 	}
+
+	Users struct {
+		Users []string `mapstructure:"users"`
+	}
 )
 
 func LoadConfig(path string) (*Config, error) {
@@ -60,6 +64,22 @@ func LoadConfig(path string) (*Config, error) {
 	}
 
 	var cfg Config
+	if err := viper.Unmarshal(&cfg); err != nil {
+		return nil, err
+	}
+
+	return &cfg, nil
+}
+
+func LoadUsers(path string) (*Users, error) {
+	viper.SetDefault("users", []string{"English"})
+	viper.SetConfigFile(path)
+
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+
+	var cfg Users
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
