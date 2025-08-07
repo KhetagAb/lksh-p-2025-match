@@ -28,9 +28,9 @@ go.work.sum
 .env
 
 # Editor/IDE
- *.idea
- .vscode
+.idea
+.vscode
 
 # Direnv
 .direnv
-accord.txt
+bff/app/tg_bot/accord.txt
