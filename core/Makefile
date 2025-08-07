@@ -3,7 +3,7 @@
 quickstart: check
 	make build mode=dev
 	make start mode=dev
-	make rm mode=dev
+	make clean mode=dev
 
 build: check
 	go mod tidy
