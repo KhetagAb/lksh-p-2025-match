@@ -1,17 +1,18 @@
 from .core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
                    PlayerAddInfo, PlayerId, SportSection, SportSectionId, RegisterPlayerInSection,
-                   PlayerNotFound, AnotherError, PlayerRegisterInfo)
+                   PlayerNotFound, UnknownError, PlayerRegisterInfo)
 import aiohttp
+from ..config import settings
 import json
 
-API_URL = "127.0.0.1:3000"
+API_URL = settings
 
 
 class PlayerNotFoundResponse(PlayerNotFound):
     pass
 
 
-class ErrorResponse(AnotherError):
+class ErrorResponse(UnknownError):
     pass
 
 
@@ -26,7 +27,7 @@ class RestValidateRegisterUser(ValidateRegisterUser):
             if response.status == 404 and data.count("detail") != 0:
                 raise PlayerNotFoundResponse
             if response.status != 200:
-                raise AnotherError
+                raise UnknownError
 
             return data["name"]
 
@@ -38,7 +39,7 @@ class RestRegisterUser(RegisterUser):
             response = await session.get(API_URL, params=query)
 
             if response.status != 200:
-                raise AnotherError
+                raise UnknownError
 
             data = await response.json()
             return PlayerRegisterInfo(data["name"], int(data['id']))
@@ -49,7 +50,7 @@ class RestGetSportSections(GetSportSections):
         async with aiohttp.ClientSession() as session:
             response = await session.get(API_URL)
             if response.status != 200:
-                raise AnotherError
+                raise UnknownError
 
             data = await response.json()
             return data["sections"]
@@ -60,7 +61,7 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
         async with aiohttp.ClientSession() as session:
             response = await session.get(API_URL)
             if response.status != 200:
-                raise AnotherError
+                raise UnknownError
 
             data = response.json()
             return data["players"]

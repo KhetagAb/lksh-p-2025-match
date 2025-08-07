@@ -9,7 +9,7 @@ SportSectionId = NewType("SectionId", int)
 class PlayerNotFound(Exception):
     pass
 
-class AnotherError(Exception):
+class UnknownError(Exception):
     pass
 
 @dataclass
