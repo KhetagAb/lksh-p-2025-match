@@ -7,8 +7,6 @@ import asyncio
 import os
 import random
 from bff.lkshmatch.adapters import rest
-from bff.lkshmatch.adapters.core import SportSection
-
 router = APIRouter()
 
 real_token = os.getenv("TELEGRAM_TOKEN")
@@ -23,10 +21,6 @@ bot = AsyncTeleBot(real_token)
 #     update = Update.de_json(data, bot)
 #     dispatcher.process_update(update)
 #     return {"ok": True}
-
-
-def get_all_sport_section() -> list[str]:
-    return ['Volleyball', 'Basketball', 'Football']
 
 
 def sign_up_to_sport(sport: str) -> str:
@@ -89,11 +83,11 @@ async def fuse_nf(mess: types.Message) -> bool:
 
 
 def get_role(id: int, sport: str) -> str:
-    return random.shuffle(['admin', 'user', 'captain'])[0]
+    return ['admin', 'user', 'captain'][random.randrange(3)]
 
 
 def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboardMarkup:
-    role = get_role(int(get_id(mess.from_user.id)))
+    role = get_role(int(get_id(mess.from_user.id)), sport)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     data_for_buttons = []
     if role == "user":
@@ -137,7 +131,7 @@ async def start(mess):
 async def register_on_sport(mess):
     if await fuse_nf(mess):
         return
-    markup = make_sports_buttons()
+    markup = await make_sports_buttons()
     await bot.send_message(mess.chat.id, "Выберите секцию", reply_markup=markup)
 
 
@@ -171,32 +165,32 @@ async def answer_to_buttons(mess: types.Message):
         return
     if await fuse_nf(mess):
         return
-    for sport in get_all_sport_section():
+    for sport in await rest.RestGetSportSections().get_sections():
         if sport == mess.text:
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            button1 = types.KeyboardButton(f"list_{sport}")
-            button2 = types.KeyboardButton(f"signup_{sport}")
+            button1 = types.KeyboardButton(f"list_{sport.name}")
+            button2 = types.KeyboardButton(f"signup_{sport.name}")
             markup.add(button1, button2)
             await bot.send_message(mess.chat.id,
-                                   f"Вы можете посмотреть список участников секции {sport} с помощью кнопки list_{sport},"
-                                   f" или записаться в секцию по кнопке signup_{sport}",
+                                   f"Вы можете посмотреть список участников секции {sport.name} с помощью кнопки list_{sport},"
+                                   f" или записаться в секцию по кнопке signup_{sport.name}",
                                    reply_markup=markup)
             return
-        if f"list_{sport}" == mess.text:
+        if f"list_{sport.name}" == mess.text:
             d = {"Волейбол": "Tennis",
                  "Футбол": "Football",
                  "Хоккей": "Hockey",
                  "Теннис": "Tennis"}
-            await bot.send_message(mess.chat.id, '\n'.join(await rest.RestGetPlayersBySportSections().players_by_sport_sections(rest.SportSection(sport, d[sport]))))
+            await bot.send_message(mess.chat.id, '\n'.join(await rest.RestGetPlayersBySportSections().players_by_sport_sections(sport)))
             return
-        if f"signup_{sport}" == mess.text:
-            msg = f"Вы зарегистрировались в секцию {sport}"
+        if f"signup_{sport.name}" == mess.text:
+            msg = f"Вы зарегистрировались в секцию {sport.name}"
             try:
                 register_player_sport_section(get_id(mess.from_user.id), sport)
             except RegistrationOver:
-                msg = f"Извините, но регистрация в секцию {sport} уже закончилась"
+                msg = f"Извините, но регистрация в секцию {sport.name} уже закончилась"
             except AlreadyRegistered:
-                msg = f"Вы уже зарегистрированы в секцию {sport}"
+                msg = f"Вы уже зарегистрированы в секцию {sport.name}"
             except BaseException:
                 msg = "Извините, что-то пошло не так. Повторите позже или обратитесь в 4ый комповник."
             await bot.send_message(mess.chat.id, msg)

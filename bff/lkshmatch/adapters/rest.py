@@ -58,7 +58,7 @@ class RestGetSportSections(GetSportSections):
 
 
 class RestGetPlayersBySportSections(GetPlayersBySportSections):
-    async def list_from_sport_sections(self, section: SportSection) -> list[Player]:
+    async def players_by_sport_sections(self, section: SportSection) -> list[str]:
         async with aiohttp.ClientSession() as session:
             response = await session.get(API_URL)
             if response.status != 200:
