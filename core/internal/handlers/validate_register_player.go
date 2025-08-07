@@ -22,6 +22,7 @@ func (h *ValidatePLayerHandler) ValidateRegisterUser(ectx echo.Context) error {
 
 	//logger.Infof(ctx, "Validating player username: %v", tgUsername)
 
+
 	playerName, err := h.validatePlayerService.ValidateRegisterUser(ctx, tgUsername)
 
 	if err != nil {

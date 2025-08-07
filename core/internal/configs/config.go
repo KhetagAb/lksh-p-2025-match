@@ -77,11 +77,13 @@ func LoadUsers(path string) (*Users, error) {
 	v.SetConfigFile(path)
 
 	if err := v.ReadInConfig(); err != nil {
+
 		return nil, err
 	}
 
 	var cfg Users
 	if err := v.Unmarshal(&cfg); err != nil {
+
 		return nil, err
 	}
 
