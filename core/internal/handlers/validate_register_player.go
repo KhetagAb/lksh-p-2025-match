@@ -4,11 +4,12 @@ import (
 	"context"
 	"github.com/labstack/echo/v4"
 	"match/pkg/errs"
+	"strconv"
 )
 
 type (
 	ValidatePlayerService interface {
-		ValidateRegisterUser(ctx context.Context, tgUsername string) (string, error)
+		ValidateRegisterUser(ctx context.Context, tgUsername string, tgId int64) (string, error)
 	}
 
 	ValidatePLayerHandler struct {
@@ -19,11 +20,10 @@ type (
 func (h *ValidatePLayerHandler) ValidateRegisterUser(ectx echo.Context) error {
 	ctx := context.Background()
 	tgUsername := ectx.Param("tgUsername")
-
+	tgId, _ := strconv.ParseInt("tgId", 10, 64)
 	//logger.Infof(ctx, "Validating player username: %v", tgUsername)
 
-
-	playerName, err := h.validatePlayerService.ValidateRegisterUser(ctx, tgUsername)
+	playerName, err := h.validatePlayerService.ValidateRegisterUser(ctx, tgUsername, tgId)
 
 	if err != nil {
 		if _, ok := err.(*errs.PlayerNotFound); ok {
