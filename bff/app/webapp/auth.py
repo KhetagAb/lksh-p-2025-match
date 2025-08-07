@@ -7,7 +7,7 @@ from fastapi.requests import Request
 from fastapi.responses import PlainTextResponse, RedirectResponse
 from jose import jwt
 
-from vars import BOT_TOKEN_HASH, JWT_SECRET_KEY, COOKIE_NAME
+from vars import BOT_TOKEN_HASH, JWT_SECRET_KEY, COOKIE_NAME, ALGORITHM
 
 auth_router = APIRouter()
 
@@ -15,10 +15,8 @@ auth_router = APIRouter()
 async def telegram_callback(
         request: Request,
         user_id: Annotated[int, Query(alias='id')],
-        query_hash: Annotated[str, Query(alias='hash')],
-        #next_url: Annotated[str, Query(alias='next')] = '/',
-):
-    print(f"USER AUTHED WITH ID: {user_id}")
+        query_hash: Annotated[str, Query(alias='hash')]
+    ):
     params = request.query_params.items()
     data_check_string = '\n'.join(sorted(f'{x}={y}' for x, y in params if x not in ('hash', 'next')))
     computed_hash = hmac.new(BOT_TOKEN_HASH.digest(), data_check_string.encode(), 'sha256').hexdigest()
@@ -26,7 +24,7 @@ async def telegram_callback(
     if not is_correct:
         return PlainTextResponse('Authorization failed. Please try again', status_code=401)
 
-    token = jwt.encode({'alg': 'HS256'}, {'k': user_id}, JWT_SECRET_KEY)
+    token = jwt.encode(claims={'user_id': user_id}, key=JWT_SECRET_KEY, algorithm=ALGORITHM)
     response = RedirectResponse("/")
     response.set_cookie(key=COOKIE_NAME, value=token)
     return response
