@@ -1,5 +1,5 @@
 from bff.lkshmatch.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
-                   PlayerAddInfo, SportSection, SportSectionId, RegisterPlayerInSportSection,
+                   PlayerAddInfo, SportSection, RegisterPlayerInSportSection,
                    PlayerNotFound, UnknownError, PlayerRegisterInfo)
 import aiohttp
 from bff.lkshmatch.config import settings
@@ -58,7 +58,7 @@ class RestGetSportSections(GetSportSections):
 
 
 class RestGetPlayersBySportSections(GetPlayersBySportSections):
-    async def list_from_sport_sections(self, section_id: SportSectionId) -> list[Player]:
+    async def list_from_sport_sections(self, section: SportSection) -> list[Player]:
         async with aiohttp.ClientSession() as session:
             response = await session.get(API_URL)
             if response.status != 200:
@@ -69,7 +69,7 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
 
 
 class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
-    async def register_player_in_sport_sectoin(self, section_id: SportSectionId, user_id: PlayerRegisterInfo) -> None:
+    async def register_player_in_sport_sectoin(self, section: SportSection, user_id: PlayerRegisterInfo) -> None:
         async with aiohttp.ClientSession() as session:
             response = await session.get(API_URL)
             if response.status != 200:
