@@ -1,11 +1,24 @@
 { pkgs ? import <nixpkgs> { } }:
 
-pkgs.mkShell {
+let pyproject = pkgs.lib.importTOML ./bff/pyproject.toml;
+in pkgs.mkShell {
   packages = [
     (pkgs.python3.withPackages (p:
       with p;
-      [ fastapi uvicorn pytelegrambotapi sqlalchemy pydantic dynaconf ]
-      ++ uvicorn.optional-dependencies.standard
+      [
+        fastapi
+        uvicorn
+        pytelegrambotapi
+        sqlalchemy
+        pydantic
+        dynaconf
+        (pkgs.python3Packages.mkPythonEditablePackage {
+          pname = pyproject.project.name;
+          version = pyproject.project.version;
+
+          root = "$PWD/bff";
+        })
+      ] ++ uvicorn.optional-dependencies.standard
       ++ fastapi.optional-dependencies.standard))
   ];
 }
