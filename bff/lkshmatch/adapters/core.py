@@ -4,7 +4,6 @@ from os.path import extsep
 from typing import NewType
 
 PlayerId = NewType("PlayerId", int)
-SportSectionId = NewType("SectionId", int)
 
 class PlayerNotFound(Exception):
     pass
@@ -24,15 +23,8 @@ class PlayerRegisterInfo:
 
 @dataclass
 class SportSection:
-    id: SportSectionId
     name: str
-
-
-@dataclass
-class Player:
-    name: str
-    is_coach: bool
-
+    en_name: str
 
 class ValidateRegisterUser(ABC):
     @abstractmethod
@@ -53,10 +45,9 @@ class GetSportSections(ABC):
 
 class GetPlayersBySportSections(ABC):
     @abstractmethod
-    async def players_by_sport_sections(self, section_id: SportSectionId) -> list[Player]:
+    async def players_by_sport_sections(self, section_id: SportSection) -> list[PlayerRegisterInfo]:
         raise NotImplementedError
 
-class RegisterPlayerInSection(ABC):
-    @abstractmethod
-    async def register_player_in_sectoin(self, user: PlayerAddInfo, section_id: SportSectionId) -> str:
+class RegisterPlayerInSportSection(ABC):
+    async def register_player_in_sport_sectoin(self, section_id: SportSection, user_id: PlayerRegisterInfo) -> None:
         raise NotImplementedError
