@@ -38,3 +38,6 @@ go.work.sum
  .vscode/
 /.idea
 /core/internal/generated/app/wire_gen.go
+
+# Python
+__pycache__/
