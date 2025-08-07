@@ -13,6 +13,7 @@ func RegisterEndpoints(server *echo.Echo) {
 	// registering endpoints here
 	// TODO прокинуть сервис игрока
 	server.GET("/", handlers.Handler{}.ValidateRegisterUser)
+
 }
 
 func GetServer() *echo.Echo {
