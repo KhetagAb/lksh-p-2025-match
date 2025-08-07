@@ -12,6 +12,9 @@ core/bin/
 # Test binary, built with `go test -c`
 *.test
 
+# Database backup
+core/db/
+
 # Code coverage profiles and other test artifacts
 *.out
 coverage.*
@@ -25,8 +28,9 @@ profile.cov
 go.work
 go.work.sum
 
-# env file
+# environment
 .env
+.env.test
 
 # Editor/IDE
  .idea/
