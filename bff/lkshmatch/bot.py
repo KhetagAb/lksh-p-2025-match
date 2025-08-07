@@ -1,6 +1,6 @@
-from telegram import Bot, Update
 from fastapi import APIRouter, Request
-import app.config as config
+
+import lkshmatch.config as config
 
 router = APIRouter()
 
