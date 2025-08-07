@@ -41,7 +41,7 @@ class ValidateRegisterUser(ABC):
 
 class RegisterUser(ABC):
     @abstractmethod
-    async def register_user(self, user: PlayerAddInfo) -> (str, PlayerId):
+    async def register_user(self, user: PlayerAddInfo) -> PlayerRegisterInfo:
         raise NotImplementedError
 
 

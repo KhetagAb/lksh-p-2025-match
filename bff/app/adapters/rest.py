@@ -21,13 +21,13 @@ class RestValidateRegisterUser(ValidateRegisterUser):
             query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
             response = await session.get(API_URL, params=query)
 
-            if response.status == 404:
-                # TODO проверять что это именно не найденный пользователь
+            data = await response.json()
+
+            if response.status == 404 and data.count("detail") != 0:
                 raise PlayerNotFoundResponse
             if response.status != 200:
                 raise AnotherError
 
-            data = await response.json()
             return data["name"]
 
 
