@@ -11,6 +11,7 @@ import (
 )
 
 func main() {
+	//TODO Logger
 	cfg, er := configs.LoadUsers("configs/users.yaml")
 	fmt.Println(cfg, er)
 	//svc, err := app.InitializeService()

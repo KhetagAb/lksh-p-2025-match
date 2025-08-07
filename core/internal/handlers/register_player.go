@@ -4,25 +4,26 @@ import (
 	"context"
 	"github.com/labstack/echo/v4"
 	"match/pkg/errs"
+	"strconv"
 )
 
 type (
-	ValidatePlayerService interface {
-		ValidateRegisterUser(ctx context.Context, tgUsername string) (string, error)
+	RegisterPlayerService interface {
+		RegisterUser(ctx context.Context, tgUsername string, tgId int64) (string, error)
 	}
 
-	ValidatePLayerHandler struct {
-		validatePlayerService ValidatePlayerService
+	RegisterPLayerHandler struct {
+		registerPlayerService RegisterPlayerService
 	}
 )
 
-func (h *ValidatePLayerHandler) ValidateRegisterUser(ectx echo.Context) error {
+func (h *RegisterPLayerHandler) RegisterUser(ectx echo.Context) error {
 	ctx := context.Background()
 	tgUsername := ectx.Param("tgUsername")
-
+	tgId, _ := strconv.ParseInt(ectx.Param("tgId"), 10, 64)
 	//logger.Infof(ctx, "Validating player username: %v", tgUsername)
 
-	playerName, err := h.validatePlayerService.ValidateRegisterUser(ctx, tgUsername)
+	playerName, err := h.registerPlayerService.RegisterUser(ctx, tgUsername, tgId)
 
 	if err != nil {
 		if _, ok := err.(*errs.PlayerNotFound); ok {
