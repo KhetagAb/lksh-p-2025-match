@@ -1,0 +1,11 @@
+name: check
+
+on: [push]
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: lint
+        uses: golangci/golangci-lint-action@v8.0.0
