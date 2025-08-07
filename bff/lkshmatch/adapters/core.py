@@ -26,7 +26,7 @@ class PlayerRegisterInfo:
 class SportSection:
     id: SportSectionId
     name: str
-
+    egl_name: str
 
 @dataclass
 class Player:
@@ -56,7 +56,7 @@ class GetPlayersBySportSections(ABC):
     async def players_by_sport_sections(self, section_id: SportSectionId) -> list[Player]:
         raise NotImplementedError
 
-class RegisterPlayerInSection(ABC):
+class RegisterPlayerInSportSection(ABC):
     @abstractmethod
-    async def register_player_in_sectoin(self, user: PlayerAddInfo, section_id: SportSectionId) -> str:
+    async def register_player_in_sport_sectoin(self, user: PlayerAddInfo, section_id: SportSectionId) -> None:
         raise NotImplementedError

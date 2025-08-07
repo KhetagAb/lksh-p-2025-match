@@ -1,5 +1,5 @@
 from bff.app.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
-                   PlayerAddInfo, SportSection, SportSectionId, RegisterPlayerInSection,
+                   PlayerAddInfo, SportSection, SportSectionId, RegisterPlayerInSportSection,
                    PlayerNotFound, UnknownError, PlayerRegisterInfo)
 import aiohttp
 from bff.app.config import settings
@@ -65,3 +65,11 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
 
             data = await response.json()
             return data["players"]
+
+
+class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
+    async def register_player_in_sport_sectoin(self, section_id: SportSectionId, user_id: PlayerRegisterInfo) -> None:
+        async with aiohttp.ClientSession() as session:
+            response = await session.get(API_URL)
+            if response.status != 200:
+                raise UnknownError
