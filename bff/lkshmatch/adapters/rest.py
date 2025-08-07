@@ -1,8 +1,8 @@
-from bff.app.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
+from bff.lkshmatch.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
                    PlayerAddInfo, SportSection, SportSectionId, RegisterPlayerInSportSection,
                    PlayerNotFound, UnknownError, PlayerRegisterInfo)
 import aiohttp
-from bff.app.config import settings
+from bff.lkshmatch.config import settings
 import json
 
 #TODO: Исправить, как - спросить у Хета
