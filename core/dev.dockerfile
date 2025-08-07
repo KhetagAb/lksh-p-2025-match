@@ -1,6 +1,6 @@
 FROM golang:1.23.8
 
-COPY .. /app
+COPY . /app
 WORKDIR /app
 
 RUN go build -o bin/match cmd/main.go
