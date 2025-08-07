@@ -2,7 +2,6 @@ package transport
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -36,5 +35,4 @@ func RunServer(server *echo.Echo) {
 		}
 	}()
 	<-quit
-	slog.Info("shutting down server...")
 }

@@ -1,12 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"log/slog"
 	"match/internal/transport"
 )
 
 func main() {
 	server := transport.GetServer()
-	fmt.Println("Pomidorka")
 	transport.RunServer(server)
+	awaitGracefulShutdown()
+}
+
+func awaitGracefulShutdown() {
+	slog.Info("shutting down server...")
 }
