@@ -54,7 +54,10 @@ class RestGetSportSections(GetSportSections):
                 raise UnknownError
 
             data = await response.json()
-            return data["sections"]
+            data_section = []
+            for i in data:
+                data_section.append(SportSection(i[0], i[1]))
+            return data_section
 
 
 class RestGetPlayersBySportSections(GetPlayersBySportSections):
@@ -65,7 +68,10 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
                 raise UnknownError
 
             data = await response.json()
-            return data["players"]
+            data_players = []
+            for i in data:
+                data_players.append(Player(i))
+            return data_players
 
 
 class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
