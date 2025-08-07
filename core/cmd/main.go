@@ -13,4 +13,5 @@ func main() {
 
 func awaitGracefulShutdown() {
 	slog.Info("shutting down server...")
+	// TODO: shut down database transactions & maybe wait a lil bit?
 }
