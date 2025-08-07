@@ -63,5 +63,5 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
             if response.status != 200:
                 raise UnknownError
 
-            data = response.json()
+            data = await response.json()
             return data["players"]
