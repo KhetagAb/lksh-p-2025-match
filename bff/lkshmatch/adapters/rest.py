@@ -5,7 +5,7 @@ import aiohttp
 from bff.app.config import settings
 import json
 
-API_URL = settings.CORE_HOST + ':' + settings.CORE_PORT
+API_URL = str(settings.CORE_HOST) + ':' + str(settings.CORE_PORT)
 
 
 class PlayerNotFoundResponse(PlayerNotFound):

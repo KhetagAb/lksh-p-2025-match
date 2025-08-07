@@ -31,7 +31,8 @@ class SportSection:
 @dataclass
 class Player:
     name: str
-    is_coach: bool
+    is_capitan: bool
+
 
 
 class ValidateRegisterUser(ABC):
@@ -58,5 +59,5 @@ class GetPlayersBySportSections(ABC):
 
 class RegisterPlayerInSportSection(ABC):
     @abstractmethod
-    async def register_player_in_sport_sectoin(self, user: PlayerAddInfo, section_id: SportSectionId) -> None:
+    async def register_player_in_sport_sectoin(self, user: PlayerRegisterInfo, section_id: SportSectionId) -> None:
         raise NotImplementedError
