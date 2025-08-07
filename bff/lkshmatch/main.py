@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+
 from lkshmatch.bot import router as bot_router
 from lkshmatch.config import settings
 
