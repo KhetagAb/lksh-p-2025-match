@@ -1,14 +1,33 @@
+import logging
+
 from telegram import Bot, Update
-from fastapi import APIRouter, Request
-from bff.config import TELEGRAM_TOKEN
+from fastapi import APIRouter, Request, FastAPI
 from telebot.async_telebot import AsyncTeleBot, Handler
 from telebot import types
+from contextlib import asynccontextmanager
 import asyncio
 import os
 import random
 from bff.lkshmatch.adapters import rest
 
-router = APIRouter()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    webhook_url = settings.get("WEBHOOK_URL")
+    await bot.set_webhook(
+        url=webhook_url,
+        drop_pending_updates=True
+    )
+    yield
+    await bot.delete_webhook()
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+@app.post('/webhook')
+async def webhook_start_bot(req: Request) -> None:
+    await bot.process_new_updates([types.Update.de_json(await req.json())])
 
 real_token = settings.get('MATCH_TELEGRAM_TOKEN')
 
@@ -73,8 +92,12 @@ def get_list_of_all_commands(sport: rest.SportSection) -> list[str]:
     return
 
 
+def set_name_of_team(old_team: str, new_team: str) -> None:
+    return
+
+
 # возвращает название команды, которое присвоила система
-def register_new_team(sport: rest.SportSection) -> str:
+def register_new_team(sport: rest.SportSection, tg_id: int) -> str:
     return "Team 228"
 
 
@@ -186,18 +209,27 @@ async def answer_to_buttons(mess: types.Message) -> None:
             return
         if f"create_{sport.en_name}" == mess.text:
             try:
-                team = register_new_team(sport)
+                team = register_new_team(sport, mess.from_user.id)
             except BaseException:
                 await bot.send_message(mess.chat.id, get_standart_message_to_exception())
                 return
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             markup.add(types.KeyboardButton())
             await bot.send_message(mess.chat.id,
-                                   f"Вы зарегистрировали новую команду. Название: {team}. Если захотите изменить название команды, нажмите set_name_{sport.en_name}_{team}",
+                                   f"Вы зарегистрировали новую команду. Название: {team}. Если захотите изменить название команды на новое_название, введите <set_name_{sport.en_name}_{team} новое_название>",
                                    reply_markup=markup)
             return
+        if f"set_name_{sport.en_name}_" == mess.text[:len(f"set_name_{sport.en_name}_")]:
+            team = mess.text.split('_')[3]
+            try:
+                new_team = mess.text.split(" ")[1]
+            except BaseException:
+                await bot.send_message(mess.chat.id, "Вы не ввели новое название команды")
+                return
+            msg = f"Название команды изменено на <{new_team}>"
+            try:
+                set_name_of_team(team, new_team)
+            except TeamNotFound:
+                pass
+
     await bot.send_message(mess.chat.id, "Я вас не понимаю.")
-
-
-if __name__ == "__main__":
-    asyncio.run(bot.polling())

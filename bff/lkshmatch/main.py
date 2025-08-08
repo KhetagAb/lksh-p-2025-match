@@ -13,4 +13,3 @@ def print_loaded_settings():
 
 app = FastAPI()
 print_loaded_settings()
-asyncio.run(telegram_bot.polling())
