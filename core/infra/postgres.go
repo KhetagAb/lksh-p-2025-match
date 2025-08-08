@@ -9,14 +9,21 @@ import (
 
 type Transaction struct{ pgx.Tx }
 
-func GetConnection() (*pgx.Conn, error) {
+func GetConnection() (context.Context, *pgx.Conn, error) {
 	ctx := context.Background()
-	conn, err := pgx.Connect(ctx, DBURL(&GetConfig().Database)) // TODO: add di
+	connection, err := pgx.Connect(ctx, DBURL(&GetConfig().Database)) // TODO: add di
 	if err != nil {
-		return conn, errors.New("postgres connection error")
+		return ctx, connection, errors.New("postgres connection error")
 	}
-	defer conn.Close(ctx)
-	return conn, nil
+	return ctx, connection, nil
+}
+
+func CloseConnection(ctx context.Context, connection pgx.Conn) error {
+	err := connection.Close(ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func OpenTransaction(s *Transaction) (context.Context, pgx.Tx, error) {
@@ -33,6 +40,9 @@ func CloseTransaction(s *Transaction, ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	defer s.Rollback(ctx)
+	err = s.Rollback(ctx)
+	if err != nil {
+		return err
+	}
 	return nil
 }
