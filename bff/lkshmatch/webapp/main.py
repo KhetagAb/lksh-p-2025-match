@@ -22,18 +22,17 @@ templates = Jinja2Templates('templates')
 app.include_router(auth_router, prefix="/auth")
 #app.mount('/', static_files, name='static')
 
-def check_user_in_whitelist(user_id: str):
-    return (user_id in WHITELIST)
-
 add_user = StubAddUser()
 get_sections = StubGetSections()
 list_from_sections = StubListFromSections()
 
 # await add_user.add_user(user=PlayerAddInfo("lol"))
 
+class User:
+    username: str
+
 @app.get("/")
 async def root(request: Request, username: str = "UU"):
-    print("SHDJFU")
     return templates.TemplateResponse(name='index.html',
                                       context={'request': request,
                                                'username': username})
@@ -69,7 +68,7 @@ async def dispatch(request: Request, call_next) -> Response:
         return await call_next(request)
 
     token = request.cookies.get(COOKIE_NAME)
-    login_wall = templates.TemplateResponse('login.html',
+    login_wall = templates.TemplateResponse('auth/login.html',
                                           context={'request': request})
     if not token:
         return login_wall
@@ -80,8 +79,5 @@ async def dispatch(request: Request, call_next) -> Response:
         return login_wall
 
     user_id = token_parts['user_id']
-    if not check_user_in_whitelist(user_id):
-        return templates.TemplateResponse('bad_user_id.html',
-                                          context={'request': request})
 
     return await call_next(request)

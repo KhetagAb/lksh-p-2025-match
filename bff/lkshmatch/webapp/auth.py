@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Query
 from fastapi.requests import Request
 from fastapi.responses import PlainTextResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
 from jose import jwt
 
 from vars import BOT_TOKEN_HASH, JWT_SECRET_KEY, COOKIE_NAME, ALGORITHM
