@@ -16,7 +16,7 @@ func RegisterEndpoints(server *echo.Echo) {
 	server.GET("/ping", handlers.PingPong)
 	// registering endpoints here
 	// TODO прокинуть сервис игрока
-	server.GET("/", handlers.Handler{}.ValidateRegisterUser)
+	server.GET("/", handlers.Handler.ValidateRegisterUser)
 }
 
 func GetServer() *echo.Echo {
