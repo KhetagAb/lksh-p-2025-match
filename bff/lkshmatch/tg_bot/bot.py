@@ -14,6 +14,7 @@ real_token = settings.get('MATCH_TELEGRAM_TOKEN')
 if real_token:
     bot = AsyncTeleBot(real_token)
 else:
+    # TODO: log error and continue work, because we have other frontends
     exit()
 
 def sign_up_to_sport(sport: str) -> str:
