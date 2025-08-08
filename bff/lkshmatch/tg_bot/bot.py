@@ -9,7 +9,7 @@ import random
 from bff.lkshmatch.adapters import rest
 router = APIRouter()
 
-real_token = os.getenv(TELEGRAM_TOKEN)
+real_token = settings.get('MATCH_TELEGRAM_TOKEN')
 
 if real_token:
     bot = AsyncTeleBot(real_token)
