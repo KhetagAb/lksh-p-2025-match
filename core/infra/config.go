@@ -51,7 +51,7 @@ type (
 )
 
 func DBURL(s *DatabaseConfig) string {
-	return fmt.Sprintf("postgres://", s.Username, ":", s.Password, "@", s.URL, ":", s.Port, "/", s.Name)
+	return "postgres://" + s.Username + ":" + s.Password + "@" + s.URL + ":" + string(s.Port) + "/" + s.Name
 }
 
 func LoadConfig(path string) (*Config, error) {
