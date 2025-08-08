@@ -10,11 +10,12 @@ from bff.lkshmatch.adapters import rest
 
 router = APIRouter()
 
-real_token = os.getenv(TELEGRAM_TOKEN)
+real_token = settings.get('MATCH_TELEGRAM_TOKEN')
 
 if real_token:
     bot = AsyncTeleBot(real_token)
 else:
+    # TODO: log error and continue work, because we have other frontends
     exit()
 
 
