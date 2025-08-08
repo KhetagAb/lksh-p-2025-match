@@ -34,5 +34,8 @@ go.work.sum
 # Direnv
 .direnv
 
+# Accord
+bff/app/tg_bot/accord.txt
+
 # Python
 __pycache__/
