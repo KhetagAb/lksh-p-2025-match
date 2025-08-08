@@ -7,6 +7,7 @@ import asyncio
 import os
 import random
 from bff.lkshmatch.adapters import rest
+
 router = APIRouter()
 
 real_token = os.getenv(TELEGRAM_TOKEN)
@@ -16,15 +17,18 @@ if real_token:
 else:
     exit()
 
+
 def sign_up_to_sport(sport: str) -> str:
     pass
 
 
+# Не будет использоваться в дальнейшем
 def add_accord(tg_id, real_id) -> None:
     with open("accord.txt", 'a') as file:
         file.write(str(tg_id) + ';' + str(real_id) + '\n')
 
 
+# Не будет использоваться в дальнейшем
 def get_id(tg_id) -> str:
     tg_id = str(tg_id)
     print(tg_id)
@@ -63,14 +67,28 @@ def get_role(id: int, sport: str) -> str:
     return ['admin', 'user', 'captain'][random.randrange(3)]
 
 
+# список всех команд по названию спорта
+def get_list_of_all_commands(sport: rest.SportSection) -> list[str]:
+    return
+
+
+# возвращает название команды, которое присвоила система
+def register_new_team(sport: rest.SportSection) -> str:
+    return "Team 228"
+
+
+def get_standart_message_to_exception() -> str:
+    return "Извините, что-то пошло не так. Повторите позже или обратитесь в 4ый комповник."
+
+
 def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboardMarkup:
     role = get_role(int(get_id(mess.from_user.id)), sport)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     data_for_buttons = []
     if role == "user":
-        data_for_buttons = ["/create_team", "/teams", "/join_team", "/approuve"]
+        data_for_buttons = ["/create_team", "/teams", "/join_team", "/approve_member_join"]
     elif role == "captain":
-        data_for_buttons = ["/teams", "/approuve", "/delete_team"]
+        data_for_buttons = ["/teams", "/approve_member_join", "/delete_team"]
     elif role == "admin":
         pass
     buttons = map(types.KeyboardButton, map(lambda x: x + f" {sport}", data_for_buttons))
@@ -79,7 +97,7 @@ def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboa
 
 
 @bot.message_handler(commands=['start'])
-async def start(mess):
+async def start(mess: types.Message) -> None:
     chat_id = mess.chat.id
     user_id = mess.from_user.id
     username = mess.from_user.username
@@ -91,7 +109,7 @@ async def start(mess):
     except rest.PlayerNotFound:
         msg = "Извините, но вас нет в списках. Подойдите в 4ый комповник."
     except BaseException:
-        msg = "Извините, что-то пошло не так. Повторите позже или обратитесь в 4ый комповник."
+        msg = get_standart_message_to_exception()
     if "Извините, " not in msg:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button1 = types.KeyboardButton("Это я, регистрацию подтверждаю.")
@@ -105,25 +123,20 @@ async def start(mess):
 
 
 @bot.message_handler(commands=['register_on_sport'])
-async def register_on_sport(mess):
+async def register_on_sport(mess: types.Message) -> None:
     if await fuse_nf(mess):
         return
     markup = await make_sports_buttons()
     await bot.send_message(mess.chat.id, "Выберите секцию", reply_markup=markup)
 
 
-@bot.message_handler(content_types=['/create_team'])
-async def tg_create_team(mess: types.Message):
-    if await fuse_nf(mess):
-        return
-
-
 @bot.message_handler(content_types=['text'])
-async def answer_to_buttons(mess: types.Message):
+async def answer_to_buttons(mess: types.Message) -> None:
     if mess.text == "Это я, регистрацию подтверждаю.":
         if await fuse_not_nf(mess):
             return
-        response = await rest.RestRegisterUser().register_user(rest.PlayerAddInfo(mess.from_user.username, mess.from_user.id))
+        response = await rest.RestRegisterUser().register_user(
+            rest.PlayerAddInfo(mess.from_user.username, mess.from_user.id))
         add_accord(mess.from_user.id, response)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button = types.KeyboardButton("/register_on_sport")
@@ -138,37 +151,50 @@ async def answer_to_buttons(mess: types.Message):
     if mess.text == "Нет, это не я. Отмена регистрации.":
         if await fuse_not_nf(mess):
             return
-        await bot.send_message(mess.chat.id, "Регистрация отменена. Если хотите зарегистрироваться, подойдите в 4ый комповник.")
+        await bot.send_message(mess.chat.id,
+                               "Регистрация отменена. Если хотите зарегистрироваться, подойдите в 4ый комповник.")
         return
     if await fuse_nf(mess):
         return
     for sport in await rest.RestGetSportSections().get_sections():
         if sport == mess.text:
+            try:
+                await bot.send_message(mess.chat.id, f"Список участников секции {sport.name}:\n" + '\n'.join(
+                    await rest.RestGetPlayersBySportSections().players_by_sport_sections(sport)))
+            except BaseException:
+                await bot.send_message(mess.chat.id, get_standart_message_to_exception())
+                return
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            button1 = types.KeyboardButton(f"list_{sport.name}")
-            button2 = types.KeyboardButton(f"signup_{sport.name}")
+            button1 = types.KeyboardButton(f"create_{sport.en_name}")
+            button2 = types.KeyboardButton(f"signup_{sport.en_name}")
             markup.add(button1, button2)
             await bot.send_message(mess.chat.id,
-                                   f"Вы можете посмотреть список участников секции {sport.name} с помощью кнопки list_{sport},"
-                                   f" или записаться в секцию по кнопке signup_{sport.name}",
+                                   f"Вы можете создать свою команду с помощью кнопки create_{sport.en_name},"
+                                   f" или записаться в уже существующую, нажав на кнопку signup_{sport.en_name}",
                                    reply_markup=markup)
             return
-        if f"list_{sport.name}" == mess.text:
-            await bot.send_message(mess.chat.id, '\n'.join(await rest.RestGetPlayersBySportSections().players_by_sport_sections(sport)))
+        if f"signup_{sport.en_name}" == mess.text:
+            buttons = []
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            for team in get_list_of_all_commands(sport):
+                buttons.append(types.KeyboardButton(f"{sport.en_name}: {team}"))
+            markup.add(*buttons)
+            await bot.send_message(mess.chat.id,
+                                   f"Для выбора команды с названием название_команды нажмите кнопку <{sport.en_name}: название команды>",
+                                   reply_markup=markup)
             return
-        if f"signup_{sport.name}" == mess.text:
-            msg = f"Вы зарегистрировались в секцию {sport.name}"
+        if f"create_{sport.en_name}" == mess.text:
             try:
-                register_player_sport_section(get_id(mess.from_user.id), sport)
-            except RegistrationOver:
-                msg = f"Извините, но регистрация в секцию {sport.name} уже закончилась"
-            except AlreadyRegistered:
-                msg = f"Вы уже зарегистрированы в секцию {sport.name}"
+                team = register_new_team(sport)
             except BaseException:
-                msg = "Извините, что-то пошло не так. Повторите позже или обратитесь в 4ый комповник."
-            await bot.send_message(mess.chat.id, msg)
+                await bot.send_message(mess.chat.id, get_standart_message_to_exception())
+                return
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            markup.add(types.KeyboardButton())
+            await bot.send_message(mess.chat.id,
+                                   f"Вы зарегистрировали новую команду. Название: {team}. Если захотите изменить название команды, нажмите set_name_{sport.en_name}_{team}",
+                                   reply_markup=markup)
             return
-
     await bot.send_message(mess.chat.id, "Я вас не понимаю.")
 
 
