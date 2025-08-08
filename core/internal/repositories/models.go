@@ -4,7 +4,7 @@ import "time"
 
 // table sports
 type Sport struct {
-	ID    int
+	ID    int64
 	Title string
 }
 
