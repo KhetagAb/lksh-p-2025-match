@@ -1,6 +1,6 @@
 from telegram import Bot, Update
 from fastapi import APIRouter, Request
-# from app.config import settings
+from bff.config import TELEGRAM_TOKEN
 from telebot.async_telebot import AsyncTeleBot, Handler
 from telebot import types
 import asyncio
@@ -9,19 +9,12 @@ import random
 from bff.lkshmatch.adapters import rest
 router = APIRouter()
 
-real_token = os.getenv("TELEGRAM_TOKEN")
-bot = AsyncTeleBot(real_token)
+real_token = os.getenv(TELEGRAM_TOKEN)
 
-# Register handlers
-# TODO
-#
-# @router.post(f"/webhook/{config.settings.telegram_token}")
-# async def webhook(request: Request):
-#     data = await request.json()
-#     update = Update.de_json(data, bot)
-#     dispatcher.process_update(update)
-#     return {"ok": True}
-
+if real_token:
+    bot = AsyncTeleBot(real_token)
+else:
+    exit()
 
 def sign_up_to_sport(sport: str) -> str:
     pass
@@ -41,22 +34,6 @@ def get_id(tg_id) -> str:
             if tg_id == line.split(';')[0]:
                 return line.split(';')[1]
         return 'nf'
-
-
-def validate_register_user(tg_id: int, username: str) -> str:
-    return "Vasya Pupkin"
-
-
-def register_user(tg_id: int, username: str) -> int:
-    return 228356789
-
-
-def get_players_by_sport_section(sport: str) -> list[str]:
-    return ['Vasya', 'Petya']
-
-
-def register_player_sport_section(real_id, sport) -> None:
-    return
 
 
 async def make_sports_buttons() -> types.ReplyKeyboardMarkup:
@@ -177,10 +154,6 @@ async def answer_to_buttons(mess: types.Message):
                                    reply_markup=markup)
             return
         if f"list_{sport.name}" == mess.text:
-            d = {"Волейбол": "Tennis",
-                 "Футбол": "Football",
-                 "Хоккей": "Hockey",
-                 "Теннис": "Tennis"}
             await bot.send_message(mess.chat.id, '\n'.join(await rest.RestGetPlayersBySportSections().players_by_sport_sections(sport)))
             return
         if f"signup_{sport.name}" == mess.text:
