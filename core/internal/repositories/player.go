@@ -38,7 +38,7 @@ func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*Player, error) 
 
 	err := p.pool.QueryRow(ctx, query, id).Scan(&id, &name, &username, &telegramID)
 	if err != nil {
-		return nil, &ErrNotFound
+		return nil, &ErrSelecting
 	}
 
 	return &Player{id, name, username, telegramID}, nil
@@ -56,7 +56,7 @@ func (p *Players) GetPlayerByTelegramID(ctx context.Context, telegramID int64) (
 
 	err := p.pool.QueryRow(ctx, query, telegramID).Scan(&id, &name, &username, &telegramID)
 	if err != nil {
-		return nil, &ErrNotFound
+		return nil, &ErrSelecting
 	}
 
 	return &Player{id, name, username, telegramID}, nil
