@@ -16,7 +16,6 @@ type (
 		HTTP     HTTPConfig     `mapstructure:"http"`
 		Database DatabaseConfig `mapstructure:"database"`
 		Web      WebConfig      `mapstructure:"web"`
-		TgBot    TgBotConfig    `mapstructure:"tg-bot"`
 	}
 
 	DatabaseConfig struct {
@@ -25,7 +24,6 @@ type (
 		Port     int32  `mapstructure:"port"`
 		Password string `mapstructure:"password"`
 		Host     string `mapstructure:"host"`
-		URL      string
 	}
 
 	WebConfig struct {
@@ -33,10 +31,6 @@ type (
 		Password string `mapstructure:"password"`
 		Port     int32  `mapstructure:"port"`
 	}
-	TgBotConfig struct {
-		Token string `mapstructure:"token"`
-	}
-
 	AppConfig struct {
 		Name    string `mapstructure:"name"`
 		Version string `mapstructure:"version"`
@@ -51,7 +45,7 @@ type (
 )
 
 func DBURL(s *DatabaseConfig) string {
-	return "postgres://" + s.Username + ":" + s.Password + "@" + s.URL + ":" + string(s.Port) + "/" + s.Name
+	return "postgres://" + s.Username + ":" + s.Password + "@" + s.Host + ":" + string(s.Port) + "/" + s.Name
 }
 
 func LoadConfig(path string) (*Config, error) {
