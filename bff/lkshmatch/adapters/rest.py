@@ -84,7 +84,3 @@ class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
             response = await session.get(f'{API_URL}/register_player_in_sport_sectoin', params=query)
             if response.status != 200:
                 raise UnknownError
-
-
-
-

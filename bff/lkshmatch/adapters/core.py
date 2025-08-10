@@ -67,6 +67,3 @@ class GetPlayersBySportSections(ABC):
 class RegisterPlayerInSportSection(ABC):
     async def register_player_in_sport_sectoin(self, section_id: SportSection, user_id: PlayerRegisterInfo) -> None:
         raise NotImplementedError
-
-
-
