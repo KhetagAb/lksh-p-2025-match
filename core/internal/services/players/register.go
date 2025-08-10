@@ -2,22 +2,53 @@ package players
 
 import (
 	"context"
+	"fmt"
+	"match/internal/repositories"
 	"match/pkg/errs"
 )
 
-type TgUsernameToName interface {
-	GetTgUsernameToName() map[string]string
-}
+type (
+	TgUsernameToName interface {
+		ConvertTgUsernameToName() map[string]string
+	}
 
-type PlayerService struct {
-	tgUsernameToName TgUsernameToName
-}
+	PlayerRep interface {
+		CreatePlayer(ctx context.Context, name, username string, telegramID int64) (*int64, error)
+		// TODO возвращать доменный объект
+		GetPlayerByTelegramID(ctx context.Context, telegramID int64) (*repositories.Player, error)
+	}
 
-func (s *PlayerService) ValidateRegisterUser(ctx context.Context, tgUsername string) (string, error) {
-	tgUserNameToName := s.tgUsernameToName.GetTgUsernameToName()
-	val, ok := tgUserNameToName[tgUsername]
+	PlayerService struct {
+		repository       PlayerRep
+		tgUsernameToName TgUsernameToName
+	}
+)
+
+func (s *PlayerService) ValidateRegisterUser(ctx context.Context, tgUsername string, tgId int64) (string, error) {
+	name := s.tgUsernameToName.ConvertTgUsernameToName()
+	val, ok := name[tgUsername]
 	if ok {
 		return val, nil
 	}
+	_, err := s.repository.GetPlayerByTelegramID(ctx, tgId)
+	if err == nil {
+		return "", &errs.PlayerAlreadyExists{}
+	}
+
 	return "", &errs.PlayerNotFound{}
+}
+
+func (s *PlayerService) RegisterUser(ctx context.Context, tgUsername string, tgId int64) (string, *int64, error) {
+	fullName, err := s.ValidateRegisterUser(ctx, tgUsername, tgId)
+	var zero int64 = 0
+	if err != nil {
+		return "", &zero, fmt.Errorf("cannot validate user registration [tgUsername=%v] [tgId=%v]", tgUsername, tgId)
+	}
+
+	id, err := s.repository.CreatePlayer(ctx, fullName, tgUsername, tgId)
+	if err != nil {
+		return "", &zero, err
+	}
+	return fullName, id, nil
+
 }
