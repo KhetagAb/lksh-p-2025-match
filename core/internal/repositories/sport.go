@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"match/internal/domain"
 )
 
 type Sports struct {
@@ -21,7 +23,7 @@ func (s *Sports) CreateSport(ctx context.Context, title string) (*int64, error) 
 	var id int64
 	err := s.pool.QueryRow(ctx, query, title).Scan(&id)
 	if err != nil {
-		return nil, &ErrInserting
+		return nil, &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
 	}
 
 	return &id, nil
@@ -37,7 +39,7 @@ func (s *Sports) GetSportByID(ctx context.Context, id int64) (*Sport, error) {
 	var title string
 	err := s.pool.QueryRow(ctx, query, id).Scan(&id, &title)
 	if err != nil {
-		return nil, &ErrSelecting
+		return nil, &domain.NotFoundError{Code: domain.NotFound, Message: err.Error()}
 	}
 
 	return &Sport{id, title}, nil
@@ -52,7 +54,7 @@ func (s *Sports) DeleteSportByID(ctx context.Context, id int64) error {
 
 	_, err := s.pool.Exec(ctx, query, id)
 	if err != nil {
-		return &ErrDeleting
+		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
 	}
 
 	return nil
