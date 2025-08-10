@@ -1,30 +1,24 @@
-from adapters.stub import StubAddUser, StubGetSections, StubListFromSections, PlayerAddInfo
+from bff.lkshmatch.webapp.vars import JWT_SECRET_KEY, COOKIE_NAME, ALGORITHM
+from bff.lkshmatch.webapp.auth import auth_router
+from bff.lkshmatch.adapters.rest import RestGetSportSections, RestGetPlayersBySportSections
+
 from jose import JWTError, jwt
-import urllib
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-import hmac
-from typing import Annotated
 
 # from fastapi.responses import HTMLResponse, FileResponse
-from fastapi import FastAPI, Request, HTTPException, APIRouter, Query
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
-from fastapi.responses import PlainTextResponse, RedirectResponse, Response
-
-from vars import BOT_TOKEN_HASH, JWT_SECRET_KEY, COOKIE_NAME, ALGORITHM
-from auth import auth_router
+from fastapi.responses import RedirectResponse, Response
 
 app = FastAPI()
-templates = Jinja2Templates('templates')
+templates = Jinja2Templates('bff/app/templates')
 #static_files = HTMLStaticFiles(directory='site/')
 
 app.include_router(auth_router, prefix="/auth")
 #app.mount('/', static_files, name='static')
 
-add_user = StubAddUser()
-get_sections = StubGetSections()
-list_from_sections = StubListFromSections()
+get_sections = RestGetSportSections()
+list_from_sections = RestGetPlayersBySportSections()
 
 # await add_user.add_user(user=PlayerAddInfo("lol"))
 
