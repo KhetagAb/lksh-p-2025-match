@@ -45,9 +45,9 @@ type (
 	}
 )
 
-func DBURL(s *DatabaseConfig) string {
-	return "postgres://" + s.Username + ":" + s.Password + "@" + s.Host + ":" + string(s.Port) + "/" + s.Name
-}
+//func getPostgresURI(s *DatabaseConfig) string {
+//	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", s.Username, s.Password, s.Host, s.Port, s.Name)
+//}
 
 func LoadConfig(path string) (*Config, error) {
 	_ = godotenv.Load()

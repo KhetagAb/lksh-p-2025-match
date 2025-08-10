@@ -16,16 +16,14 @@ services:
     image: postgres:16.3
     container_name: postgres
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PORT: ${DB_PORT}
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_PASSWORD: ${DB_PASS}
-    volumes:
-      - ./db:/var/lib/postgresql/data
+      POSTGRES_USER: ${DB_POSTGRES_USER}
+      POSTGRES_PORT: ${DB_POSTGRES_PORT}
+      POSTGRES_DB: ${DB_POSTGRES_NAME}
+      POSTGRES_PASSWORD: ${DB_POSTGRES_PASS}
     networks:
       - backend_test
     ports:
-      - ${DB_PORT}:${DB_PORT}
+      - ${DB_POSTGRES_PORT}:${DB_POSTGRES_PORT}
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
       interval: 10s
