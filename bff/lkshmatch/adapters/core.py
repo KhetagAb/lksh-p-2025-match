@@ -8,6 +8,15 @@ PlayerId = NewType("PlayerId", int)
 class PlayerNotFound(Exception):
     pass
 
+class TeamIsFull(Exception):
+    pass
+
+class NameTeamReserveError(Exception):
+    pass
+
+class PlayerAlreadyInTeam(Exception):
+    pass
+
 class UnknownError(Exception):
     pass
 
@@ -25,6 +34,13 @@ class PlayerRegisterInfo:
 class SportSection:
     name: str
     en_name: str
+
+@dataclass
+class Team:
+    name: str
+    id: int
+    name_sport_section: str
+    capitan_id: int
 
 class ValidateRegisterUser(ABC):
     @abstractmethod
@@ -45,7 +61,7 @@ class GetSportSections(ABC):
 
 class GetPlayersBySportSections(ABC):
     @abstractmethod
-    async def players_by_sport_sections(self, section_id: SportSection) -> list[PlayerRegisterInfo]:
+    async def get_players_by_sport_sections(self, section_id: SportSection) -> list[PlayerRegisterInfo]:
         raise NotImplementedError
 
 class RegisterPlayerInSportSection(ABC):
