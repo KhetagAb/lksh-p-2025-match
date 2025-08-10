@@ -1,11 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Main page</title>
-    <meta charset="utf-8" />
-</head>
-<body>
-    <h2>Main page</h2>
-    <a href="/sections">Список видов спорта</a>
-</body>
-</html>
+{% extends "basic_interface.html" %}
+
+{% block title %}
+Главная страница
+{% endblock %}
+
+{% block content %}
+
+<h2>Главная страница</h2>
+<a href="/sections?username={{ username }}">Список видов спорта</a>
+
+{% endblock %}

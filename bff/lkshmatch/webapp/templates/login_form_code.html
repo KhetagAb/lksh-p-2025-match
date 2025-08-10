@@ -1,0 +1,11 @@
+{% extends "login_forms.html" %}
+
+{% block content %}
+
+<form action="/login/code">
+    <label for="code">Введите код, который отправил telegram-bot:</label><br>
+    <input type="number" id="username" name="code" required autofocus><br>
+    <input type="submit" value="Отправить">
+</form> 
+
+{% endblock %}
