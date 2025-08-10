@@ -39,8 +39,5 @@ go.work.sum
 /.idea
 /core/internal/generated/app/wire_gen.go
 
-# Accord
-bff/app/tg_bot/accord.txt
-
 # Python
 __pycache__/
