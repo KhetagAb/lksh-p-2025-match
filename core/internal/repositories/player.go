@@ -13,7 +13,7 @@ type Players struct {
 func (p *Players) CreatePlayer(ctx context.Context, name, username string, telegramID int64) (*int64, error) {
 	query := `
         INSERT INTO players (name, username, telegram_id)
-        VALUES ($1, $2)
+        VALUES ($1, $2, $3)
         RETURNING id
     `
 
