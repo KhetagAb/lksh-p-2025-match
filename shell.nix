@@ -1,9 +1,15 @@
-{ pkgs ? import <nixpkgs> { } }:
+{
+  pkgs ? import <nixpkgs> { },
+}:
 
-let pyproject = pkgs.lib.importTOML ./bff/pyproject.toml;
-in pkgs.mkShell {
+let
+  pyproject = pkgs.lib.importTOML ./bff/pyproject.toml;
+  dishka = pkgs.callPackage ./dishka.nix { };
+in
+pkgs.mkShell {
   packages = [
-    (pkgs.python3.withPackages (p:
+    (pkgs.python3.withPackages (
+      p:
       with p;
       [
         fastapi
@@ -12,6 +18,7 @@ in pkgs.mkShell {
         sqlalchemy
         pydantic
         dynaconf
+        dishka
         python-jose
         (pkgs.python3Packages.mkPythonEditablePackage {
           pname = pyproject.project.name;
@@ -19,7 +26,9 @@ in pkgs.mkShell {
 
           root = "$PWD/bff";
         })
-      ] ++ uvicorn.optional-dependencies.standard
-      ++ fastapi.optional-dependencies.standard))
+      ]
+      ++ uvicorn.optional-dependencies.standard
+      ++ fastapi.optional-dependencies.standard
+    ))
   ];
 }
