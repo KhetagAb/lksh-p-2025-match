@@ -22,7 +22,7 @@ class RestValidateRegisterUser(ValidateRegisterUser):
     async def validate_register_user(self, user: PlayerAddInfo) -> str:
         async with aiohttp.ClientSession() as session:
             query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
-            response = await session.get(API_URL, params=query)
+            response = await session.get(API_URL + '/validate_register_user', params=query)
 
             data = await response.json()
 
@@ -38,7 +38,7 @@ class RestRegisterUser(RegisterUser):
     async def register_user(self, user: PlayerAddInfo) -> PlayerRegisterInfo:
         async with aiohttp.ClientSession() as session:
             query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
-            response = await session.get(API_URL, params=query)
+            response = await session.get(API_URL + '/register_user', params=query)
 
             if response.status != 200:
                 raise UnknownError
@@ -50,7 +50,7 @@ class RestRegisterUser(RegisterUser):
 class RestGetSportSections(GetSportSections):
     async def get_sections(self) -> list[SportSection]:
         async with aiohttp.ClientSession() as session:
-            response = await session.get(API_URL)
+            response = await session.get(API_URL + '/get_sections')
             if response.status != 200:
                 raise UnknownError
 
@@ -65,7 +65,7 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
     async def get_players_by_sport_sections(self, section: SportSection) -> list[PlayerRegisterInfo]:
         async with aiohttp.ClientSession() as session:
             query = {"name_section": section.en_name}
-            response = await session.get(API_URL, params=query)
+            response = await session.get(API_URL + '/get_players_by_sport_sections', params=query)
             if response.status != 200:
                 raise UnknownError
 
@@ -80,7 +80,7 @@ class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
     async def register_player_in_sport_sectoin(self, section: SportSection, user: PlayerRegisterInfo) -> None:
         async with aiohttp.ClientSession() as session:
             query = {"name_section": section.en_name, "user_id": user.id}
-            response = await session.get(API_URL, params=query)
+            response = await session.get(API_URL + '/register_player_in_sport_sectoin', params=query)
             if response.status != 200:
                 raise UnknownError
 
