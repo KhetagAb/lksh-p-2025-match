@@ -19,7 +19,7 @@ from .vars import ALGORITHM, BOT_TOKEN_HASH, COOKIE_NAME, JWT_SECRET_KEY
 app = FastAPI()
 container = make_async_container(*all_providers())
 setup_dishka(container, app)
-templates = Jinja2Templates("templates")
+templates = Jinja2Templates("bff/lkshmatch/webapp/templates")
 # static_files = HTMLStaticFiles(directory='site/')
 
 app.include_router(auth_router, prefix="/auth")
@@ -44,14 +44,12 @@ async def root(request: Request, username: str = "UU"):
 async def sections(
     request: Request,
     get_sections: FromDishka[GetSportSections],
-    username: str = "UU",
 ):
     return templates.TemplateResponse(
         name="sections.html",
         context={
             "request": request,
             "list_of_sections": await get_sections.get_sections(),
-            "username": username,
         },
     )
 
@@ -79,7 +77,7 @@ async def get_list(
 
 @app.get("/sections/{section_name}/reg")
 async def registration(
-    request: Request, section_name: str, username: str = "UU"
+    request: Request, section_name: str
 ):
     # user registration
     return RedirectResponse("/sections/" + section_name)
