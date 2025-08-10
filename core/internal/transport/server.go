@@ -2,6 +2,7 @@ package transport
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,7 +12,7 @@ import (
 )
 
 func RegisterEndpoints(server *echo.Echo) {
-	//server.GET("/ping", handlers.PingPong)
+	server.GET("/ping", PingPong)
 	// registering endpoints here
 	// TODO прокинуть сервис игрока
 	// TODO server.GET("/", handlers.Handler{}.ValidateRegisterUser
@@ -38,4 +39,8 @@ func RunServer(server *echo.Echo) {
 		}
 	}()
 	<-quit
+}
+
+func PingPong(c echo.Context) error {
+	return c.String(http.StatusOK, "pong")
 }

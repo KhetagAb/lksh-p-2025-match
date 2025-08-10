@@ -18,6 +18,9 @@ up: check
 test: check
 	docker-compose -f docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
+migrate: check
+	goose -dir migrations postgres $(uri) up
+
 run-local:
 	bin/match
 
