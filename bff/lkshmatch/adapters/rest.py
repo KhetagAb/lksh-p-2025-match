@@ -1,6 +1,8 @@
-from bff.lkshmatch.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
+from bff.lkshmatch.adapters.core import (ValidateRegisterUser, RegisterUser,
+                    GetSportSections, GetPlayersBySportSections,
                    PlayerAddInfo, SportSection, RegisterPlayerInSportSection,
-                   PlayerNotFound, UnknownError, PlayerRegisterInfo)
+                   PlayerNotFound, UnknownError, PlayerRegisterInfo, Team, NameTeamReserveError,
+                    PlayerAlreadyInTeam)
 import aiohttp
 from bff.lkshmatch.config import settings
 import json
@@ -21,7 +23,7 @@ class RestValidateRegisterUser(ValidateRegisterUser):
     async def validate_register_user(self, user: PlayerAddInfo) -> str:
         async with aiohttp.ClientSession() as session:
             query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
-            response = await session.get(API_URL, params=query)
+            response = await session.get(f'{API_URL}/validate_register_user', params=query)
 
             data = await response.json()
 
@@ -37,7 +39,7 @@ class RestRegisterUser(RegisterUser):
     async def register_user(self, user: PlayerAddInfo) -> PlayerRegisterInfo:
         async with aiohttp.ClientSession() as session:
             query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
-            response = await session.get(API_URL, params=query)
+            response = await session.get(f'{API_URL}/register_user', params=query)
 
             if response.status != 200:
                 raise UnknownError
@@ -49,28 +51,36 @@ class RestRegisterUser(RegisterUser):
 class RestGetSportSections(GetSportSections):
     async def get_sections(self) -> list[SportSection]:
         async with aiohttp.ClientSession() as session:
-            response = await session.get(API_URL)
+            response = await session.get(f'{API_URL}/get_sections')
             if response.status != 200:
                 raise UnknownError
 
             data = await response.json()
-            return data["sections"]
+            return [
+                SportSection(name, en_name)
+                for name, en_name in data
+            ]
 
 
 class RestGetPlayersBySportSections(GetPlayersBySportSections):
-    async def players_by_sport_sections(self, section: SportSection) -> list[str]:
+    async def get_players_by_sport_sections(self, section: SportSection) -> list[PlayerRegisterInfo]:
         async with aiohttp.ClientSession() as session:
-            response = await session.get(API_URL)
+            query = {"name_section": section.en_name}
+            response = await session.get(f'{API_URL}/get_players_by_sport_sections', params=query)
             if response.status != 200:
                 raise UnknownError
 
             data = await response.json()
-            return data["players"]
+            return [
+                PlayerRegisterInfo(name, id_player)
+                for name, id_player in data
+                ]
 
 
 class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
-    async def register_player_in_sport_sectoin(self, section: SportSection, user_id: PlayerRegisterInfo) -> None:
+    async def register_player_in_sport_sectoin(self, section: SportSection, user: PlayerRegisterInfo) -> None:
         async with aiohttp.ClientSession() as session:
-            response = await session.get(API_URL)
+            query = {"name_section": section.en_name, "user_id": user.id}
+            response = await session.get(f'{API_URL}/register_player_in_sport_sectoin', params=query)
             if response.status != 200:
                 raise UnknownError
