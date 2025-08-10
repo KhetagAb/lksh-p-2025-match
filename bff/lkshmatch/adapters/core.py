@@ -4,6 +4,9 @@ from os.path import extsep
 from typing import NewType
 
 PlayerId = NewType("PlayerId", int)
+TeamId= NewType("TeamId", int)
+SportSectionId = NewType("SportSectionId", int)
+SportSectionName = NewType("SportSectionName", str)
 
 class PlayerNotFound(Exception):
     pass
@@ -42,6 +45,17 @@ class Team:
     name_sport_section: str
     capitan_id: int
 
+@dataclass
+class data:
+    start:int
+    end:int
+
+
+@dataclass
+class tournament:
+    id:int
+    sport_name:SportSectionName
+
 class ValidateRegisterUser(ABC):
     @abstractmethod
     async def validate_register_user(self, user: PlayerAddInfo) -> str:
@@ -52,18 +66,53 @@ class RegisterUser(ABC):
     async def register_user(self, user: PlayerAddInfo) -> PlayerRegisterInfo:
         raise NotImplementedError
 
-
 class GetSportSections(ABC):
     @abstractmethod
     async def get_sections(self) -> list[SportSection]:
         raise NotImplementedError
-
 
 class GetPlayersBySportSections(ABC):
     @abstractmethod
     async def get_players_by_sport_sections(self, section_id: SportSection) -> list[PlayerRegisterInfo]:
         raise NotImplementedError
 
-class RegisterPlayerInSportSection(ABC):
-    async def register_player_in_sport_sectoin(self, section_id: SportSection, user_id: PlayerRegisterInfo) -> None:
+class RegisterPlayerInSpotrSection(ABC):
+    @abstractmethod
+    async def register_player_in_sport_sectoin(self, user: PlayerAddInfo, section_id: SportSectionId) -> None:
+        raise NotImplementedError
+
+class CreateTournament(ABC):
+    @abstractmethod
+    async def create_tournament(self,data_tournament:data,sport_name:SportSectionName)-> None:
+        raise NotImplementedError
+
+class GetAllListTournament(ABC):
+    @abstractmethod
+    async def get_all_list_tournament(self)-> list[tournament]:
+        raise NotImplementedError
+
+class GetListTournament(ABC):
+    @abstractmethod
+    async def get_list_tournament(self,sport_name:SportSectionName)-> list[tournament]:
+        raise NotImplementedError
+
+class RegisterTeamInTournament(ABC):
+    @abstractmethod
+    async def registration_tesm_in_tournament(self,sport_name:SportSectionName)-> None:
+        raise NotImplementedError
+
+class UnRegisterTeamInTournament(ABC):
+    @abstractmethod
+    async def un_registration_team_in_tournament(self,sport_name:SportSectionName,player_cap_id:PlayerId)-> None:
+        raise NotImplementedError
+
+
+class RemoveTournament(ABC):
+    @abstractmethod
+    async def remove_tournament(self,sport_name:SportSectionName,player_cap_id:PlayerId)-> None:
+        raise NotImplementedError
+
+class ModifyTournament(ABC):
+    @abstractmethod
+    async def modify_tournament(self,sport_name:SportSectionName,player_cap_id:PlayerId)-> None:
         raise NotImplementedError
