@@ -3,7 +3,7 @@ package main
 import (
 	"log/slog"
 
-	"match/cmd/transport"
+	"match/internal/transport"
 )
 
 func main() {

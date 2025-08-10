@@ -8,33 +8,23 @@ import (
 )
 
 type (
-	TgUsernameToName interface {
-		ConvertTgUsernameToName() map[string]string
-	}
-
-	PlayerRep interface {
+	PlayerRepository interface {
 		CreatePlayer(ctx context.Context, name, username string, telegramID int64) (*int64, error)
 		// TODO возвращать доменный объект
 		GetPlayerByTelegramID(ctx context.Context, telegramID int64) (*repositories.Player, error)
 	}
 
 	PlayerService struct {
-		repository       PlayerRep
-		tgUsernameToName TgUsernameToName
+		repository PlayerRepository
 	}
 )
 
 func (s *PlayerService) ValidateRegisterUser(ctx context.Context, tgUsername string, tgId int64) (string, error) {
-	name := s.tgUsernameToName.ConvertTgUsernameToName()
-	val, ok := name[tgUsername]
-	if ok {
-		return val, nil
-	}
 	_, err := s.repository.GetPlayerByTelegramID(ctx, tgId)
+	// TODO почистить
 	if err == nil {
 		return "", &errs.PlayerAlreadyExists{}
 	}
-
 	return "", &errs.PlayerNotFound{}
 }
 

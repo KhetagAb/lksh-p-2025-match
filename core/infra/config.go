@@ -31,6 +31,7 @@ type (
 		Password string `mapstructure:"password"`
 		Port     int32  `mapstructure:"port"`
 	}
+
 	AppConfig struct {
 		Name    string `mapstructure:"name"`
 		Version string `mapstructure:"version"`
