@@ -2,19 +2,16 @@ package domain
 
 import "time"
 
-// table sports
 type Sport struct {
 	ID    int64
 	Title string
 }
 
-// table results
 type Result struct {
 	ID     int64
 	Result map[int64]int32
 }
 
-// table players
 type Player struct {
 	ID         int64
 	Name       string
@@ -22,7 +19,6 @@ type Player struct {
 	TelegramID int64
 }
 
-// table teams
 type Team struct {
 	ID        int64
 	Name      string
@@ -30,7 +26,6 @@ type Team struct {
 	CaptainID int64
 }
 
-// table matches
 type Match struct {
 	ID       int64
 	TourID   int64
@@ -39,7 +34,6 @@ type Match struct {
 	SportID  int64
 }
 
-// table tournaments
 type Tournament struct {
 	ID      int64
 	SportID int64
