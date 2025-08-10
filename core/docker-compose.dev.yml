@@ -24,6 +24,8 @@ services:
       POSTGRES_PASSWORD: ${DB_POSTGRES_PASS}
     ports:
       - ${DB_POSTGRES_PORT}:${DB_POSTGRES_PORT}
+    volumes:
+      - ./db:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_POSTGRES_USER}']
       interval: 10s

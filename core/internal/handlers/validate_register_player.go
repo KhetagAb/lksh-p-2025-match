@@ -8,14 +8,22 @@ import (
 )
 
 type (
-	ValidatePlayerService interface {
+	ValidateRegisterPlayerService interface {
 		ValidateRegisterUser(ctx context.Context, tgUsername string, tgId int64) error
 	}
 
 	ValidatePlayerHandler struct {
-		validatePlayerService ValidatePlayerService
+		validatePlayerService ValidateRegisterPlayerService
 	}
 )
+
+func NewValidatePlayerHandler(
+	validatePlayerService ValidateRegisterPlayerService,
+) *ValidatePlayerHandler {
+	return &ValidatePlayerHandler{
+		validatePlayerService: validatePlayerService,
+	}
+}
 
 func (h *ValidatePlayerHandler) ValidateRegisterUser(ectx echo.Context) error {
 	ctx := context.Background()

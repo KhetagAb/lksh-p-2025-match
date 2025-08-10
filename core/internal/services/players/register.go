@@ -18,6 +18,14 @@ type (
 	}
 )
 
+func NewPlayerService(
+	repository PlayerRepository,
+) *PlayerService {
+	return &PlayerService{
+		repository: repository,
+	}
+}
+
 func (s *PlayerService) ValidateRegisterUser(ctx context.Context, tgUsername string, tgId int64) error {
 	_, err := s.repository.GetPlayerByTelegramID(ctx, tgId)
 	var notFoundError *domain.NotFoundError
