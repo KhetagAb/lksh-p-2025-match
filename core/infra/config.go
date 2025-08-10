@@ -1,10 +1,12 @@
-package configs
+package infra
 
 import (
-	"github.com/joho/godotenv"
+	"fmt"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -14,13 +16,12 @@ type (
 		HTTP     HTTPConfig     `mapstructure:"http"`
 		Database DatabaseConfig `mapstructure:"database"`
 		Web      WebConfig      `mapstructure:"web"`
-		TgBot    TgBotConfig    `mapstructure:"tg"`
 	}
 
 	DatabaseConfig struct {
 		Name     string `mapstructure:"name"`
 		Username string `mapstructure:"username"`
-		Port     int64  `mapstructure:"port"`
+		Port     int32  `mapstructure:"port"`
 		Password string `mapstructure:"password"`
 		Host     string `mapstructure:"host"`
 	}
@@ -28,10 +29,7 @@ type (
 	WebConfig struct {
 		Host     string `mapstructure:"host"`
 		Password string `mapstructure:"password"`
-		Port     int64  `mapstructure:"port"`
-	}
-	TgBotConfig struct {
-		Token string `mapstructure:"token"`
+		Port     int32  `mapstructure:"port"`
 	}
 
 	AppConfig struct {
@@ -45,11 +43,11 @@ type (
 		WriteTimeout    time.Duration `mapstructure:"write_timeout"`
 		ShutdownTimeout time.Duration `mapstructure:"shutdown_timeout"`
 	}
-
-	Users struct {
-		Users []string `mapstructure:"users"`
-	}
 )
+
+func DBURL(s *DatabaseConfig) string {
+	return "postgres://" + s.Username + ":" + s.Password + "@" + s.Host + ":" + string(s.Port) + "/" + s.Name
+}
 
 func LoadConfig(path string) (*Config, error) {
 	_ = godotenv.Load()
@@ -71,19 +69,17 @@ func LoadConfig(path string) (*Config, error) {
 	return &cfg, nil
 }
 
-func LoadUsers(path string) (*Users, error) {
-	v := viper.New()
-	v.SetDefault("users", []string{"English"})
-	v.SetConfigFile(path)
+const defaultConfigPath = "configs/config.yaml"
 
-	if err := v.ReadInConfig(); err != nil {
-		return nil, err
+func GetConfig() *Config {
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = defaultConfigPath
 	}
 
-	var cfg Users
-	if err := v.Unmarshal(&cfg); err != nil {
-		return nil, err
+	cfg, err := LoadConfig(configPath)
+	if err != nil {
+		panic(fmt.Sprintf("failed to load configuration: %v", err))
 	}
-
-	return &cfg, nil
+	return cfg
 }
