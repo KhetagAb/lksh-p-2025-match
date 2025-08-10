@@ -76,9 +76,12 @@ func (s *Sports) DeleteSportByID(ctx context.Context, id int64) error {
 		return &domain.FailedLoadingResourcesError{Code: domain.FailedLoadingResources, Message: err.Error()}
 	}
 
-	_, err = s.pool.Exec(ctx, *query, id)
+	commandTag, err := s.pool.Exec(ctx, *query, id)
 	if err != nil {
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
+	}
+	if commandTag.RowsAffected() != 1 {
+		return &domain.NotFoundError{Code: domain.NotFound, Message: err.Error()}
 	}
 
 	return nil
