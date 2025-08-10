@@ -20,7 +20,27 @@ func (e *InvalidOperationError) Error() string {
 	return fmt.Sprintf("Error code %s: %s", e.Code, e.Message)
 }
 
+type FailedLoadingResourcesError struct {
+	Code    string
+	Message string
+}
+
+func (e *FailedLoadingResourcesError) Error() string {
+	return fmt.Sprintf("Error code %s: %s", e.Code, e.Message)
+}
+
+type UndefinedError struct {
+	Code    string
+	Message string
+}
+
+func (e *UndefinedError) Error() string {
+	return fmt.Sprintf("Error code %s: %s", e.Code, e.Message)
+}
+
 const (
-	NotFound         = "Not found"
-	InvalidOperation = "Invalid operation"
+	NotFound               = "Not found"
+	InvalidOperation       = "Invalid operation"
+	FailedLoadingResources = "Failed loading resources"
+	Undefined              = "Undefined event encountered"
 )
