@@ -1,7 +1,8 @@
 from fastapi import FastAPI
-
-from lkshmatch.bot import router as bot_router
+from lkshmatch.tg_bot.bot import bot as telegram_bot
+from lkshmatch.tg_bot.bot import router as bot_router
 from lkshmatch.config import settings
+import asyncio
 
 
 def print_loaded_settings():
