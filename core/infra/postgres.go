@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/jackc/pgx/v5"
+	"go.uber.org/fx"
 )
 
 type Transaction struct{ pgx.Tx }
@@ -26,23 +27,21 @@ func CloseConnection(ctx context.Context, connection pgx.Conn) error {
 	return nil
 }
 
-func OpenTransaction(s *Transaction) (context.Context, pgx.Tx, error) {
-	ctx := context.Background()
+func WithTransaction(s *Transaction, ctx context.Context, lc fx.Lifecycle) (context.Context, pgx.Tx, error) {
 	transaction, err := s.Begin(ctx)
 	if err != nil {
 		return ctx, transaction, errors.New("")
 	}
+	lc.Append(fx.Hook{
+		OnStop: func(context.Context) error {
+			if err := s.Commit(ctx); err != nil {
+				return err
+			}
+			if err = s.Rollback(ctx); err != nil {
+				return err
+			}
+			return nil
+		},
+	})
 	return ctx, transaction, nil
-}
-
-func CloseTransaction(s *Transaction, ctx context.Context) error {
-	err := s.Commit(ctx)
-	if err != nil {
-		return err
-	}
-	err = s.Rollback(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
 }
