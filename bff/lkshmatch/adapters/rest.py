@@ -1,7 +1,7 @@
 from bff.lkshmatch.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
                    PlayerAddInfo, SportSection, RegisterPlayerInSportSection,
                    PlayerNotFound, UnknownError, PlayerRegisterInfo, Team, NameTeamReserveError,
-                    PlayerAlreadyInTeam, TeamIsFull)
+                    PlayerAlreadyInTeam)
 import aiohttp
 from bff.lkshmatch.config import settings
 import json
@@ -22,7 +22,7 @@ class RestValidateRegisterUser(ValidateRegisterUser):
     async def validate_register_user(self, user: PlayerAddInfo) -> str:
         async with aiohttp.ClientSession() as session:
             query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
-            response = await session.get(API_URL + '/validate_register_user', params=query)
+            response = await session.get(API_URL + '/validate_register_usergit', params=query)
 
             data = await response.json()
 
