@@ -10,9 +10,8 @@ type Sport struct {
 
 // table results
 type Result struct {
-	ID       int64
-	TeamsIDs []int64
-	Results  []int32
+	ID     int64
+	Result map[int64]int32
 }
 
 // table players
