@@ -1,41 +1,83 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, FileResponse
+from adapters.stub import StubAddUser, StubGetSections, StubListFromSections, PlayerAddInfo
+from jose import JWTError, jwt
+import urllib
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+import hmac
+from typing import Annotated
+
+# from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import FastAPI, Request, HTTPException, APIRouter, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
- 
+from fastapi.requests import Request
+from fastapi.responses import PlainTextResponse, RedirectResponse, Response
+
+from vars import BOT_TOKEN_HASH, JWT_SECRET_KEY, COOKIE_NAME, ALGORITHM
+from auth import auth_router
+
 app = FastAPI()
-templates = Jinja2Templates(directory='templates')
+templates = Jinja2Templates('templates')
+#static_files = HTMLStaticFiles(directory='site/')
 
-def get_list_of_sections_core():
-    return ['1', '2', 'hahaha', 'djhs']
+app.include_router(auth_router, prefix="/auth")
+#app.mount('/', static_files, name='static')
 
-def get_list_in_section_core(section: str):
-    if section == "1":
-        return ["187", "236712738", "237612983"]
-    elif section == "2":
-        return []
-    elif section == "hahaha":
-        return ["hahahahaa"]
-    else:
-        return ["unsigned section"]
+add_user = StubAddUser()
+get_sections = StubGetSections()
+list_from_sections = StubListFromSections()
 
-def registration_on_section(section_name, user_name, auth):
-    return "OK"
+# await add_user.add_user(user=PlayerAddInfo("lol"))
+
+class User:
+    username: str
 
 @app.get("/")
-def root(request: Request):
+async def root(request: Request, username: str = "UU"):
     return templates.TemplateResponse(name='index.html',
-                                      context={'request': request})
+                                      context={'request': request,
+                                               'username': username})
 
 @app.get("/sections")
-def sections(request: Request):
+async def sections(request: Request, username: str = "UU"):
     return templates.TemplateResponse(name='sections.html',
-                                      context={'request': request, 'list_of_sections': get_list_of_sections_core()})
+                                      context={'request': request,
+                                               'list_of_sections': await get_sections.get_sections(),
+                                               'username': username})
 
 @app.get("/sections/{section_name}")
-def get_list(section_name):
-    return get_list_in_section_core(section_name)
+async def get_list(request: Request, section_name, username: str = "UU"):
+    return templates.TemplateResponse(name='one_section.html',
+                                      context={'request': request,
+                                               'list_of_players': await list_from_sections.list_from_sections(section_name),
+                                               'section_name': section_name,
+                                               'username': username})
 
 @app.get("/sections/{section_name}/reg")
-def get_list(section_name, user_name, auth):
-    return get_list_in_section_core(section_name, user_name, auth)
+async def registration(request: Request, section_name : str, username: str = "UU"):
+    # user registration
+    return RedirectResponse("/sections/" + section_name)
+
+# @app.get("/sections/{section_name}/reg")
+# async def get_list(section_name, user_name, auth):
+#     return registration_on_section(section_name, user_name, auth)
+# app.add_middleware(TelegramAuth)
+
+@app.middleware("http")
+async def dispatch(request: Request, call_next) -> Response:
+    if request.url.path.startswith('/auth/'):
+        return await call_next(request)
+
+    token = request.cookies.get(COOKIE_NAME)
+    login_wall = templates.TemplateResponse('auth/login.html',
+                                          context={'request': request})
+    if not token:
+        return login_wall
+
+    try:
+        token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
+    except JWTError:
+        return login_wall
+
+    user_id = token_parts['user_id']
+
+    return await call_next(request)

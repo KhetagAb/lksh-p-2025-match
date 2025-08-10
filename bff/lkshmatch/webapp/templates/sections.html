@@ -1,18 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sections</title>
-    <meta charset="utf-8" />
-</head>
-<body>
-    <h2>Виды спорта</h2>
+{% extends "basic_interface.html" %}
+
+{% block title %}
+Виды спорта
+{% endblock %}
+
+{% block content %}
+
+<h2>Виды спорта</h2>
+<ol>
+<div>
+    {% for section in list_of_sections %}
     <div>
-        {% for section in list_of_sections %}
-        <div>
-            <p>Name: {{ section }}</p>
-            <!-- Добавьте другие атрибуты по вашему усмотрению -->
-        </div>
-        {% endfor %}
+        <li><a href="sections/{{ section.name }}?username={{ username }}">{{ section.name }}</a></li>
     </div>
-</body>
-</html>
+    {% endfor %}
+</div>
+</ol>
+
+{% endblock %}
