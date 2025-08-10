@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: test.dockerfile
-    networks:
-      - backend_test
     env_file:
       - .env.test
     depends_on:
@@ -22,8 +20,6 @@ services:
       POSTGRES_PASSWORD: ${DB_PASS}
     volumes:
       - ./db:/var/lib/postgresql/data
-    networks:
-      - backend_test
     ports:
       - ${DB_PORT}:${DB_PORT}
     healthcheck:
@@ -31,17 +27,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  pgadmin:
-    container_name: pgadmin_app
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: 'user@example.com'
-      PGADMIN_DEFAULT_PASSWORD: 'qwerty'
-    ports:
-      - "5050:80"
-
-
-networks:
-  backend_test:
-    driver: "bridge"

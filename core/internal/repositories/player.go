@@ -3,8 +3,7 @@ package repositories
 import (
 	"context"
 	_ "embed"
-
-	"match/internal/domain"
+	"match/domain"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -37,7 +36,7 @@ func (p *Players) CreatePlayer(ctx context.Context, name, username string, teleg
 	return &id, nil
 }
 
-func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*Player, error) {
+func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*domain.Player, error) {
 	var telegramID int64
 	var name string
 	var username string
@@ -47,10 +46,10 @@ func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*Player, error) 
 		return nil, &domain.NotFoundError{Code: domain.NotFound, Message: err.Error()}
 	}
 
-	return &Player{id, name, username, telegramID}, nil
+	return &domain.Player{ID: id, Name: name, Username: username, TelegramID: telegramID}, nil
 }
 
-func (p *Players) GetPlayerByTelegramID(ctx context.Context, telegramID int64) (*Player, error) {
+func (p *Players) GetPlayerByTelegramID(ctx context.Context, telegramID int64) (*domain.Player, error) {
 	var id int64
 	var name string
 	var username string
@@ -60,7 +59,7 @@ func (p *Players) GetPlayerByTelegramID(ctx context.Context, telegramID int64) (
 		return nil, &domain.NotFoundError{Code: domain.NotFound, Message: err.Error()}
 	}
 
-	return &Player{id, name, username, telegramID}, nil
+	return &domain.Player{ID: id, Name: name, Username: username, TelegramID: telegramID}, nil
 }
 
 func (p *Players) DeletePlayerByID(ctx context.Context, id int64) error {
