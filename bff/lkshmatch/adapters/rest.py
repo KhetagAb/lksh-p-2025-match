@@ -1,7 +1,7 @@
 from bff.lkshmatch.adapters.core import (ValidateRegisterUser, RegisterUser, GetSportSections, GetPlayersBySportSections, Player,
                    PlayerAddInfo, SportSection, RegisterPlayerInSportSection,
                    PlayerNotFound, UnknownError, PlayerRegisterInfo, Team, NameTeamReserveError,
-                    PlayerAlreadyInTeam, CreateTeam, JoinTeam, TeamIsFull)
+                    PlayerAlreadyInTeam, TeamIsFull)
 import aiohttp
 from bff.lkshmatch.config import settings
 import json
