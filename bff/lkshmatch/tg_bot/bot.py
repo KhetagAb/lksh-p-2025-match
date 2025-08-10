@@ -29,6 +29,7 @@ app = FastAPI(lifespan=lifespan)
 async def webhook_start_bot(req: Request) -> None:
     await bot.process_new_updates([types.Update.de_json(await req.json())])
 
+
 real_token = settings.get('MATCH_TELEGRAM_TOKEN')
 
 if real_token:
@@ -101,8 +102,12 @@ def register_new_team(sport: rest.SportSection, tg_id: int) -> str:
     return "Team 228"
 
 
-def get_standart_message_to_exception() -> str:
+def standart_message_to_base_exception() -> str:
     return "Извините, что-то пошло не так. Повторите позже или обратитесь в 4ый комповник."
+
+
+def standard_message_to_insufficient_rights() -> str:
+    return f"У вас недостаточно прав для этого действия."
 
 
 def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboardMarkup:
@@ -133,7 +138,7 @@ async def start(mess: types.Message) -> None:
     except rest.PlayerNotFound:
         msg = "Извините, но вас нет в списках. Подойдите в 4ый комповник."
     except BaseException:
-        msg = get_standart_message_to_exception()
+        msg = standart_message_to_base_exception()
     if "Извините, " not in msg:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button1 = types.KeyboardButton("Это я, регистрацию подтверждаю.")
@@ -186,7 +191,7 @@ async def answer_to_buttons(mess: types.Message) -> None:
                 await bot.send_message(mess.chat.id, f"Список участников секции {sport.name}:\n" + '\n'.join(
                     await rest.RestGetPlayersBySportSections().players_by_sport_sections(sport)))
             except BaseException:
-                await bot.send_message(mess.chat.id, get_standart_message_to_exception())
+                await bot.send_message(mess.chat.id, standart_message_to_base_exception())
                 return
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             button1 = types.KeyboardButton(f"create_{sport.en_name}")
@@ -207,29 +212,43 @@ async def answer_to_buttons(mess: types.Message) -> None:
                                    f"Для выбора команды с названием название_команды нажмите кнопку <{sport.en_name}: название команды>",
                                    reply_markup=markup)
             return
+        if f"{sport.en_name}: " in mess.text:
+            team = mess.text[len(f"{sport.en_name}: "):]
+             
         if f"create_{sport.en_name}" == mess.text:
             try:
                 team = register_new_team(sport, mess.from_user.id)
+            except InsufficientRights:
+                await bot.send_message(mess.chat.id, standard_message_to_insufficient_rights())
             except BaseException:
-                await bot.send_message(mess.chat.id, get_standart_message_to_exception())
+                await bot.send_message(mess.chat.id, standart_message_to_base_exception())
                 return
-            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-            markup.add(types.KeyboardButton())
             await bot.send_message(mess.chat.id,
-                                   f"Вы зарегистрировали новую команду. Название: {team}. Если захотите изменить название команды на новое_название, введите <set_name_{sport.en_name}_{team} новое_название>",
-                                   reply_markup=markup)
+                                   f"Вы зарегистрировали новую команду. Название: {team}. Если захотите изменить название команды на новое_название, введите <set_name_{sport.en_name}_{team}: новое_название>.")
             return
         if f"set_name_{sport.en_name}_" == mess.text[:len(f"set_name_{sport.en_name}_")]:
-            team = mess.text.split('_')[3]
             try:
-                new_team = mess.text.split(" ")[1]
+                team = mess.text[len(f"set_name_{sport.en_name}_"):mess.text.find(': ')]
             except BaseException:
-                await bot.send_message(mess.chat.id, "Вы не ввели новое название команды")
+                await bot.send_message(mess.chat.id, "Вы не ввели текущее название команды.")
                 return
-            msg = f"Название команды изменено на <{new_team}>"
+            try:
+                new_team = ': '.join(mess.text.split(": ")[1:])
+            except BaseException:
+                await bot.send_message(mess.chat.id, "Вы не ввели новое название команды.")
+                return
+            msg = f"Название команды изменено на <{new_team}>."
             try:
                 set_name_of_team(team, new_team)
             except TeamNotFound:
-                pass
+                msg = f"Команда {team} не найдена в секции {sport.name}."
+            except NewTeamIsBusy:
+                msg = f"Название {new_team} уже занято. Если хотите сменить название, повторите операцию, но с другим новым названием."
+            except InsufficientRights:
+                msg = standard_message_to_insufficient_rights()
+            except BaseException:
+                msg = standart_message_to_base_exception()
+            await bot.send_message(mess.chat.id, msg)
+            return
 
     await bot.send_message(mess.chat.id, "Я вас не понимаю.")
