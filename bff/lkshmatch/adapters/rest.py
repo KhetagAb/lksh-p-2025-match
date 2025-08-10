@@ -95,4 +95,3 @@ class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
             )
             if response.status != 200:
                 raise UnknownError
-
