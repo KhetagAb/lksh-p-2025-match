@@ -8,6 +8,12 @@ PlayerId = NewType("PlayerId", int)
 class PlayerNotFound(Exception):
     pass
 
+class NameTeamReserveError(Exception):
+    pass
+
+class PlayerAlreadyInTeam(Exception):
+    pass
+
 class UnknownError(Exception):
     pass
 
@@ -25,6 +31,13 @@ class PlayerRegisterInfo:
 class SportSection:
     name: str
     en_name: str
+
+@dataclass
+class Team:
+    name: str
+    id: int
+    name_sport_section: str
+    capitan_id: int
 
 class ValidateRegisterUser(ABC):
     @abstractmethod
@@ -50,4 +63,31 @@ class GetPlayersBySportSections(ABC):
 
 class RegisterPlayerInSportSection(ABC):
     async def register_player_in_sport_sectoin(self, section_id: SportSection, user_id: PlayerRegisterInfo) -> None:
+        raise NotImplementedError
+
+
+
+class CreateTeam(ABC):
+    @abstractmethod
+    async def create_team(self, section: SportSection, user: PlayerRegisterInfo, name_team: str) -> None:
+        raise NotImplementedError
+
+class GetTeams(ABC):
+    @abstractmethod
+    async def teams(self, section: SportSection) -> list[Team]:
+        raise NotImplementedError
+
+class JoinTeam(ABC):
+    @abstractmethod
+    async def join_team(self, team: Team, user: PlayerRegisterInfo) -> int:
+        raise NotImplementedError
+
+class LeaveTeam(ABC):
+    @abstractmethod
+    async def leave_team(self, team: Team, user: PlayerRegisterInfo) -> None:
+        raise NotImplementedError
+
+class Approve(ABC):
+    @abstractmethod
+    async def approve(self, team: Team, user: PlayerRegisterInfo):
         raise NotImplementedError
