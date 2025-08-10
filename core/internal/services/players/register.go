@@ -2,16 +2,15 @@ package players
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"match/internal/repositories"
-	"match/pkg/errs"
+	"match/domain"
 )
 
 type (
 	PlayerRepository interface {
 		CreatePlayer(ctx context.Context, name, username string, telegramID int64) (*int64, error)
-		// TODO возвращать доменный объект
-		GetPlayerByTelegramID(ctx context.Context, telegramID int64) (*repositories.Player, error)
+		GetPlayerByTelegramID(ctx context.Context, telegramID int64) (*domain.Player, error)
 	}
 
 	PlayerService struct {
@@ -19,26 +18,29 @@ type (
 	}
 )
 
-func (s *PlayerService) ValidateRegisterUser(ctx context.Context, tgUsername string, tgId int64) (string, error) {
+func (s *PlayerService) ValidateRegisterUser(ctx context.Context, tgUsername string, tgId int64) error {
 	_, err := s.repository.GetPlayerByTelegramID(ctx, tgId)
-	// TODO почистить
-	if err == nil {
-		return "", &errs.PlayerAlreadyExists{}
+	var notFoundError *domain.NotFoundError
+	if errors.As(err, &notFoundError) {
+		return nil
 	}
-	return "", &errs.PlayerNotFound{}
+	if err != nil {
+		return fmt.Errorf("cannot get player by telegram id [tgId=%v]", tgId)
+	}
+
+	return domain.PlayerAlreadyExistsError("Player with tgUsername=%v and tgId=%v already exists", tgUsername, tgId)
 }
 
-func (s *PlayerService) RegisterUser(ctx context.Context, tgUsername string, tgId int64) (string, *int64, error) {
-	fullName, err := s.ValidateRegisterUser(ctx, tgUsername, tgId)
-	var zero int64 = 0
+func (s *PlayerService) RegisterUser(ctx context.Context, name string, tgUsername string, tgId int64) (*int64, error) {
+	err := s.ValidateRegisterUser(ctx, tgUsername, tgId)
 	if err != nil {
-		return "", &zero, fmt.Errorf("cannot validate user registration [tgUsername=%v] [tgId=%v]", tgUsername, tgId)
+		return nil, fmt.Errorf("cannot validate user registration [tgUsername=%v] [tgId=%v]: %w", tgUsername, tgId, err)
 	}
 
-	id, err := s.repository.CreatePlayer(ctx, fullName, tgUsername, tgId)
+	id, err := s.repository.CreatePlayer(ctx, name, tgUsername, tgId)
 	if err != nil {
-		return "", &zero, err
+		return nil, fmt.Errorf("cannot create player [name=%v] [tgUsername=%v] [tgId=%v]: %w", name, tgUsername, tgId, err)
 	}
-	return fullName, id, nil
+	return id, nil
 
 }

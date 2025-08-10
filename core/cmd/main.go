@@ -10,7 +10,6 @@ func main() {
 	server := transport.GetServer()
 	transport.RunServer(server)
 	awaitGracefulShutdown()
-
 }
 
 func awaitGracefulShutdown() {

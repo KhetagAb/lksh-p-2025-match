@@ -8,8 +8,6 @@ services:
       - '8080:8080'
     volumes:
       - ./:/api/
-    networks:
-      - backend
     env_file:
       - .env
     depends_on:
@@ -24,8 +22,6 @@ services:
       POSTGRES_PORT: ${DB_POSTGRES_PORT}
       POSTGRES_DB: ${DB_POSTGRES_NAME}
       POSTGRES_PASSWORD: ${DB_POSTGRES_PASS}
-    networks:
-      - backend
     ports:
       - ${DB_POSTGRES_PORT}:${DB_POSTGRES_PORT}
     healthcheck:
@@ -33,17 +29,3 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
-  pgadmin:
-    container_name: pgadmin_app
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: 'user@example.com'
-      PGADMIN_DEFAULT_PASSWORD: 'qwerty'
-    ports:
-      - "5050:80"
-
-
-networks:
-  backend:
-    driver: "bridge"

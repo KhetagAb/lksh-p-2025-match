@@ -8,12 +8,10 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-
-	"match/internal/handlers"
 )
 
 func RegisterEndpoints(server *echo.Echo) {
-	server.GET("/ping", handlers.PingPong)
+	//server.GET("/ping", handlers.PingPong)
 	// registering endpoints here
 	// TODO прокинуть сервис игрока
 	// TODO server.GET("/", handlers.Handler{}.ValidateRegisterUser
