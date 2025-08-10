@@ -10,7 +10,7 @@ from jose import JWTError, jwt
 from starlette.middleware.base import (BaseHTTPMiddleware,
                                        RequestResponseEndpoint)
 
-from lkshmatch.adapters.core import GetPlayersBySportSections, GetSportSections
+from lkshmatch.adapters.sport_sections import GetPlayersBySportSections, GetSportSections
 from lkshmatch.di import all_providers
 
 from .auth import auth_router

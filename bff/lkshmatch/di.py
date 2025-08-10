@@ -2,13 +2,13 @@ from dishka import Provider, Scope, provide
 
 from lkshmatch.adapters.core import (GetPlayersBySportSections,
                                      GetSportSections,
-                                     RegisterPlayerInSportSection,
-                                     RegisterUser, ValidateRegisterUser)
-from lkshmatch.adapters.rest import (RestGetPlayersBySportSections,
+                                     RegisterPlayerInSpotrSection,
+                                     RegisterPlayer, ValidateRegisterPlayer)
+from lkshmatch.adapters.sport_sections import (RestGetPlayersBySportSections,
                                      RestGetSportSections,
-                                     RestRegisterPlayerInSportSection,
-                                     RestRegisterUser,
-                                     RestValidateRegisterUser)
+                                     RestRegisterPlayerInSportSection)
+from lkshmatch.adapters.players import(RestRegisterPlayer,
+                                     RestValidateRegisterPlayer)
 
 
 class AdaptersProvider(Provider):
@@ -21,11 +21,11 @@ class AdaptersProvider(Provider):
         RestGetSportSections, provides=GetSportSections
     )
     register_player_in_sport_section = provide(
-        RestRegisterPlayerInSportSection, provides=RegisterPlayerInSportSection
+        RestRegisterPlayerInSportSection, provides=RegisterPlayerInSpotrSection
     )
-    register_user = provide(RestRegisterUser, provides=RegisterUser)
+    register_user = provide(RestRegisterPlayer, provides=RegisterPlayer)
     validate_register_user = provide(
-        RestValidateRegisterUser, provides=ValidateRegisterUser
+        RestValidateRegisterPlayer, provides=ValidateRegisterPlayer
     )
 
 
