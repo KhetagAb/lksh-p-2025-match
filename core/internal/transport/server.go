@@ -2,43 +2,47 @@ package transport
 
 import (
 	"fmt"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"match/infra"
+	"match/internal/handlers"
+	"net/http"
 )
 
-func RegisterEndpoints(server *echo.Echo) {
-	server.GET("/ping", PingPong)
-	// registering endpoints here
-	// TODO прокинуть сервис игрока
-	// TODO server.GET("/", handlers.Handler{}.ValidateRegisterUser
+type HTTPServer struct {
+	echo *echo.Echo
+	cfg  *infra.Config
+
+	validatePlayerHandler *handlers.ValidatePlayerHandler
 }
 
-func GetServer() *echo.Echo {
+func (s *HTTPServer) RegisterEndpoints() {
+	s.echo.GET("/ping", PingPong)
+	s.echo.GET("/validate_register_user", s.validatePlayerHandler.ValidateRegisterUser)
+}
+
+func CreateServer(
+	cfg *infra.Config,
+	validatePlayerHandler *handlers.ValidatePlayerHandler,
+) *HTTPServer {
 	server := echo.New()
 
 	server.Use(middleware.Logger())
 	server.Use(middleware.Recover())
 
-	RegisterEndpoints(server)
-	return server
+	srv := &HTTPServer{
+		echo: server,
+		cfg:  cfg,
+
+		validatePlayerHandler: validatePlayerHandler,
+	}
+	srv.RegisterEndpoints()
+
+	return srv
 }
 
-func RunServer(server *echo.Echo) {
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-
-	go func() {
-		// TODO: replace port with config later
-		if err := server.Start(":8080"); err != nil {
-			panic(fmt.Sprintf("failed to initialize server: %v", err))
-		}
-	}()
-	<-quit
+func (s *HTTPServer) StartServer() error {
+	return s.echo.Start(fmt.Sprintf(":%v", s.cfg.HTTP.Port))
 }
 
 func PingPong(c echo.Context) error {

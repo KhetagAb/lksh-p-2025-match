@@ -36,3 +36,4 @@ go.work.sum
  .idea/
  .vscode/
 /.idea
+/core/internal/generated/app/wire_gen.go

@@ -26,6 +26,12 @@ type Players struct {
 	pool *pgxpool.Pool
 }
 
+func NewPlayersRepository(
+	pool *pgxpool.Pool,
+) *Players {
+	return &Players{pool: pool}
+}
+
 func (p *Players) CreatePlayer(ctx context.Context, name, username string, telegramID int64) (*int64, error) {
 	var id int64
 	err := p.pool.QueryRow(ctx, createPlayerQuery, name, username, telegramID).Scan(&id)

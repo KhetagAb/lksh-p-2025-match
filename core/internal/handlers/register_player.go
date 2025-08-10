@@ -14,12 +14,20 @@ type (
 		RegisterUser(ctx context.Context, name string, tgUsername string, tgId int64) (*int64, error)
 	}
 
-	RegisterPLayerHandler struct {
+	RegisterPlayerHandler struct {
 		registerPlayerService RegisterPlayerService
 	}
 )
 
-func (h *RegisterPLayerHandler) RegisterUser(ectx echo.Context) error {
+func NewRegisterPlayerHandler(
+	registerPlayerService RegisterPlayerService,
+) *RegisterPlayerHandler {
+	return &RegisterPlayerHandler{
+		registerPlayerService: registerPlayerService,
+	}
+}
+
+func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context) error {
 	ctx := context.Background()
 
 	name := ectx.Param("name")
