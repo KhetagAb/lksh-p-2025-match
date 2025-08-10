@@ -186,8 +186,9 @@ async def answer_to_buttons(mess: types.Message) -> None:
     for sport in await rest.RestGetSportSections().get_sections():
         if sport == mess.text:
             try:
-                await bot.send_message(mess.chat.id, f"Список участников секции {sport.name}:\n" + "\n".join(
-                    await rest.RestGetPlayersBySportSections().players_by_sport_sections(sport)))
+                list_of_all_participants = await rest.RestGetPlayersBySportSections().get_players_by_sport_sections(sport)
+                msg = [participant.name for participant in list_of_all_participants]
+                await bot.send_message(mess.chat.id, f"Список участников секции {sport.name}:\n" + '\n'.join(msg))
             except BaseException as be:
                 print(be)
                 await bot.send_message(mess.chat.id, standart_message_to_base_exception())
