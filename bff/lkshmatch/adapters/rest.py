@@ -64,7 +64,8 @@ class RestGetSportSections(GetSportSections):
 class RestGetPlayersBySportSections(GetPlayersBySportSections):
     async def get_players_by_sport_sections(self, section: SportSection) -> list[PlayerRegisterInfo]:
         async with aiohttp.ClientSession() as session:
-            response = await session.get(API_URL)
+            query = {"name_section": section.en_name}
+            response = await session.get(API_URL, params=query)
             if response.status != 200:
                 raise UnknownError
 
@@ -76,9 +77,10 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
 
 
 class RestRegisterPlayerInSportSection(RegisterPlayerInSportSection):
-    async def register_player_in_sport_sectoin(self, section: SportSection, user_id: PlayerRegisterInfo) -> None:
+    async def register_player_in_sport_sectoin(self, section: SportSection, user: PlayerRegisterInfo) -> None:
         async with aiohttp.ClientSession() as session:
-            response = await session.get(API_URL)
+            query = {"name_section": section.en_name, "user_id": user.id}
+            response = await session.get(API_URL, params=query)
             if response.status != 200:
                 raise UnknownError
 
