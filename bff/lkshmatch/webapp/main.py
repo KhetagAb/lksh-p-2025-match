@@ -12,7 +12,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 from fastapi.responses import PlainTextResponse, RedirectResponse, Response
 
-from vars import BOT_TOKEN_HASH, JWT_SECRET_KEY, COOKIE_NAME, WHITELIST, ALGORITHM
+from vars import BOT_TOKEN_HASH, JWT_SECRET_KEY, COOKIE_NAME, ALGORITHM
 from auth import auth_router
 
 app = FastAPI()
