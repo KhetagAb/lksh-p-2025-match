@@ -4,15 +4,14 @@ import "time"
 
 // table sports
 type Sport struct {
-	ID    int
+	ID    int64
 	Title string
 }
 
 // table results
 type Result struct {
-	ID       int64
-	TeamsIDs []int64
-	Results  []int32
+	ID     int64
+	Result map[int64]int32
 }
 
 // table players
