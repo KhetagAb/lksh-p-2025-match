@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"strconv"
 )
 
 type (
@@ -19,7 +18,7 @@ type (
 func (h *RegisterPlayerInSportSectionHandler) RegisterPlayerInSportSection(ectx echo.Context) error {
 	ctx := context.Background()
 	//logger.Infof(ctx, "Validating player username: %v", tgUsername)
-	id, _ := strconv.ParseInt(ectx.Param("id"), 10, 64)
+	id := 1 // TODO
 	status, err := h.RegisterPlayerInSportSectionService.RegisterPlayerInSportSection(ctx, id)
 
 	if err != nil {

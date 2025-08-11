@@ -17,7 +17,9 @@ func NewContextProvider() context.Context {
 
 var All = wire.NewSet(
 	NewContextProvider,
+
 	infra.NewConfig,
+	infra.NewPgxPool,
 
 	wire.Bind(new(server.ServerInterface), new(*handlers.ServerInterface)),
 	transport.CreateServer,
