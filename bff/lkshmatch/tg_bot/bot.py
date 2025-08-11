@@ -133,7 +133,7 @@ async def start(mess: types.Message) -> None:
     if await fuse_not_nf(mess):
         return
     try:
-        msg = await rest.RestValidateRegisterUser().validate_register_user(rest.PlayerAddInfo(username, int(user_id)))
+        msg = await rest.RestValidateRegisterPlayer().validate_register_user(rest.PlayerAddInfo(username, int(user_id)))
     except rest.PlayerNotFound:
         msg = "Извините, но вас нет в списках. Подойдите в 4-ый комповник."
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -163,7 +163,7 @@ async def answer_to_buttons(mess: types.Message) -> None:
     if mess.text == "Это я, регистрацию подтверждаю.":
         if await fuse_not_nf(mess):
             return
-        response = await rest.RestRegisterUser().register_user(
+        response = await rest.RestRegisterPlayer().register_user(
             rest.PlayerAddInfo(mess.from_user.username, mess.from_user.id))
         add_matching(mess.from_user.id, response)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -186,8 +186,9 @@ async def answer_to_buttons(mess: types.Message) -> None:
     for sport in await rest.RestGetSportSections().get_sections():
         if sport == mess.text:
             try:
-                await bot.send_message(mess.chat.id, f"Список участников секции {sport.name}:\n" + "\n".join(
-                    await rest.RestGetPlayersBySportSections().players_by_sport_sections(sport)))
+                list_of_all_participants = await rest.RestGetPlayersBySportSections().get_players_by_sport_sections(sport)
+                msg = [participant.name for participant in list_of_all_participants]
+                await bot.send_message(mess.chat.id, f"Список участников секции {sport.name}:\n" + '\n'.join(msg))
             except BaseException as be:
                 print(be)
                 await bot.send_message(mess.chat.id, standart_message_to_base_exception())
