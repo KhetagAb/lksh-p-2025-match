@@ -27,8 +27,8 @@ type Sports struct {
 	pool *pgxpool.Pool
 }
 
-func (s *Sports) CreateSport(ctx context.Context, title string) (*int64, error) {
-	var id int64
+func (s *Sports) CreateSport(ctx context.Context, title string) (*int, error) {
+	var id int
 	err := s.pool.QueryRow(ctx, createSportQuery, title).Scan(&id)
 	if err != nil {
 		return nil, &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
@@ -37,7 +37,7 @@ func (s *Sports) CreateSport(ctx context.Context, title string) (*int64, error) 
 	return &id, nil
 }
 
-func (s *Sports) GetSportByID(ctx context.Context, id int64) (*domain.Sport, error) {
+func (s *Sports) GetSportByID(ctx context.Context, id int) (*domain.Sport, error) {
 	var title string
 	err := s.pool.QueryRow(ctx, getByIDSportQuery, id).Scan(&id, &title)
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *Sports) GetSportsList(ctx context.Context) ([]domain.Sport, error) {
 
 }
 
-func (s *Sports) DeleteSportByID(ctx context.Context, id int64) error {
+func (s *Sports) DeleteSportByID(ctx context.Context, id int) error {
 	commandTag, err := s.pool.Exec(ctx, deleteSportQuery, id)
 	if err != nil {
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/google/wire"
 	"match/infra"
+	"match/internal/generated/server"
 	"match/internal/handlers"
 	"match/internal/repositories"
 	"match/internal/services/players"
@@ -18,6 +19,7 @@ var All = wire.NewSet(
 	NewContextProvider,
 	infra.NewConfig,
 
+	wire.Bind(new(server.ServerInterface), new(*handlers.ServerInterface)),
 	transport.CreateServer,
 
 	repositories.NewPlayersRepository,
@@ -25,7 +27,6 @@ var All = wire.NewSet(
 	players.NewPlayerService,
 
 	wire.Bind(new(handlers.RegisterPlayerService), new(*players.PlayerService)),
-	wire.Bind(new(handlers.ValidateRegisterPlayerService), new(*players.PlayerService)),
 	handlers.NewRegisterPlayerHandler,
-	handlers.NewValidatePlayerHandler,
+	handlers.NewServerInterface,
 )

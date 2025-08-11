@@ -1,4 +1,4 @@
-OpenAPI: 3.1.0
+openapi: 3.0.0
 info:
   title: Test
   description: Test
@@ -14,6 +14,11 @@ paths:
           required: true
           schema:
             type: string
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
         - name: tg_id
           in: query
           required: true
@@ -22,7 +27,7 @@ paths:
       responses:
         200:
           description: В случае если пользователь УЖЕ был зарегистрирован
-          $ref: '#/components/responses/PlayerRegistrationResponse'
+          $ref: '#/components/responses/ErrorResponse'
         201:
           description: В случае если ДО этого пользователь не был зарегистрирован
           $ref: '#/components/responses/PlayerRegistrationResponse'
@@ -38,8 +43,9 @@ components:
             type: "object"
             properties:
               id:
-               type: integer
-               description: Core-идентифиактор
+                type: integer
+                description: Core-идентифиактор
+      description: ""
     ErrorResponse:
       content:
         application/json:
@@ -48,6 +54,7 @@ components:
             properties:
               message:
                 type: string
+      description: ""
 
 
 

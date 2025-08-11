@@ -3,40 +3,40 @@ package domain
 import "time"
 
 type Sport struct {
-	ID    int64
+	ID    int
 	Title string
 }
 
 type Result struct {
-	ID     int64
-	Result map[int64]int32
+	ID     int
+	Result map[int]int
 }
 
 type Player struct {
-	ID         int64
+	ID         int
 	Name       string
 	Username   string
-	TelegramID int64
+	TelegramID int
 }
 
 type Team struct {
-	ID        int64
+	ID        int
 	Name      string
-	TourID    int64
-	CaptainID int64
+	TourID    int
+	CaptainID int
 }
 
 type Match struct {
-	ID       int64
-	TourID   int64
+	ID       int
+	TourID   int
 	Teams    []Team
-	ResultID int64
-	SportID  int64
+	ResultID int
+	SportID  int
 }
 
 type Tournament struct {
-	ID      int64
-	SportID int64
+	ID      int
+	SportID int
 	Teams   []Team
 	Coaches []Player
 	Date    time.Time
