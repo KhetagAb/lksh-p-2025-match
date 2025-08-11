@@ -5,38 +5,30 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"match/infra"
-	"match/internal/handlers"
+	"match/internal/generated/server"
 	"net/http"
 )
 
 type HTTPServer struct {
 	echo *echo.Echo
 	cfg  *infra.Config
-
-	validatePlayerHandler *handlers.ValidatePlayerHandler
-}
-
-func (s *HTTPServer) RegisterEndpoints() {
-	s.echo.GET("/ping", PingPong)
-	s.echo.GET("/validate_register_user", s.validatePlayerHandler.ValidateRegisterUser)
 }
 
 func CreateServer(
 	cfg *infra.Config,
-	validatePlayerHandler *handlers.ValidatePlayerHandler,
+	serverInterface server.ServerInterface,
 ) *HTTPServer {
-	server := echo.New()
+	echo := echo.New()
 
-	server.Use(middleware.Logger())
-	server.Use(middleware.Recover())
+	echo.Use(middleware.Logger())
+	echo.Use(middleware.Recover())
 
 	srv := &HTTPServer{
-		echo: server,
+		echo: echo,
 		cfg:  cfg,
-
-		validatePlayerHandler: validatePlayerHandler,
 	}
-	srv.RegisterEndpoints()
+
+	server.RegisterHandlers(echo, serverInterface)
 
 	return srv
 }

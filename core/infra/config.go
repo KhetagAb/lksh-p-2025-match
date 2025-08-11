@@ -21,7 +21,7 @@ type (
 	DatabaseConfig struct {
 		Name     string `mapstructure:"name"`
 		Username string `mapstructure:"username"`
-		Port     int32  `mapstructure:"port"`
+		Port     int    `mapstructure:"port"`
 		Password string `mapstructure:"password"`
 		Host     string `mapstructure:"host"`
 	}
@@ -29,7 +29,7 @@ type (
 	WebConfig struct {
 		Host     string `mapstructure:"host"`
 		Password string `mapstructure:"password"`
-		Port     int32  `mapstructure:"port"`
+		Port     int    `mapstructure:"port"`
 	}
 
 	AppConfig struct {

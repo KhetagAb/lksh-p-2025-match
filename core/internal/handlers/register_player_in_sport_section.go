@@ -8,7 +8,7 @@ import (
 
 type (
 	RegisterPlayerInSportSectionService interface {
-		RegisterPlayerInSportSection(ctx context.Context, id int64) (string, error)
+		RegisterPlayerInSportSection(ctx context.Context, id int) (string, error)
 	}
 
 	RegisterPlayerInSportSectionHandler struct {
