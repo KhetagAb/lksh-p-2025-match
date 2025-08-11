@@ -6,8 +6,6 @@ services:
       dockerfile: dev.dockerfile
     ports:
       - '8080:8080'
-    volumes:
-      - ./:/api/
     environment:
       APP_POSTGRES_HOST: "postgres"
       APP_POSTGRES_NAME: ${DB_POSTGRES_USER}
