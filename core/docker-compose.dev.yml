@@ -1,0 +1,33 @@
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: dev.dockerfile
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./:/api/
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16.3
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${DB_POSTGRES_USER}
+      POSTGRES_PORT: ${DB_POSTGRES_PORT}
+      POSTGRES_DB: ${DB_POSTGRES_NAME}
+      POSTGRES_PASSWORD: ${DB_POSTGRES_PASS}
+    ports:
+      - ${DB_POSTGRES_PORT}:${DB_POSTGRES_PORT}
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5

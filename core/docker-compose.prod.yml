@@ -1,0 +1,12 @@
+services:
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: prod.dockerfile
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./:/api/
+    env_file:
+      - .env
