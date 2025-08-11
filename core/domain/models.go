@@ -2,42 +2,31 @@ package domain
 
 import "time"
 
-type Sport struct {
-	ID    int
-	Title string
-}
-
-type Result struct {
-	ID     int
-	Result map[int]int
-}
-
 type Player struct {
-	ID         int
+	ID         int64
 	Name       string
-	Username   string
-	TelegramID int
+	TgUsername string
+	TgID       int64
 }
 
-type Team struct {
-	ID        int
-	Name      string
-	TourID    int
-	CaptainID int
-}
-
-type Match struct {
-	ID       int
-	TourID   int
-	Teams    []Team
-	ResultID int
-	SportID  int
+type SportSection struct {
+	ID     int64
+	EnName string
+	RuName string
 }
 
 type Tournament struct {
-	ID      int
-	SportID int
-	Teams   []Team
-	Coaches []Player
-	Date    time.Time
+	ID                   int64
+	Name                 string
+	SportSectionID       int64
+	RegistrationDeadline time.Time
+	StartDate            time.Time
+	EndDate              time.Time
+}
+
+type Team struct {
+	ID        int64
+	Name      string
+	TourID    int64
+	CaptainID int64
 }
