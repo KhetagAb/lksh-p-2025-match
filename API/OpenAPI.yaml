@@ -1,0 +1,10 @@
+OpenAPI: 3.1.0
+info:
+  title: Test
+  description: Test
+  version: 1.0.0
+paths:
+  /validate_register_player:
+    get:
+      summary: "Checks if player in "
+
