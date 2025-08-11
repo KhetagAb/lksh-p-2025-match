@@ -7,7 +7,7 @@ import (
 
 type (
 	RegisterPlayerInSportSectionService interface {
-		RegisterPlayerInSportSection(ctx context.Context, id int) (string, error)
+		RegisterPlayerInSportSection(ctx context.Context, id int64) (string, error)
 	}
 
 	RegisterPlayerInSportSectionHandler struct {
@@ -18,7 +18,7 @@ type (
 func (h *RegisterPlayerInSportSectionHandler) RegisterPlayerInSportSection(ectx echo.Context) error {
 	ctx := context.Background()
 	//logger.Infof(ctx, "Validating player username: %v", tgUsername)
-	id := 1 // TODO
+	id := int64(1) // TODO
 	status, err := h.RegisterPlayerInSportSectionService.RegisterPlayerInSportSection(ctx, id)
 
 	if err != nil {

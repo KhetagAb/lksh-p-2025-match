@@ -9,8 +9,8 @@ import (
 
 type (
 	PlayerRepository interface {
-		CreatePlayer(ctx context.Context, name, username string, telegramID int) (*int, error)
-		GetPlayerByTelegramID(ctx context.Context, telegramID int) (*domain.Player, error)
+		CreatePlayer(ctx context.Context, name, username string, telegramID int64) (*int64, error)
+		GetPlayerByTgID(ctx context.Context, telegramID int64) (*domain.Player, error)
 	}
 
 	PlayerService struct {
@@ -26,7 +26,7 @@ func NewPlayerService(
 	}
 }
 
-func (s *PlayerService) RegisterUser(ctx context.Context, name string, tgUsername string, tgId int) (*int, bool, error) {
+func (s *PlayerService) RegisterUser(ctx context.Context, name string, tgUsername string, tgId int64) (*int64, bool, error) {
 	isRegistered := false
 	player, err := s.getPlayer(ctx, tgId)
 	if err != nil {
@@ -44,8 +44,8 @@ func (s *PlayerService) RegisterUser(ctx context.Context, name string, tgUsernam
 	return id, isRegistered, nil
 }
 
-func (s *PlayerService) getPlayer(ctx context.Context, tgId int) (*domain.Player, error) {
-	player, err := s.repository.GetPlayerByTelegramID(ctx, tgId)
+func (s *PlayerService) getPlayer(ctx context.Context, tgId int64) (*domain.Player, error) {
+	player, err := s.repository.GetPlayerByTgID(ctx, tgId)
 	var notFoundError *domain.NotFoundError
 	if errors.As(err, &notFoundError) {
 		return nil, nil

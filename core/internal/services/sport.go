@@ -8,7 +8,7 @@ import (
 type (
 	GetAllSportSectionService interface {
 		//TODO возвращать доменный объект
-		GetSportsList(ctx context.Context) ([]*repositories.Sports, error)
+		GetSportsList(ctx context.Context) ([]*repositories.SportSections, error)
 	}
 
 	SportService struct {
