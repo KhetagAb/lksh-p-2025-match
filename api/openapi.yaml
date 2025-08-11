@@ -24,12 +24,11 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       responses:
         200:
-          description: В случае если пользователь УЖЕ был зарегистрирован
           $ref: '#/components/responses/ErrorResponse'
         201:
-          description: В случае если ДО этого пользователь не был зарегистрирован
           $ref: '#/components/responses/PlayerRegistrationResponse'
         400:
           $ref: '#/components/responses/ErrorResponse'
@@ -44,13 +43,16 @@ components:
             properties:
               id:
                 type: integer
-                description: Core-идентифиактор
+                format: int64
+                description: Core-идентификатор
       description: ""
     ErrorResponse:
       content:
         application/json:
           schema:
             type: "object"
+            required:
+              - message
             properties:
               message:
                 type: string

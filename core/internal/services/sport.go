@@ -8,7 +8,7 @@ import (
 type (
 	GetAllSportSectionService interface {
 		//TODO возвращать доменный объект
-		GetSportsList(ctx context.Context) ([]*repositories.Sport, error)
+		GetSportsList(ctx context.Context) ([]*repositories.Sports, error)
 	}
 
 	SportService struct {
@@ -22,12 +22,7 @@ func (s *SportService) GetAllSportSection(ctx context.Context) ([]string, error)
 		return nil, err
 	} else {
 		var ans []string
-		for _, el := range cnt {
-			ans = append(ans, el.Title)
-
-		}
 		return ans, nil
 
 	}
 }
-

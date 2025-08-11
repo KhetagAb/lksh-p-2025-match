@@ -8,6 +8,12 @@ services:
       - '8080:8080'
     volumes:
       - ./:/api/
+    environment:
+      APP_POSTGRES_HOST: "postgres"
+      APP_POSTGRES_NAME: ${DB_POSTGRES_USER}
+      APP_POSTGRES_PASSWORD: ${DB_POSTGRES_PASS}
+      APP_POSTGRES_PORT: ${DB_POSTGRES_PORT}
+      APP_POSTGRES_DB: ${DB_POSTGRES_DB}
     env_file:
       - .env
     depends_on:
@@ -20,7 +26,7 @@ services:
     environment:
       POSTGRES_USER: ${DB_POSTGRES_USER}
       POSTGRES_PORT: ${DB_POSTGRES_PORT}
-      POSTGRES_DB: ${DB_POSTGRES_NAME}
+      POSTGRES_DB: ${DB_POSTGRES_DB}
       POSTGRES_PASSWORD: ${DB_POSTGRES_PASS}
     ports:
       - ${DB_POSTGRES_PORT}:${DB_POSTGRES_PORT}
@@ -31,3 +37,4 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s

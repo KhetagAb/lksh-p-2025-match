@@ -4,26 +4,40 @@ import (
 	"context"
 	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"log"
-	"os"
 )
 
-func NewPostgresqlPool() *pgxpool.Pool {
-	poolConfig, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
+func NewPgxPool(
+	ctx context.Context,
+	cfg *Config,
+) *pgxpool.Pool {
+	db := cfg.Postgres
+
+	connStr := fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s",
+		db.Name,
+		db.Password,
+		db.Host,
+		db.Port,
+		db.Database,
+	)
+
+	poolConfig, err := pgxpool.ParseConfig(connStr)
 	if err != nil {
-		log.Fatalln("Unable to parse DATABASE_URL:", err)
+		panic(fmt.Errorf("unable to parse pool config: %w", err))
 	}
 
-	pool, err := pgxpool.NewWithConfig(context.Background(), poolConfig)
+	//poolConfig.MaxConns = 10
+	//poolConfig.MaxConnLifetime = time.Hour
+	//poolConfig.MaxConnIdleTime = 30 * time.Minute
+
+	pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
 	if err != nil {
-		log.Fatalln("Unable to create connection pool:", err)
-	}
-	defer pool.Close()
-
-	if err := pool.Ping(context.Background()); err != nil {
-		log.Fatalf("Unable to ping database: %v\n", err)
+		panic(fmt.Errorf("unable to connect to database: %w", err))
 	}
 
-	fmt.Println("Successfully connected to the database!")
+	if err := pool.Ping(ctx); err != nil {
+		panic(fmt.Errorf("unable to ping database: %w", err))
+	}
+
 	return pool
 }
