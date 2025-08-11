@@ -90,7 +90,7 @@ func (p *Players) DeletePlayerByID(ctx context.Context, id int64) error {
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
 	}
 	if commandTag.RowsAffected() != 1 {
-		return &domain.NotFoundError{Code: domain.NotFound, Message: err.Error()}
+		return &domain.NotFoundError{Code: domain.NotFound, Message: "player not found"}
 	}
 
 	return nil
