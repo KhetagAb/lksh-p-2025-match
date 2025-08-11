@@ -1,0 +1,61 @@
+openapi: 3.0.0
+info:
+  title: Test
+  description: Test
+  version: 1.0.0
+paths:
+  /core/player/register:
+    get:
+      operationId: registerPlayer
+      summary: "Регистрирует пользователя"
+      parameters:
+        - name: tg_username
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: tg_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: В случае если пользователь УЖЕ был зарегистрирован
+          $ref: '#/components/responses/ErrorResponse'
+        201:
+          description: В случае если ДО этого пользователь не был зарегистрирован
+          $ref: '#/components/responses/PlayerRegistrationResponse'
+        400:
+          $ref: '#/components/responses/ErrorResponse'
+
+components:
+  responses:
+    PlayerRegistrationResponse:
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: integer
+                description: Core-идентифиактор
+      description: ""
+    ErrorResponse:
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: string
+      description: ""
+
+
+
+

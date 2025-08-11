@@ -32,8 +32,8 @@ func NewPlayersRepository(
 	return &Players{pool: pool}
 }
 
-func (p *Players) CreatePlayer(ctx context.Context, name, username string, telegramID int64) (*int64, error) {
-	var id int64
+func (p *Players) CreatePlayer(ctx context.Context, name, username string, telegramID int) (*int, error) {
+	var id int
 	err := p.pool.QueryRow(ctx, createPlayerQuery, name, username, telegramID).Scan(&id)
 	if err != nil {
 		return nil, &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
@@ -42,8 +42,8 @@ func (p *Players) CreatePlayer(ctx context.Context, name, username string, teleg
 	return &id, nil
 }
 
-func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*domain.Player, error) {
-	var telegramID int64
+func (p *Players) GetPlayerByID(ctx context.Context, id int) (*domain.Player, error) {
+	var telegramID int
 	var name string
 	var username string
 
@@ -55,8 +55,8 @@ func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*domain.Player, 
 	return &domain.Player{ID: id, Name: name, Username: username, TelegramID: telegramID}, nil
 }
 
-func (p *Players) GetPlayerByTelegramID(ctx context.Context, telegramID int64) (*domain.Player, error) {
-	var id int64
+func (p *Players) GetPlayerByTelegramID(ctx context.Context, telegramID int) (*domain.Player, error) {
+	var id int
 	var name string
 	var username string
 
@@ -68,7 +68,7 @@ func (p *Players) GetPlayerByTelegramID(ctx context.Context, telegramID int64) (
 	return &domain.Player{ID: id, Name: name, Username: username, TelegramID: telegramID}, nil
 }
 
-func (p *Players) DeletePlayerByID(ctx context.Context, id int64) error {
+func (p *Players) DeletePlayerByID(ctx context.Context, id int) error {
 	commandTag, err := p.pool.Exec(ctx, deletePlayerQuery, id)
 	if err != nil {
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
