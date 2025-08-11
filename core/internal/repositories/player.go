@@ -87,7 +87,7 @@ func (p *Players) GetPlayerByTgUsername(ctx context.Context, username string) (*
 	return &domain.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
 }
 
-func (p *Players) GetPlayerExistanceByTelegramID(
+func (p *Players) GetPlayerExistanceByTgID(
 	ctx context.Context,
 	tgID int64,
 ) (bool, error) {
