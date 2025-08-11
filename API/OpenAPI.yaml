@@ -6,5 +6,31 @@ info:
 paths:
   /validate_register_player:
     get:
-      summary: "Checks if player in "
+      summary: "Checks if player in db"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  tgUsername:
+                    name: username
+                    in: query
+                    required: true
+                    schema:
+                      type: string
+                  tgId:
+                    name: id
+                    in: query
+                    required: true
+                    schema:
+                      type: integer
+
+
+
+
+
+
 
