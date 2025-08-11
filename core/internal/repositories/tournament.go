@@ -29,7 +29,7 @@ func NewTournamentsRepository(pool *pgxpool.Pool) *Tournaments {
 func (t *Tournaments) CreateTournament(
 	ctx context.Context,
 	name string,
-	sportSectionID int32,
+	sportSectionID int64,
 	registrationDeadline, startDate, endDate time.Time,
 ) (*int64, error) {
 	var id int64
@@ -52,11 +52,11 @@ func (t *Tournaments) CreateTournament(
 
 func (t *Tournaments) GetTournamentByID(
 	ctx context.Context,
-	id int32,
+	id int64,
 ) (*domain.Tournament, error) {
 	var (
 		name           string
-		sportSectionID int32
+		sportSectionID int64
 		regDeadline    time.Time
 		startDate      time.Time
 		endDate        time.Time
@@ -78,7 +78,7 @@ func (t *Tournaments) GetTournamentByID(
 	}, nil
 }
 
-func (t *Tournaments) DeleteTournamentByID(ctx context.Context, id int32) error {
+func (t *Tournaments) DeleteTournamentByID(ctx context.Context, id int64) error {
 	tag, err := t.pool.Exec(ctx, deleteTournamentQuery, id)
 	if err != nil {
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}

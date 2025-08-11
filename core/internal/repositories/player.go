@@ -104,7 +104,7 @@ func (p *Players) GetPlayerExistanceByTgID(
 	return exists, nil
 }
 
-func (p *Players) DeletePlayerByID(ctx context.Context, id int32) error {
+func (p *Players) DeletePlayerByID(ctx context.Context, id int64) error {
 	commandTag, err := p.pool.Exec(ctx, deletePlayerQuery, id)
 	if err != nil {
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}

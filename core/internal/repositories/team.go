@@ -28,7 +28,7 @@ func NewTeamsRepository(pool *pgxpool.Pool) *Teams {
 func (r *Teams) CreateTeam(
 	ctx context.Context,
 	name string,
-	captainID, tournamentID int32,
+	captainID, tournamentID int64,
 ) (*int64, error) {
 	var id int64
 	err := r.pool.QueryRow(ctx, createTeamQuery, name, captainID, tournamentID).Scan(&id)
@@ -38,11 +38,11 @@ func (r *Teams) CreateTeam(
 	return &id, nil
 }
 
-func (r *Teams) GetTeamByID(ctx context.Context, id int32) (*domain.Team, error) {
+func (r *Teams) GetTeamByID(ctx context.Context, id int64) (*domain.Team, error) {
 	var (
 		name         string
-		captainID    int32
-		tournamentID int32
+		captainID    int64
+		tournamentID int64
 	)
 
 	err := r.pool.QueryRow(ctx, getTeamByIDQuery, id).Scan(&id, &name, &captainID, &tournamentID)
@@ -58,7 +58,7 @@ func (r *Teams) GetTeamByID(ctx context.Context, id int32) (*domain.Team, error)
 	}, nil
 }
 
-func (r *Teams) DeleteTeamByID(ctx context.Context, id int32) error {
+func (r *Teams) DeleteTeamByID(ctx context.Context, id int64) error {
 	tag, err := r.pool.Exec(ctx, deleteTeamQuery, id)
 	if err != nil {
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}

@@ -41,7 +41,7 @@ func (s *SportSections) CreateSportSection(
 
 func (s *SportSections) GetSportSectionByID(
 	ctx context.Context,
-	id int32,
+	id int64,
 ) (*domain.SportSection, error) {
 	var enName, ruName string
 	if err := s.pool.QueryRow(ctx, getSportSectionByIDQuery, id).Scan(&id, &enName, &ruName); err != nil {
@@ -77,7 +77,7 @@ func (s *SportSections) ListSportSections(
 	return sections, nil
 }
 
-func (s *SportSections) DeleteSportSectionByID(ctx context.Context, id int32) error {
+func (s *SportSections) DeleteSportSectionByID(ctx context.Context, id int64) error {
 	tag, err := s.pool.Exec(ctx, deleteSportSectionQuery, id)
 	if err != nil {
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
