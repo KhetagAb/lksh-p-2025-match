@@ -21,6 +21,9 @@ var (
 	//go:embed queries/player/get-by-tg-username.sql
 	getByTgUsernamePlayerQuery string
 
+	//go:embed queries/player/exists-by-tg-id.sql
+	existsByTgIDPlayerQuery string
+
 	//go:embed queries/player/delete.sql
 	deletePlayerQuery string
 )
@@ -84,7 +87,24 @@ func (p *Players) GetPlayerByTgUsername(ctx context.Context, username string) (*
 	return &domain.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
 }
 
-func (p *Players) DeletePlayerByID(ctx context.Context, id int64) error {
+func (p *Players) GetPlayerExistanceByTelegramID(
+	ctx context.Context,
+	tgID int64,
+) (bool, error) {
+
+	var exists bool
+	err := p.pool.QueryRow(ctx, existsByTgIDPlayerQuery, tgID).Scan(&exists)
+	if err != nil {
+		return false, &domain.InvalidOperationError{
+			Code:    domain.InvalidOperation,
+			Message: err.Error(),
+		}
+	}
+
+	return exists, nil
+}
+
+func (p *Players) DeletePlayerByID(ctx context.Context, id int32) error {
 	commandTag, err := p.pool.Exec(ctx, deletePlayerQuery, id)
 	if err != nil {
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
