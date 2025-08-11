@@ -25,6 +25,11 @@ func NewValidatePlayerHandler(
 	}
 }
 
+type Handler struct {
+	response *struct {
+	}
+}
+
 func (h *ValidatePlayerHandler) ValidateRegisterUser(ectx echo.Context) error {
 	ctx := context.Background()
 	tgUsername := ectx.Param("tgUsername")

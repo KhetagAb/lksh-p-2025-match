@@ -4,32 +4,50 @@ info:
   description: Test
   version: 1.0.0
 paths:
-  /validate_register_player:
+  /core/player/register:
     get:
-      summary: "Checks if player in db"
+      operationId: registerPlayer
+      summary: "Регистрирует пользователя"
+      parameters:
+        - name: tg_username
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: tg_id
+          in: query
+          required: true
+          schema:
+            type: integer
       responses:
-        "200":
-          description: "OK"
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  tgUsername:
-                    name: username
-                    in: query
-                    required: true
-                    schema:
-                      type: string
-                  tgId:
-                    name: id
-                    in: query
-                    required: true
-                    schema:
-                      type: integer
+        200:
+          description: В случае если пользователь УЖЕ был зарегистрирован
+          $ref: '#/components/responses/PlayerRegistrationResponse'
+        201:
+          description: В случае если ДО этого пользователь не был зарегистрирован
+          $ref: '#/components/responses/PlayerRegistrationResponse'
+        400:
+          $ref: '#/components/responses/ErrorResponse'
 
-
-
+components:
+  responses:
+    PlayerRegistrationResponse:
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              id:
+               type: integer
+               description: Core-идентифиактор
+    ErrorResponse:
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: string
 
 
 
