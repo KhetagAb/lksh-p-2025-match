@@ -11,7 +11,7 @@ import (
 
 type (
 	RegisterPlayerService interface {
-		RegisterUser(ctx context.Context, name string, tgUsername string, tgId int) (*int, bool, error)
+		RegisterUser(ctx context.Context, name string, tgUsername string, tgId int64) (*int64, bool, error)
 	}
 
 	RegisterPlayerHandler struct {
@@ -49,7 +49,7 @@ func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context, params server.Re
 		httpCode = 201
 	}
 	return ectx.JSON(httpCode, struct {
-		PlayerId int `json:"playerId"`
+		PlayerId int64 `json:"playerId"`
 	}{
 		*playerId,
 	})
