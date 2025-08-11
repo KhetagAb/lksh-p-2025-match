@@ -33,7 +33,11 @@ go.work.sum
 .env.test
 
 # Editor/IDE
+.direnv
  .idea/
  .vscode/
 /.idea
 /core/internal/generated/app/wire_gen.go
+
+# Python
+__pycache__/

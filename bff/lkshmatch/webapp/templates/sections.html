@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sections</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h2>Виды спорта</h2>
+    <div>
+        {% for section in list_of_sections %}
+        <div>
+            <p>Name: {{ section }}</p>
+            <!-- Добавьте другие атрибуты по вашему усмотрению -->
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

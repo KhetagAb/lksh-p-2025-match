@@ -1,0 +1,22 @@
+[project]
+name = "lkshmatch"
+version = "0.0.1"
+requires-python = "~=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "python-telegram-bot>=20.0",
+    "SQLAlchemy>=1.4",
+    "pydantic",
+    "dynaconf",
+    "pytelegrambotapi"
+]
+
+[tool.setuptools]
+package-dir = { "" = "" }
+
+[tool.black]
+line-length = 79
+
+[tool.autoflake]
+remove-all-unused-imports = true
