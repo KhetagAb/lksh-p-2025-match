@@ -1,9 +1,7 @@
 from pymongo import MongoClient
 from bff.lkshmatch.config import settings
 
-API_URL = str(settings.CORE_HOST) + ':' + str(settings.CORE_PORT)
+MONGO_URL = "mongodb://mongodb:mongodb@localhost:27017/mongodb"
 
-
-class CreateMongo():
-    def __init__(self, host: API_URL):
-        client = MongoClient()
+def create_mongodb_client():
+    return MongoClient(MONGO_URL)
