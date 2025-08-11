@@ -142,7 +142,7 @@ async def start(mess: types.Message) -> None:
     if await fuse_not_nf(mess):
         return
     try:
-        msg = await rest.RestValidateRegisterUser().validate_register_user(
+        msg = await rest.RestValidateRegisterPlayer().validate_register_user(
             rest.PlayerAddInfo(username, int(user_id))
         )
     except rest.PlayerNotFound:
@@ -178,7 +178,7 @@ async def answer_to_buttons(mess: types.Message) -> None:
     if mess.text == "Это я, регистрацию подтверждаю.":
         if await fuse_not_nf(mess):
             return
-        response = await rest.RestRegisterUser().register_user(
+        response = await rest.RestRegisterPlayer().register_user(
             rest.PlayerAddInfo(mess.from_user.username, mess.from_user.id)
         )
         add_matching(mess.from_user.id, response)

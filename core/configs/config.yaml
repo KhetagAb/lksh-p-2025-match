@@ -7,3 +7,18 @@ http:
   read_timeout: 10s
   write_timeout: 10s
   shutdown_timeout: 5s
+
+database:
+  name: "example"
+  password: <placeholder>
+  port: 22
+  username: "example"
+  host: "1.1.1.1"
+
+web:
+  host: "1.1.1.1"
+  password: <placeholder>
+  port: 22
+
+tg:
+  token: <placeholder>
