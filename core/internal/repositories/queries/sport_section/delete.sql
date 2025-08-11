@@ -1,2 +1,2 @@
-DELETE FROM sports
-WHERE id = $1
+DELETE FROM sport_sections
+WHERE id = $1;
