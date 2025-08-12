@@ -1,9 +1,14 @@
 FROM golang:1.24.6
 
-COPY . /app
 WORKDIR /app
 
-RUN go mod tidy
+COPY core/go.mod core/go.sum ./
+
+RUN go mod download
+
+COPY core/ .
+COPY docs/api/openapi.yaml ./api/openapi.yaml
+
 RUN make codegen
 RUN go build -o bin/match cmd/main.go
 
