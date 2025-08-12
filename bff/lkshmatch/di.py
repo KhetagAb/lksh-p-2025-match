@@ -36,33 +36,14 @@ class MongoProvider(Provider):
 
 class MongoRepositoryProvider(Provider):
     scope = Scope.APP
-
     mongo_admin_repository = provide(
         MongoAdminRepository, provides=AdminRepository)
     mongo_player_repository = provide(
         MongoPlayerRepository, provides=PlayerRepository)
 
 
-class AdaptersProvider(Provider):
-    scope = Scope.APP
-
-    get_player_by_sport_sections = provide(
-        RestGetPlayersBySportSections, provides=GetPlayersBySportSections
-    )
-    get_sport_sections = provide(
-        RestGetSportSections, provides=GetSportSections
-    )
-    register_player_in_sport_section = provide(
-        RestRegisterPlayerInSportSection, provides=RegisterPlayerInSpotrSection
-    )
-    register_user = provide(RestRegisterPlayer, provides=RegisterPlayer)
-    validate_register_user = provide(
-        RestValidateRegisterPlayer, provides=ValidateRegisterPlayer
-    )
-
-
 def all_providers() -> list[Provider]:
     mongo_uri = os.getenv('MATCH_MONGO_URI')
     if mongo_uri is None:
         raise ValueError("MATCH_MONGO_URI environment variable is not set")
-    return [AdaptersProvider(), MongoProvider(mongo_uri)]
+    return [MongoProvider(mongo_uri), MongoRepositoryProvider()]
