@@ -45,7 +45,9 @@ class RestAdapterProvider(Provider):
 
 
 def all_providers() -> List[Provider]:
-    mongo_uri = os.getenv("MONGO_URI")
+    # fixme
+    mongo_uri = f'mongodb://{os.getenv("MONGODB_ROOT_USERNAME")}:{os.getenv("MONGODB_ROOT_PASSWORD")}@mongodb:27017/{os.getenv("MONGODB_DATABASE")}'
+    print(mongo_uri)
     if mongo_uri is None:
         raise ValueError("MONGO_URI environment variable is not set")
     return [MongoProvider(mongo_uri), MongoRepositoryProvider(), RestAdapterProvider()]
