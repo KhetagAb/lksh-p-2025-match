@@ -14,8 +14,6 @@ services:
     volumes:
       - mongodb_data:/data/db
       - ./mongodb/mongo-init-scripts:/docker-entrypoint-initdb.d:ro
-    networks:
-      - match-network
 
   # Веб-приложение lkshmatch
   #  lkshmatch-web:
@@ -44,14 +42,15 @@ services:
       dockerfile: lkshmatch/Dockerfile
     container_name: match-bot
     environment:
-      - MATCH_CORE_HOST=127.0.0.1
-      - MATCH_CORE_PORT=32442
+      - MATCH_CORE_HOST=match-core
+      - MATCH_CORE_PORT=8080
       - MATCH_TELEGRAM_TOKEN=${MATCH_TELEGRAM_TOKEN}
       - MATCH_MONGO_URI=mongodb://${MONGODB_ROOT_USERNAME}:${MONGODB_ROOT_PASSWORD}@mongodb:27017/${MONGODB_DATABASE}
     depends_on:
       - mongodb
     networks:
-      - match-network
+      - default
+      - match-shared-network
     command: [ "python", "lkshmatch/main.py" ]
 
 volumes:
@@ -59,5 +58,5 @@ volumes:
     driver: local
 
 networks:
-  match-network:
-    driver: bridge
+  match-shared-network:
+    external: true

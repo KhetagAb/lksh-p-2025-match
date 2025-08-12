@@ -56,10 +56,12 @@ async def make_sports_buttons() -> types.ReplyKeyboardMarkup:
     return markup
 
 
+# fixme что за?
 async def fuse_not_nf(mess: types.Message) -> bool:
     return False
 
 
+# fixme что за?
 async def fuse_nf(mess: types.Message) -> bool:
     return False
 

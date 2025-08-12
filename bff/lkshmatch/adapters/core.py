@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import NewType
+
 from lkshmatch.config import settings
 
 PlayerId = NewType("PlayerId", int)
@@ -8,7 +9,7 @@ TeamId = NewType("TeamId", int)
 SportSectionId = NewType("SportSectionId", int)
 SportSectionName = NewType("SportSectionName", str)
 
-API_URL = str(settings.CORE_HOST) + ':' + str(settings.CORE_PORT)
+API_URL = 'http://' + str(settings.CORE_HOST) + ':' + str(settings.CORE_PORT)
 
 
 class PlayerNotFound(Exception):
@@ -124,7 +125,8 @@ class RegisterPlayerInSpotrSection(ABC):
 
 class CreateTournament(ABC):
     @abstractmethod
-    async def create_tournament(self, tournament_interval: TournamentInterval, sport_name: SportSectionName, player_info: Admin) -> None:
+    async def create_tournament(self, tournament_interval: TournamentInterval, sport_name: SportSectionName,
+                                player_info: Admin) -> None:
         raise NotImplementedError
 
 
@@ -142,13 +144,15 @@ class GetListTournament(ABC):
 
 class RegisterTeamInTournament(ABC):
     @abstractmethod
-    async def register_team_in_tournament(self, tournament: Tournament, team_id: TeamId, player_info: PlayerAddInfo) -> None:
+    async def register_team_in_tournament(self, tournament: Tournament, team_id: TeamId,
+                                          player_info: PlayerAddInfo) -> None:
         raise NotImplementedError
 
 
 class UnregisterTeamInTournament(ABC):
     @abstractmethod
-    async def unregister_team_in_tournament(self, tournament: Tournament, team_id: TeamId, player_info: PlayerAddInfo) -> None:
+    async def unregister_team_in_tournament(self, tournament: Tournament, team_id: TeamId,
+                                            player_info: PlayerAddInfo) -> None:
         raise NotImplementedError
 
 

@@ -1,7 +1,7 @@
 [test]
-CORE_HOST =  "127.0.0.1"
-CORE_PORT = 32441
+CORE_HOST =  "match-core"
+CORE_PORT = 8080
 
 [prod]
-CORE_HOST =  "127.0.0.2"
-CORE_PORT = 32442
+CORE_HOST =  "match-core"
+CORE_PORT = 8080
