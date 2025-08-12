@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := quickstart
 
+mode := dev
+
 quickstart: check
 	make build mode=dev
 	make start mode=dev
@@ -9,16 +11,16 @@ build: check
 	go mod tidy
 	go build -o bin/match cmd/main.go
 
-start:# check
+start:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans
 
-up: check
+up:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans -d
 
 stop:
 	docker-compose -f docker-compose.$(mode).yml stop --build --force-recreate --remove-orphans -d
 
-test: check
+test:
 	docker-compose -f docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
 upgrade:
