@@ -143,17 +143,13 @@ class GetListTournament(ABC):
 
 class RegisterTeamInTournament(ABC):
     @abstractmethod
-    async def register_team_in_tournament(
-        self, tournament: Tournament, team_id: TeamId, player_info: Player
-    ) -> None:
+    async def register_team_in_tournament(self, tournament: Tournament, team_id: TeamId, player_info: Player) -> None:
         raise NotImplementedError
 
 
 class UnregisterTeamInTournament(ABC):
     @abstractmethod
-    async def unregister_team_in_tournament(
-        self, tournament: Tournament, team_id: TeamId, player_info: Player
-    ) -> None:
+    async def unregister_team_in_tournament(self, tournament: Tournament, team_id: TeamId, player_info: Player) -> None:
         raise NotImplementedError
 
 

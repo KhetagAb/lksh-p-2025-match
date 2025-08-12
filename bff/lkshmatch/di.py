@@ -1,9 +1,12 @@
 import os
 from collections.abc import Iterable
+from typing import List
 
-from dishka import Provider, Scope, provide
+from dishka import Container, Provider, Scope, make_container, provide
 from pymongo import MongoClient
 
+from lkshmatch.adapters.base import PlayerAdapter
+from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.domain.repositories.player_repository import LKSHStudentsRepository
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
@@ -29,12 +32,23 @@ class MongoProvider(Provider):
 
 class MongoRepositoryProvider(Provider):
     scope = Scope.APP
-    mongo_admin_repository = provide(MongoAdminRepository, provides=AdminRepository)
-    mongo_player_repository = provide(MongoLKSHStudentsRepository, provides=LKSHStudentsRepository)
+    mongo_admin_repository = provide(
+        MongoAdminRepository, provides=AdminRepository)
+    mongo_player_repository = provide(
+        MongoLKSHStudentsRepository, provides=LKSHStudentsRepository)
 
 
-def all_providers() -> list[Provider]:
-    mongo_uri = os.getenv("MATCH_MONGO_URI")
+class RestAdapterProvider(Provider):
+    scope = Scope.APP
+    core_player_adapter = provide(
+        CorePlayerAdapter, provides=PlayerAdapter)
+
+
+def all_providers() -> List[Provider]:
+    mongo_uri = os.getenv("MONGO_URI")
     if mongo_uri is None:
-        raise ValueError("MATCH_MONGO_URI environment variable is not set")
-    return [MongoProvider(mongo_uri), MongoRepositoryProvider()]
+        raise ValueError("MONGO_URI environment variable is not set")
+    return [MongoProvider(mongo_uri), MongoRepositoryProvider(), RestAdapterProvider()]
+
+
+app_container: Container = make_container(*all_providers())

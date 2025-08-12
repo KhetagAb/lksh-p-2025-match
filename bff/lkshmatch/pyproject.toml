@@ -5,8 +5,6 @@ requires-python = "~=3.13"
 dependencies = [
     "fastapi",
     "uvicorn[standard]",
-    "python-telegram-bot>=20.0",
-    "SQLAlchemy>=1.4",
     "pydantic",
     "dynaconf",
     "pytelegrambotapi",
