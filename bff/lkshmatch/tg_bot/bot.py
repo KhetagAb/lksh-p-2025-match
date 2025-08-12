@@ -267,7 +267,6 @@ async def make_request_to_add_in_team(mess: types.Message, sport: SportSection) 
         try:
             add_person_to_team(team, mess.from_user.id)
         except TeamIsFull:
-
         return True
     return False
 
