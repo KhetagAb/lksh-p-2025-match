@@ -6,3 +6,5 @@ python-jose
 pytelegrambotapi
 dishka
 pymongo
+httpx
+aiohttp

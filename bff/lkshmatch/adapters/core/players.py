@@ -2,7 +2,6 @@ import logging
 import os
 
 from pymongo import MongoClient
-from sqlalchemy.testing.suite.test_reflection import users
 
 import core_client
 from core_client.api.default import register_player
