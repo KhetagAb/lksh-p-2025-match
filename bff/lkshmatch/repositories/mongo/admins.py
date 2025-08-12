@@ -9,7 +9,7 @@ DATABASE_NAME = "match"
 class Admin:
     tg_id: int
 
-class AdminsRepository:
+class MongoAdminRepository:
     def __init__(self, mongo_client: MongoClient):
         self.client: MongoClient = mongo_client
 

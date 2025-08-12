@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-from bff.lkshmatch.config import settings
+from lkshmatch.config import settings
 
 MONGO_URL = "mongodb://mongodb:mongodb@localhost:27017/mongodb"
 

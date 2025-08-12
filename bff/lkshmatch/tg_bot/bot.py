@@ -1,15 +1,14 @@
-from bff.lkshmatch.adapters.players import RestValidateRegisterPlayer, RestRegisterPlayer, PlayerAddInfo
-from bff.lkshmatch.adapters.sport_sections import SportSection, RestGetSportSections, RestGetPlayersBySportSections
-from bff.lkshmatch.adapters.core import NameTeamReserveError, UnknownError, PlayerNotFound, TeamIsFull
+from lkshmatch.adapters.players import RestValidateRegisterPlayer, RestRegisterPlayer, PlayerAddInfo
+from lkshmatch.adapters.sport_sections import SportSection, RestGetSportSections, RestGetPlayersBySportSections
+from lkshmatch.adapters.core import InsufficientRights, NameTeamReserveError, TeamNotFound, UnknownError, PlayerNotFound, TeamIsFull
 import logging
 from telegram import Bot, Update
 from fastapi import APIRouter, Request, FastAPI
 from telebot.async_telebot import AsyncTeleBot, Handler
 from telebot import types
 from contextlib import asynccontextmanager
-import asyncio
-import os
 import random
+from lkshmatch.config import settings
 
 
 # @asynccontextmanager
@@ -44,7 +43,7 @@ else:
 bot = AsyncTeleBot(token)
 
 # Не будет использоваться в дальнейшем
-def add_matching(tg_id, real_id) -> None:
+def add_matching(tg_id: int, real_id) -> None:
     with open("accord.txt", 'a') as file:
         file.write(str(tg_id) + ';' + str(real_id) + '\n')
 
@@ -73,13 +72,15 @@ def get_role(id: int, sport: str) -> str:
 
 # список всех команд по названию спорта
 def get_list_of_all_teams(sport: SportSection) -> list[str]:
-    return
+    return [] # TODO: срочно реализовать
 
 
 def set_name_of_team(old_team: str, new_team: str) -> None:
     return
 
-#Возвращает tg_id-шник капитана команды
+# Возвращает tg_id-шник капитана команды
+
+
 def add_person_to_team(team: str, tg_id: int) -> int:
     return 228777
 
@@ -102,16 +103,18 @@ def standard_message_to_insufficient_rights() -> str:
 
 
 def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboardMarkup:
-    role = get_role(mess.from_user.id, sport)
+    role = get_role(mess.from_user.id, sport) # type: ignore
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     data_for_buttons = []
     if role == "user":
-        data_for_buttons = ["/create_team", "/teams", "/join_team", "/approve_member_join"]
+        data_for_buttons = ["/create_team", "/teams",
+                            "/join_team", "/approve_member_join"]
     elif role == "captain":
         data_for_buttons = ["/teams", "/approve_member_join", "/delete_team"]
     elif role == "admin":
         pass
-    buttons = map(types.KeyboardButton, map(lambda x: f"{x} {sport}", data_for_buttons))
+    buttons = map(types.KeyboardButton, map(
+        lambda x: f"{x} {sport}", data_for_buttons))
     markup.add(*buttons)
     return markup
 
@@ -119,12 +122,13 @@ def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboa
 @bot.message_handler(commands=["start"])
 async def start(mess: types.Message) -> None:
     chat_id = mess.chat.id
-    user_id = mess.from_user.id
-    username = mess.from_user.username
+    user_id = mess.from_user.id if mess.from_user is not None else 0
+    username = mess.from_user.username if mess.from_user is not None else None
     if await fuse_not_nf(mess):
         return
     try:
-        msg = await RestValidateRegisterPlayer().validate_register_user(PlayerAddInfo(username, int(user_id)))
+        safe_username = username if username is not None else "unknown_user"
+        msg = await RestValidateRegisterPlayer().validate_register_user(PlayerAddInfo(safe_username, int(user_id)))
     except PlayerNotFound:
         msg = "Извините, но вас нет в списках. Подойдите в 4-ый комповник."
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -154,9 +158,16 @@ async def processing_of_registration(mess: types.Message) -> bool:
         if await fuse_not_nf(mess):
             await bot.send_message(mess.chat.id, "Вы не начинали регистрацию.")
             return True
+        if mess.from_user is not None:
+            username = mess.from_user.username if mess.from_user.username is not None else "unknown_user"
+            user_id = mess.from_user.id
+        else:
+            username = "unknown_user"
+            user_id = 0  # or handle appropriately
         response = await RestRegisterPlayer().register_user(
-            PlayerAddInfo(mess.from_user.username, mess.from_user.id))
-        add_matching(mess.from_user.id, response)
+            PlayerAddInfo(username, user_id))
+        if mess.from_user is not None:
+            add_matching(mess.from_user.id, response)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         markup.add(types.KeyboardButton("/register_on_sport"))
         to_pin = (await bot.send_message(mess.chat.id,
@@ -200,16 +211,17 @@ async def processing_select_sport(mess: types.Message, sport: SportSection) -> b
 
 async def setname_team(mess: types.Message, sport: SportSection) -> bool:
     setname_string = f"set_name_{sport.en_name}_"
-    if setname_string == mess.text[:len(setname_string)]:
+    if mess.text is not None and setname_string == mess.text[:len(setname_string)]:
         try:
-            team = mess.text[len(f"set_name_{sport.en_name}_"):mess.text.find(": ")]
-        except UnknownError as ue:
+            team = mess.text[len(
+                f"set_name_{sport.en_name}_"):mess.text.find(": ")]
+        except Exception as ue:
             print(ue)
             await bot.send_message(mess.chat.id, "Вы не ввели текущее название команды.")
             return True
         try:
             new_team = ": ".join(mess.text.split(": ")[1:])
-        except UnknownError as ue:
+        except Exception as ue:
             print(ue)
             await bot.send_message(mess.chat.id, "Вы не ввели новое название команды.")
             return True
@@ -234,7 +246,7 @@ async def create_team(mess: types.Message, sport: SportSection) -> bool:
     if f"create_{sport.en_name}" == mess.text:
         team = ""
         try:
-            team = register_new_team(sport, mess.from_user.id)
+            team = register_new_team(sport, mess.from_user.id) # type: ignore
         except InsufficientRights:
             await bot.send_message(mess.chat.id, standard_message_to_insufficient_rights())
         except UnknownError as ue:
@@ -262,12 +274,12 @@ async def signup_to_sport(mess: types.Message, sport: SportSection) -> bool:
 
 
 async def make_request_to_add_in_team(mess: types.Message, sport: SportSection) -> bool:
-    if f"{sport.en_name}: " in mess.text:
-        team = mess.text[len(f"{sport.en_name}: "):]
+    if f"{sport.en_name}: " in mess.text: # type: ignore
+        team = mess.text[len(f"{sport.en_name}: "):] # type: ignore
         try:
-            add_person_to_team(team, mess.from_user.id)
+            add_person_to_team(team, mess.from_user.id) # type: ignore
         except TeamIsFull:
-
+            pass
         return True
     return False
 

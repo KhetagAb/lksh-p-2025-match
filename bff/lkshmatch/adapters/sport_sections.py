@@ -1,9 +1,7 @@
 import aiohttp
 
-from bff.lkshmatch.adapters.core import GetSportSections, SportSection, UnknownError, GetPlayersBySportSections, \
+from lkshmatch.adapters.core import GetSportSections, SportSection, UnknownError, GetPlayersBySportSections, \
     PlayerRegisterInfo, RegisterPlayerInSpotrSection, PlayerNotFound, API_URL
-
-from bff.lkshmatch.admin.admin_privilege import PrivilegeChecker
 
 class PlayerNotFoundResponse(PlayerNotFound):
     pass

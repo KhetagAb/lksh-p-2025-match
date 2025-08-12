@@ -6,3 +6,5 @@ pydantic
 dynaconf
 python-jose
 pytelegrambotapi
+dishka
+pymongo
