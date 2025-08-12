@@ -3,6 +3,11 @@ from dataclasses import dataclass
 from typing import NewType
 from bff.lkshmatch.config import settings
 
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import NewType
+from bff.lkshmatch.config import settings
+
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)
 SportSectionId = NewType("SportSectionId", int)
@@ -69,6 +74,10 @@ class Tournament:
     sport_name: SportSectionName
 
 
+@dataclass
+class Admin:
+    tg_id: int
+
 class ValidateRegisterPlayer(ABC):
     @abstractmethod
     async def validate_register_user(self, user: PlayerAddInfo) -> str:
@@ -101,7 +110,7 @@ class RegisterPlayerInSpotrSection(ABC):
 
 class CreateTournament(ABC):
     @abstractmethod
-    async def create_tournament(self, tournament_interval: TournamentInterval, sport_name: SportSectionName) -> None:
+    async def create_tournament(self, tournament_interval: TournamentInterval, sport_name: SportSectionName,player_info:Admin) -> None:
         raise NotImplementedError
 
 
@@ -119,22 +128,22 @@ class GetListTournament(ABC):
 
 class RegisterTeamInTournament(ABC):
     @abstractmethod
-    async def register_team_in_tournament(self, tournament: Tournament, team_id: TeamId) -> None:
+    async def register_team_in_tournament(self, tournament: Tournament, team_id: TeamId,player_info :PlayerAddInfo) -> None:
         raise NotImplementedError
 
 
 class UnregisterTeamInTournament(ABC):
     @abstractmethod
-    async def unregister_team_in_tournament(self, tournament: Tournament, team_id: TeamId) -> None:
+    async def unregister_team_in_tournament(self, tournament: Tournament, team_id: TeamId,player_info :PlayerAddInfo) -> None:
         raise NotImplementedError
 
 class RemoveTournament(ABC):
     @abstractmethod
-    async def remove_tournament(self, tournament: Tournament) -> None:
+    async def remove_tournament(self, tournament: Tournament,player_info :Admin) -> None:
         raise NotImplementedError
 
 
 class ModifyTournament(ABC):
     @abstractmethod
-    async def modify_tournament(self, tournament: Tournament) -> None:
+    async def modify_tournament(self, tournament: Tournament,player_info :Admin) -> None:
         raise NotImplementedError
