@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 from lkshmatch.adapters.base import Player, PlayerNotFound
-from lkshmatch.domain.repositories.player_repository import LKSHStudentsRepository, Student
+from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository, Student
 
 DATABASE_NAME = "match"
 

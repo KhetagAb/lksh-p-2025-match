@@ -8,9 +8,9 @@ from pymongo import MongoClient
 from lkshmatch.adapters.base import PlayerAdapter
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
-from lkshmatch.domain.repositories.player_repository import LKSHStudentsRepository
+from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
-from lkshmatch.repositories.mongo.players import MongoLKSHStudentsRepository
+from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 
 
 class MongoProvider(Provider):

@@ -9,7 +9,7 @@ from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 
 from lkshmatch.di import app_container
-from lkshmatch.domain.repositories.player_repository import LKSHStudentsRepository
+from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
