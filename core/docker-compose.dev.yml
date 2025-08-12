@@ -6,8 +6,12 @@ services:
       dockerfile: dev.dockerfile
     ports:
       - '8080:8080'
-    volumes:
-      - ./:/api/
+    environment:
+      APP_POSTGRES_HOST: "postgres"
+      APP_POSTGRES_NAME: ${DB_POSTGRES_USER}
+      APP_POSTGRES_PASSWORD: ${DB_POSTGRES_PASS}
+      APP_POSTGRES_PORT: 5432
+      APP_POSTGRES_DB: ${DB_POSTGRES_DB}
     env_file:
       - .env
     depends_on:
@@ -19,15 +23,19 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: ${DB_POSTGRES_USER}
-      POSTGRES_PORT: ${DB_POSTGRES_PORT}
-      POSTGRES_DB: ${DB_POSTGRES_NAME}
+      POSTGRES_DB: ${DB_POSTGRES_DB}
       POSTGRES_PASSWORD: ${DB_POSTGRES_PASS}
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - ${DB_POSTGRES_PORT}:${DB_POSTGRES_PORT}
+      - ${DB_POSTGRES_PORT}:5432
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_POSTGRES_USER}']
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+
+volumes:
+  postgres_data:

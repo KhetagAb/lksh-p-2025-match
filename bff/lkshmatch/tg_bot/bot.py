@@ -43,6 +43,7 @@ else:
 
 bot = AsyncTeleBot(token)
 
+
 # Не будет использоваться в дальнейшем
 def add_matching(tg_id, real_id) -> None:
     with open("accord.txt", 'a') as file:
@@ -184,6 +185,7 @@ async def processing_select_sport(mess: types.Message, sport: SportSection) -> b
             await bot.send_message(mess.chat.id, f"Список участников секции {sport.name}:\n" + '\n'.join(msg))
         except UnknownError as ue:
             print(ue)
+
             await bot.send_message(mess.chat.id, standart_message_to_base_exception())
             return True
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)

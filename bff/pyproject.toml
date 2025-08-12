@@ -9,7 +9,8 @@ dependencies = [
     "SQLAlchemy>=1.4",
     "pydantic",
     "dynaconf",
-    "pytelegrambotapi"
+    "pytelegrambotapi",
+    "dishka",
 ]
 
 [tool.setuptools]

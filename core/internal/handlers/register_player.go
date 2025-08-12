@@ -3,15 +3,15 @@ package handlers
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"match/domain"
-	"strconv"
+	"match/internal/generated/server"
+	"match/pkg/logger"
 )
 
 type (
 	RegisterPlayerService interface {
-		RegisterUser(ctx context.Context, name string, tgUsername string, tgId int64) (*int64, error)
+		RegisterUser(ctx context.Context, name string, tgUsername string, tgId int64) (*int64, bool, error)
 	}
 
 	RegisterPlayerHandler struct {
@@ -27,29 +27,28 @@ func NewRegisterPlayerHandler(
 	}
 }
 
-func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context) error {
+func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context, params server.RegisterPlayerParams) error {
 	ctx := context.Background()
 
-	name := ectx.Param("name")
-	tgUsername := ectx.Param("tgUsername")
-	tgId, err := strconv.ParseInt(ectx.Param("tgId"), 10, 64)
-	if err != nil {
-		return fmt.Errorf("cannot parse telegram chat id: %v", err)
-	}
-	//logger.Infof(ctx, "Validating player username: %v", tgUsername)
+	logger.Infof(ctx, "Validating player username: %v", params.TgUsername)
 
-	playerId, err := h.registerPlayerService.RegisterUser(ctx, name, tgUsername, tgId)
+	playerId, isRegistered, err := h.registerPlayerService.RegisterUser(ctx, params.Name, params.TgUsername, params.TgId)
 	var playerAlreadyExists *domain.PlayerAlreadyExists
 	if errors.As(err, &playerAlreadyExists) {
-		//logger.Errorf(ctx, "Player %v ot found", tgUsername)
+		logger.Errorf(ctx, "Player %v ot found", params.TgUsername)
 		return ectx.JSON(409, "User already exists")
 	}
 	if err != nil {
-		//logger.Errorf(ctx, "Internal server error while trying to find %v: %v", tgUsername, err)
-		return ectx.JSON(500, err)
+		logger.Errorf(ctx, "Internal server error while trying to find %v: %v", params.TgUsername, err)
+		return InternalErrorResponse(ectx, err.Error())
 	}
-	//logger.Infof(ctx, "Player %v has been found succesfully", tgUsername)
-	return ectx.JSON(200, struct {
+
+	logger.Infof(ctx, "Player %v has been found succesfully", params.TgUsername)
+	httpCode := 200
+	if isRegistered {
+		httpCode = 201
+	}
+	return ectx.JSON(httpCode, struct {
 		PlayerId int64 `json:"playerId"`
 	}{
 		*playerId,

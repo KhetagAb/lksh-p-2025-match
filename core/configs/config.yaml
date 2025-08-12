@@ -8,12 +8,12 @@ http:
   write_timeout: 10s
   shutdown_timeout: 5s
 
-database:
-  name: "example"
-  password: <placeholder>
-  port: 22
-  username: "example"
-  host: "1.1.1.1"
+postgres:
+  host: "localhost"
+  name: "postgres"
+  password: "postgres"
+  port: 5432
+  db: "postgres"
 
 web:
   host: "1.1.1.1"
