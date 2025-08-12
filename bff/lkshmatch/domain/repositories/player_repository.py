@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass
-class Player:
+class Student:
     tg_username: str
     name: str
 
 
-class PlayerRepository(ABC):
+class LKSHStudentsRepository(ABC):
     @abstractmethod
-    def get_players(self) -> list[Player]:
+    def get_players(self) -> List[Student]:
         raise NotImplementedError

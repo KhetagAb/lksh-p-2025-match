@@ -1,4 +1,6 @@
-import aiohttp
+import os
+
+from pymongo import MongoClient
 
 import core_client
 from core_client.api.default import register_player
@@ -6,32 +8,26 @@ from core_client.models import RegisterPlayerResponse400, RegisterPlayerResponse
 from lkshmatch.adapters.base import CoreID, PlayerToRegister, PlayerAdapter, PlayerNotFound, PlayerAlreadyRegister, \
     UnknownError, Player
 from lkshmatch.config import settings
-from lkshmatch.domain.repositories.player_repository import PlayerRepository
-
-core_client_url = f'{settings.get("CORE_HOST")}:{settings.get("CORE_PORT")}'
-
+from lkshmatch.repositories.mongo.players import MongoLKSHStudentsRepository
 
 class CorePlayerAdapter(PlayerAdapter):
     def __init__(self):
         # TODO DI
+        core_client_url = f'{settings.get("CORE_HOST")}:{settings.get("CORE_PORT")}'
+        mongo_client = MongoClient(host=os.getenv("MATCH_MONGO_URI"))
         self.client = core_client.Client(base_url=core_client_url)
+        self.lksh_config = MongoLKSHStudentsRepository(mongo_client)
 
     async def validate_register_user(self, user: Player) -> PlayerToRegister:
-        # TODO
-        players = PlayerRepository().get_players()
-
-        player_name = None
-        for i in players:
-            if i.tg_username == user.tg_username:
-                player_name = i.name
-        if player_name is None:
-            raise PlayerNotFound()
-
-        return PlayerToRegister(
-            tg_username=user.tg_username,
-            tg_id=user.tg_id,
-            name=player_name
-        )
+        students = self.lksh_config.get_players()
+        for student in students:
+            if student.tg_username == user.tg_username:
+                return PlayerToRegister(
+                    tg_username=user.tg_username,
+                    tg_id=user.tg_id,
+                    name=student.name
+                )
+        raise PlayerNotFound()
 
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         response = await register_player.asyncio(

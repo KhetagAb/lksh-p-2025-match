@@ -5,9 +5,9 @@ from dishka import Provider, Scope, provide
 from pymongo import MongoClient
 
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
-from lkshmatch.domain.repositories.player_repository import PlayerRepository
+from lkshmatch.domain.repositories.player_repository import LKSHStudentsRepository
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
-from lkshmatch.repositories.mongo.players import MongoPlayerRepository
+from lkshmatch.repositories.mongo.players import MongoLKSHStudentsRepository
 
 
 class MongoProvider(Provider):
@@ -30,7 +30,7 @@ class MongoProvider(Provider):
 class MongoRepositoryProvider(Provider):
     scope = Scope.APP
     mongo_admin_repository = provide(MongoAdminRepository, provides=AdminRepository)
-    mongo_player_repository = provide(MongoPlayerRepository, provides=PlayerRepository)
+    mongo_player_repository = provide(MongoLKSHStudentsRepository, provides=LKSHStudentsRepository)
 
 
 def all_providers() -> list[Provider]:

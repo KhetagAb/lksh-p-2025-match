@@ -144,7 +144,7 @@ class GetListTournament(ABC):
 class RegisterTeamInTournament(ABC):
     @abstractmethod
     async def register_team_in_tournament(
-        self, tournament: Tournament, team_id: TeamId, player_info: PlayerAddInfo
+        self, tournament: Tournament, team_id: TeamId, player_info: Player
     ) -> None:
         raise NotImplementedError
 
@@ -152,7 +152,7 @@ class RegisterTeamInTournament(ABC):
 class UnregisterTeamInTournament(ABC):
     @abstractmethod
     async def unregister_team_in_tournament(
-        self, tournament: Tournament, team_id: TeamId, player_info: PlayerAddInfo
+        self, tournament: Tournament, team_id: TeamId, player_info: Player
     ) -> None:
         raise NotImplementedError
 
@@ -171,7 +171,7 @@ class ModifyTournament(ABC):
 
 class CreateTeam(ABC):
     @abstractmethod
-    async def create_team(self, section: SportSection, user: PlayerRegisterInfo, name_team: str) -> None:
+    async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
         raise NotImplementedError
 
 
@@ -183,17 +183,17 @@ class GetTeams(ABC):
 
 class JoinTeam(ABC):
     @abstractmethod
-    async def join_team(self, team: Team, user: PlayerRegisterInfo) -> int:
+    async def join_team(self, team: Team, user: Player) -> int:
         raise NotImplementedError
 
 
 class LeaveTeam(ABC):
     @abstractmethod
-    async def leave_team(self, team: Team, user: PlayerRegisterInfo) -> None:
+    async def leave_team(self, team: Team, user: Player) -> None:
         raise NotImplementedError
 
 
 class Approve(ABC):
     @abstractmethod
-    async def approve(self, team: Team, user: PlayerRegisterInfo):
+    async def approve(self, team: Team, user: Player):
         raise NotImplementedError
