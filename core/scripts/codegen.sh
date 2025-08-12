@@ -16,7 +16,7 @@ print_status() {
 
 version=$(oapi-codegen --version 2>/dev/null | tail -n1 || echo "unknown")
 print_status "Oapi-codegen version" "$version" "$BLUE"
-if oapi-codegen -config api/config.yaml ../api/openapi.yaml; then
+if oapi-codegen -config api/config.yaml ../../api/openapi.yaml; then
   print_status "Generating OpenAPI code" "OK" "$GREEN"
 else
   print_status "Generating OpenAPI code" "FAILED" "$RED"
