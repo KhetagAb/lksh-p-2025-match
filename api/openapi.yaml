@@ -4,6 +4,49 @@ info:
   description: Test
   version: 1.0.0
 paths:
+  /core/tournament/create:
+    post:
+      operationId: createTournament
+      summary: "Создает турнир"
+      parameters:
+        - name: sport
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: registration_deadline
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        201:
+          $ref: '#/components/responses/TournamentCreationResponse'
+        400:
+          $ref: '#/components/responses/ErrorResponse'
+        409:
+          $ref: '#/components/responses/ErrorResponse'
+
   /core/player/register:
     get:
       operationId: registerPlayer
@@ -32,12 +75,14 @@ paths:
           $ref: '#/components/responses/PlayerRegistrationResponse'
         400:
           $ref: '#/components/responses/ErrorResponse'
+
   /core/sports/get:
     get:
       summary: "Возращает список всех возможных существующих видов спорта"
       responses:
         200:
           $ref: '#/components/responses/SportSectionList'
+
   /core/sport/get/{sport}:
     get:
       summary: "Возвращает для определенного спорта массив пользователей, которые участвуют в данном виде спорта"
@@ -83,6 +128,17 @@ components:
 
 
   responses:
+    TournamentCreationResponse:
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              id:
+                type: integer
+                format: int64
+                description: Идентификатор турнира
+      description: ""
     PlayerRegistrationResponse:
       description: "Информация о регистрации пользователя"
       content:
