@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: Test
-  description: Test
+  title: Core
+  description: Client for app core part
   version: 1.0.0
 paths:
   /core/tournament/create:
@@ -40,11 +40,11 @@ paths:
             type: string
             format: date-time
       responses:
-        201:
+        "201":
           $ref: '#/components/responses/TournamentCreationResponse'
-        400:
+        "400":
           $ref: '#/components/responses/ErrorResponse'
-        409:
+        "409":
           $ref: '#/components/responses/ErrorResponse'
 
   /core/player/register:
@@ -69,18 +69,18 @@ paths:
             type: integer
             format: int64
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/ErrorResponse'
-        201:
+        "201":
           $ref: '#/components/responses/PlayerRegistrationResponse'
-        400:
+        "400":
           $ref: '#/components/responses/ErrorResponse'
 
   /core/sports/get:
     get:
       summary: "Возращает список всех возможных существующих видов спорта"
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/SportSectionList'
 
   /core/sport/get/{sport}:
@@ -93,13 +93,13 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/SportSectionPlayers'
   /core/sports/get/all:
     get:
       summary: "Возвращает словаль, где для каждого существующего вида спорта соотносится массив пользователей"
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/SportSectionPlayers'
 
 components:
