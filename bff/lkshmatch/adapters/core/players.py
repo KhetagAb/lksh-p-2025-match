@@ -16,7 +16,7 @@ from lkshmatch.adapters.base import (
     UnknownError,
 )
 from lkshmatch.config import settings
-from lkshmatch.repositories.mongo.players import MongoLKSHStudentsRepository
+from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 
 
 class CorePlayerAdapter(PlayerAdapter):
