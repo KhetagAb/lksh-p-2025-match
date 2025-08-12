@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import NewType
+from typing import List, NewType
 
 from lkshmatch.config import settings
 
@@ -9,7 +9,7 @@ TeamId = NewType("TeamId", int)
 SportSectionId = NewType("SportSectionId", int)
 SportSectionName = NewType("SportSectionName", str)
 
-API_URL = 'http://' + str(settings.CORE_HOST) + ':' + str(settings.CORE_PORT)
+API_URL = "http://" + str(settings.CORE_HOST) + ":" + str(settings.CORE_PORT)
 
 
 class PlayerNotFound(Exception):
@@ -44,22 +44,28 @@ class InsufficientRights(Exception):
     pass
 
 
+CoreID = int
+
+
 @dataclass
-class PlayerAddInfo:
+class Player:
     tg_username: str
     tg_id: int
 
 
 @dataclass
-class PlayerRegisterInfo:
+class CorePlayer(Player):
+    core_id: int
+
+
+@dataclass
+class PlayerToRegister(Player):
     name: str
-    id: int
 
 
 @dataclass
 class SportSection:
     name: str
-    en_name: str
 
 
 @dataclass
@@ -87,46 +93,39 @@ class Admin:
     tg_id: int
 
 
-class ValidateRegisterPlayer(ABC):
+class PlayerAdapter(ABC):
     @abstractmethod
-    async def validate_register_user(self, user: PlayerAddInfo) -> str:
+    async def validate_register_user(self, user: Player) -> PlayerToRegister:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def register_user(self, user: PlayerToRegister) -> CoreID:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_player_id(self, user: Player) -> CoreID:
         raise NotImplementedError
 
 
-class RegisterPlayer(ABC):
+class SportAdapter(ABC):
     @abstractmethod
-    async def register_user(self, user: PlayerAddInfo) -> PlayerRegisterInfo:
+    async def get_sections(self) -> List[SportSection]:
         raise NotImplementedError
 
-
-class GetPlayerId(ABC):
     @abstractmethod
-    async def get_player_id(self, user: PlayerAddInfo) -> int:
+    async def get_players_by_sport_sections(self, section: SportSection) -> List[CorePlayer]:
         raise NotImplementedError
 
-
-class GetSportSections(ABC):
     @abstractmethod
-    async def get_sections(self) -> list[SportSection]:
-        raise NotImplementedError
-
-
-class GetPlayersBySportSections(ABC):
-    @abstractmethod
-    async def get_players_by_sport_sections(self, section_id: SportSection) -> list[PlayerRegisterInfo]:
-        raise NotImplementedError
-
-
-class RegisterPlayerInSpotrSection(ABC):
-    @abstractmethod
-    async def register_player_in_sport_section(self, section: SportSection, user: PlayerRegisterInfo) -> None:
+    async def register_player_in_sport_section(self, section: SportSection, user: CorePlayer) -> None:
         raise NotImplementedError
 
 
 class CreateTournament(ABC):
     @abstractmethod
-    async def create_tournament(self, tournament_interval: TournamentInterval, sport_name: SportSectionName,
-                                player_info: Admin) -> None:
+    async def create_tournament(
+        self, tournament_interval: TournamentInterval, sport_name: SportSectionName, player_info: Admin
+    ) -> None:
         raise NotImplementedError
 
 
@@ -144,15 +143,17 @@ class GetListTournament(ABC):
 
 class RegisterTeamInTournament(ABC):
     @abstractmethod
-    async def register_team_in_tournament(self, tournament: Tournament, team_id: TeamId,
-                                          player_info: PlayerAddInfo) -> None:
+    async def register_team_in_tournament(
+        self, tournament: Tournament, team_id: TeamId, player_info: PlayerAddInfo
+    ) -> None:
         raise NotImplementedError
 
 
 class UnregisterTeamInTournament(ABC):
     @abstractmethod
-    async def unregister_team_in_tournament(self, tournament: Tournament, team_id: TeamId,
-                                            player_info: PlayerAddInfo) -> None:
+    async def unregister_team_in_tournament(
+        self, tournament: Tournament, team_id: TeamId, player_info: PlayerAddInfo
+    ) -> None:
         raise NotImplementedError
 
 

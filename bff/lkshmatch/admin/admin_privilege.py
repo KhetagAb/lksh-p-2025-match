@@ -1,7 +1,7 @@
 import hashlib
 
-from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.adapters.core import Admin
+from lkshmatch.domain.repositories.admin_repository import AdminRepository
 
 
 class PrivilegeChecker:
@@ -10,10 +10,9 @@ class PrivilegeChecker:
 
     def check_admin(self, player_info: Admin) -> dict[str, str]:
         admins_list = self.admin_repository.get_admins()
-        headers = {'admin_token': " "}
+        headers = {"admin_token": " "}
         for admin in admins_list:
             if admin == player_info:
-                mb5_hash_tg_id = hashlib.md5(
-                    str(player_info).encode()).hexdigest()
-                headers['admin_token'] = mb5_hash_tg_id
+                mb5_hash_tg_id = hashlib.md5(str(player_info).encode()).hexdigest()
+                headers["admin_token"] = mb5_hash_tg_id
         return headers

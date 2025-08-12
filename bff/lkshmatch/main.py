@@ -1,7 +1,8 @@
 import asyncio
 
-from dishka import make_container, Container
+from dishka import Container, make_container
 from fastapi import FastAPI
+
 from lkshmatch.config import settings
 from lkshmatch.di import all_providers
 from lkshmatch.tg_bot.bot import bot as telegram_bot

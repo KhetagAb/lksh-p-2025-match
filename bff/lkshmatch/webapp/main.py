@@ -1,20 +1,16 @@
-from dishka import make_async_container
-from dishka.integrations.fastapi import FromDishka, inject, setup_dishka
+from dishka.integrations.fastapi import FromDishka, inject
+
 # from fastapi.responses import HTMLResponse, FileResponse
-from fastapi import APIRouter, FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, Request
 from fastapi.requests import Request
-from fastapi.responses import PlainTextResponse, RedirectResponse, Response
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 from jose import JWTError, jwt
-from starlette.middleware.base import (BaseHTTPMiddleware,
-                                       RequestResponseEndpoint)
 
 from lkshmatch.adapters.sport_sections import GetPlayersBySportSections, GetSportSections
-from lkshmatch.di import all_providers
 
 from .auth import auth_router
-from .vars import ALGORITHM, BOT_TOKEN_HASH, COOKIE_NAME, JWT_SECRET_KEY
+from .vars import ALGORITHM, COOKIE_NAME, JWT_SECRET_KEY
 
 app = FastAPI()
 templates = Jinja2Templates("bff/lkshmatch/webapp/templates")
@@ -28,9 +24,7 @@ class User:
 
 @app.get("/")
 async def root(request: Request, username: str = "UU"):
-    return templates.TemplateResponse(
-        name="index.html", context={"request": request, "username": username}
-    )
+    return templates.TemplateResponse(name="index.html", context={"request": request, "username": username})
 
 
 @app.get("/sections")
@@ -60,9 +54,7 @@ async def get_list(
         name="one_section.html",
         context={
             "request": request,
-            "list_of_players": await get_players_by_sport_sections.get_players_by_sport_sections(
-                section_name
-            ),
+            "list_of_players": await get_players_by_sport_sections.get_players_by_sport_sections(section_name),
             "section_name": section_name,
             "username": username,
         },
@@ -70,9 +62,7 @@ async def get_list(
 
 
 @app.get("/sections/{section_name}/reg")
-async def registration(
-    request: Request, section_name: str
-):
+async def registration(request: Request, section_name: str):
     # user registration
     return RedirectResponse("/sections/" + section_name)
 
@@ -89,9 +79,7 @@ async def dispatch(request: Request, call_next) -> Response:
         return await call_next(request)
 
     token = request.cookies.get(COOKIE_NAME)
-    login_wall = templates.TemplateResponse(
-        "auth/login.html", context={"request": request}
-    )
+    login_wall = templates.TemplateResponse("auth/login.html", context={"request": request})
     if not token:
         return login_wall
 
