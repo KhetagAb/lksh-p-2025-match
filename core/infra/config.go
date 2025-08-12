@@ -14,22 +14,22 @@ type (
 	Config struct {
 		App      AppConfig      `mapstructure:"app"`
 		HTTP     HTTPConfig     `mapstructure:"http"`
-		Database DatabaseConfig `mapstructure:"database"`
+		Postgres PostgresConfig `mapstructure:"postgres"`
 		Web      WebConfig      `mapstructure:"web"`
 	}
 
-	DatabaseConfig struct {
+	PostgresConfig struct {
 		Name     string `mapstructure:"name"`
-		Username string `mapstructure:"username"`
-		Port     int32  `mapstructure:"port"`
+		Port     int    `mapstructure:"port"`
 		Password string `mapstructure:"password"`
 		Host     string `mapstructure:"host"`
+		Database string `mapstructure:"db"`
 	}
 
 	WebConfig struct {
 		Host     string `mapstructure:"host"`
 		Password string `mapstructure:"password"`
-		Port     int32  `mapstructure:"port"`
+		Port     int    `mapstructure:"port"`
 	}
 
 	AppConfig struct {
@@ -45,7 +45,7 @@ type (
 	}
 )
 
-//func getPostgresURI(s *DatabaseConfig) string {
+//func getPostgresURI(s *PostgresConfig) string {
 //	return fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", s.Username, s.Password, s.Host, s.Port, s.Name)
 //}
 

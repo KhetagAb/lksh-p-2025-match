@@ -23,24 +23,9 @@ var (
 	once          sync.Once
 )
 
-func Init(serviceName, level string) {
+func Init() {
 	once.Do(func() {
-		var zapLevel zapcore.Level
-		switch level {
-		case DebugLevel:
-			zapLevel = zapcore.DebugLevel
-		case InfoLevel:
-			zapLevel = zapcore.InfoLevel
-		case WarnLevel:
-			zapLevel = zapcore.WarnLevel
-		case ErrorLevel:
-			zapLevel = zapcore.ErrorLevel
-		case FatalLevel:
-			zapLevel = zapcore.FatalLevel
-		default:
-			zapLevel = zapcore.InfoLevel
-		}
-
+		var zapLevel = zapcore.InfoLevel
 		encoderConfig := zapcore.EncoderConfig{
 			TimeKey:        "time",
 			LevelKey:       "level",
@@ -68,7 +53,7 @@ func Init(serviceName, level string) {
 			zap.Fields(zapcore.Field{
 				Key:    "service",
 				Type:   zapcore.StringType,
-				String: serviceName,
+				String: "match",
 			}),
 		)
 
