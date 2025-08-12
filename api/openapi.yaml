@@ -32,10 +32,59 @@ paths:
           $ref: '#/components/responses/PlayerRegistrationResponse'
         400:
           $ref: '#/components/responses/ErrorResponse'
+  /core/sports/get:
+    get:
+      summary: "Возращает список всех возможных существующих видов спорта"
+      responses:
+        200:
+          $ref: '#/components/responses/SportSectionList'
+  /core/sport/get/{sport}:
+    get:
+      summary: "Возвращает для определенного спорта массив пользователей, которые участвуют в данном виде спорта"
+      parameters:
+        - name: sport
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/SportSectionPlayers'
+  /core/sports/get/all:
+    get:
+      summary: "Возвращает словаль, где для каждого существующего вида спорта соотносится массив пользователей"
+      responses:
+        200:
+          $ref: '#/components/responses/SportSectionPlayers'
 
 components:
+  schemas:
+    Player:
+      description: "Структура описывающая пользователя"
+      type: object
+      properties:
+        tgId:
+          type: integer
+          format: int64
+        coreId:
+          type: integer
+          format: int64
+    PlayerList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Player"
+
+
+    PlayersBySport:
+      description: "Словарь из вида спорта в массив пользователей, которые на него записаны"
+      type: object
+      additionalProperties:
+        $ref: "#/components/schemas/PlayerList"
+
+
   responses:
     PlayerRegistrationResponse:
+      description: "Информация о регистрации пользователя"
       content:
         application/json:
           schema:
@@ -45,7 +94,27 @@ components:
                 type: integer
                 format: int64
                 description: Core-идентификатор
-      description: ""
+
+    SportSectionPlayers:
+      description: "Словарь где ключ это вид спорта а значение это масиив id игроков которые принимают участие в данном виде спорта"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PlayersBySport"
+
+
+    SportSectionList:
+      description: "Массив, в котором содержатся названия всех существующих видов спорта"
+      content:
+        application/json:
+          schema:
+            type: "object"
+            properties:
+              sports_sections:
+                type: array
+                items:
+                  type: string
+
     ErrorResponse:
       content:
         application/json:
