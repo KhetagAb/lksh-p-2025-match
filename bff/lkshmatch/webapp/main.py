@@ -17,15 +17,9 @@ from .auth import auth_router
 from .vars import ALGORITHM, BOT_TOKEN_HASH, COOKIE_NAME, JWT_SECRET_KEY
 
 app = FastAPI()
-container = make_async_container(*all_providers())
-setup_dishka(container, app)
 templates = Jinja2Templates("bff/lkshmatch/webapp/templates")
-# static_files = HTMLStaticFiles(directory='site/')
 
 app.include_router(auth_router, prefix="/auth")
-# app.mount('/', static_files, name='static')
-
-# await add_user.add_user(user=PlayerAddInfo("lol"))
 
 
 class User:

@@ -1,12 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import NewType
-from bff.lkshmatch.config import settings
-
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import NewType
-from bff.lkshmatch.config import settings
+from lkshmatch.config import settings
 
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)
@@ -23,6 +18,7 @@ class PlayerNotFound(Exception):
 class PlayerAlreadyRegister(Exception):
     pass
 
+
 class TeamIsFull(Exception):
     pass
 
@@ -35,7 +31,15 @@ class PlayerAlreadyInTeam(Exception):
     pass
 
 
+class TeamNotFound(Exception):
+    pass
+
+
 class UnknownError(Exception):
+    pass
+
+
+class InsufficientRights(Exception):
     pass
 
 
@@ -81,6 +85,7 @@ class Tournament:
 class Admin:
     tg_id: int
 
+
 class ValidateRegisterPlayer(ABC):
     @abstractmethod
     async def validate_register_user(self, user: PlayerAddInfo) -> str:
@@ -92,10 +97,12 @@ class RegisterPlayer(ABC):
     async def register_user(self, user: PlayerAddInfo) -> PlayerRegisterInfo:
         raise NotImplementedError
 
+
 class GetPlayerId(ABC):
     @abstractmethod
     async def get_player_id(self, user: PlayerAddInfo) -> int:
         raise NotImplementedError
+
 
 class GetSportSections(ABC):
     @abstractmethod
@@ -115,11 +122,9 @@ class RegisterPlayerInSpotrSection(ABC):
         raise NotImplementedError
 
 
-
-
 class CreateTournament(ABC):
     @abstractmethod
-    async def create_tournament(self, tournament_interval: TournamentInterval, sport_name: SportSectionName,player_info:Admin) -> None:
+    async def create_tournament(self, tournament_interval: TournamentInterval, sport_name: SportSectionName, player_info: Admin) -> None:
         raise NotImplementedError
 
 
@@ -137,24 +142,25 @@ class GetListTournament(ABC):
 
 class RegisterTeamInTournament(ABC):
     @abstractmethod
-    async def register_team_in_tournament(self, tournament: Tournament, team_id: TeamId,player_info :PlayerAddInfo) -> None:
+    async def register_team_in_tournament(self, tournament: Tournament, team_id: TeamId, player_info: PlayerAddInfo) -> None:
         raise NotImplementedError
 
 
 class UnregisterTeamInTournament(ABC):
     @abstractmethod
-    async def unregister_team_in_tournament(self, tournament: Tournament, team_id: TeamId,player_info :PlayerAddInfo) -> None:
+    async def unregister_team_in_tournament(self, tournament: Tournament, team_id: TeamId, player_info: PlayerAddInfo) -> None:
         raise NotImplementedError
+
 
 class RemoveTournament(ABC):
     @abstractmethod
-    async def remove_tournament(self, tournament: Tournament,player_info :Admin) -> None:
+    async def remove_tournament(self, tournament: Tournament, player_info: Admin) -> None:
         raise NotImplementedError
 
 
 class ModifyTournament(ABC):
     @abstractmethod
-    async def modify_tournament(self, tournament: Tournament,player_info :Admin) -> None:
+    async def modify_tournament(self, tournament: Tournament, player_info: Admin) -> None:
         raise NotImplementedError
 
 
@@ -163,20 +169,24 @@ class CreateTeam(ABC):
     async def create_team(self, section: SportSection, user: PlayerRegisterInfo, name_team: str) -> None:
         raise NotImplementedError
 
+
 class GetTeams(ABC):
     @abstractmethod
     async def teams(self, section: SportSection) -> list[Team]:
         raise NotImplementedError
+
 
 class JoinTeam(ABC):
     @abstractmethod
     async def join_team(self, team: Team, user: PlayerRegisterInfo) -> int:
         raise NotImplementedError
 
+
 class LeaveTeam(ABC):
     @abstractmethod
     async def leave_team(self, team: Team, user: PlayerRegisterInfo) -> None:
         raise NotImplementedError
+
 
 class Approve(ABC):
     @abstractmethod

@@ -2,16 +2,15 @@ from typing import List
 
 import aiohttp
 
-from bff.lkshmatch.adapters.core import CreateTournament, API_URL, UnknownError, GetAllListTournament, Tournament, \
+from lkshmatch.domain.repositories.admin_repository import AdminRepository
+from lkshmatch.adapters.core import CreateTournament, API_URL, UnknownError, GetAllListTournament, Tournament, \
     TournamentInterval, SportSectionName, GetListTournament, RegisterTeamInTournament, TeamId, RemoveTournament, \
     ModifyTournament, UnregisterTeamInTournament, Admin
-from bff.lkshmatch.admin.admin_privilege import PrivilegeChecker
-from bff.lkshmatch.repositories.admins import AdminsRepository
-from bff.lkshmatch.repositories.mongodb import create_mongodb_client
+from lkshmatch.admin.admin_privilege import PrivilegeChecker
 
 
 class RestCreateTournament(CreateTournament):
-    def __init__(self, admin_repository: AdminsRepository, privilege_checker: PrivilegeChecker):
+    def __init__(self, admin_repository: AdminRepository, privilege_checker: PrivilegeChecker):
         self.admins_repository = admin_repository
         self.privilege_checker = privilege_checker
 
@@ -64,7 +63,7 @@ class RestUnregisterTeamInTournament(UnregisterTeamInTournament):
 
 
 class RestRemoveTournament(RemoveTournament):
-    def __init__(self, admin_repository: AdminsRepository, privilege_checker: PrivilegeChecker):
+    def __init__(self, admin_repository: AdminRepository, privilege_checker: PrivilegeChecker):
         self.admins_repository = admin_repository
         self.privilege_checker = privilege_checker
 
@@ -77,7 +76,7 @@ class RestRemoveTournament(RemoveTournament):
 
 
 class RestModifyTournament(ModifyTournament):
-    def __init__(self, admin_repository: AdminsRepository, privilege_checker: PrivilegeChecker):
+    def __init__(self, admin_repository: AdminRepository, privilege_checker: PrivilegeChecker):
         self.admins_repository = admin_repository
         self.privilege_checker = privilege_checker
 
