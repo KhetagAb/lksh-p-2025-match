@@ -1,15 +1,14 @@
+import logging
+import random
+
+from telebot import types
+from telebot.async_telebot import AsyncTeleBot
+
+from lkshmatch.adapters.core import InsufficientRights, NameTeamReserveError, TeamNotFound, UnknownError, \
+    PlayerNotFound, TeamIsFull
 from lkshmatch.adapters.players import RestValidateRegisterPlayer, RestRegisterPlayer, PlayerAddInfo
 from lkshmatch.adapters.sport_sections import SportSection, RestGetSportSections, RestGetPlayersBySportSections
-from lkshmatch.adapters.core import InsufficientRights, NameTeamReserveError, TeamNotFound, UnknownError, PlayerNotFound, TeamIsFull
-import logging
-from telegram import Bot, Update
-from fastapi import APIRouter, Request, FastAPI
-from telebot.async_telebot import AsyncTeleBot, Handler
-from telebot import types
-from contextlib import asynccontextmanager
-import random
 from lkshmatch.config import settings
-
 
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
@@ -30,17 +29,17 @@ from lkshmatch.config import settings
 #     await bot.process_new_updates([types.Update.de_json(await req.json())])
 
 
-real_token = settings.get("MATCH_TELEGRAM_TOKEN")
+token = settings.get("TELEGRAM_TOKEN")
+logging.info(f"TELEGRAM_TOKEN: {token}")
 
-token = ""
+if token == None:
+    raise ValueError("TG token required!")
 
-if real_token:
-    token = real_token
-else:
-    # TODO: log error and continue work, because we have other frontends
-    exit()
-
-bot = AsyncTeleBot(token)
+try:
+    bot = AsyncTeleBot(token)
+except Exception as e:
+    logging.error(f"Ошибка создания Telegram бота: {e}")
+    exit(1)
 
 # Не будет использоваться в дальнейшем
 def add_matching(tg_id: int, real_id) -> None:

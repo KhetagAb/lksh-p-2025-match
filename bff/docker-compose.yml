@@ -6,9 +6,9 @@ services:
     container_name: match-mongodb
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: password123
-      MONGO_INITDB_DATABASE: match
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
     ports:
       - "27017:27017"
     volumes:
@@ -43,13 +43,11 @@ services:
       context: .
       dockerfile: lkshmatch/Dockerfile
     container_name: match-bot
-    restart: unless-stopped
     environment:
-      - MATCH_ENV=prod
       - MATCH_CORE_HOST=127.0.0.1
       - MATCH_CORE_PORT=32442
-      - MATCH_TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
-      - MATCH_MONGO_URI=mongodb://admin:password123@mongodb:27017/lkshmatch?authSource=admin
+      - MATCH_TELEGRAM_TOKEN=${MATCH_TELEGRAM_TOKEN}
+      - MATCH_MONGO_URI=mongodb://${MONGODB_ROOT_USERNAME}:${MONGODB_ROOT_PASSWORD}@mongodb:27017/${MONGODB_DATABASE}
     depends_on:
       - mongodb
     networks:
