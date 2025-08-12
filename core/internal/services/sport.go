@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"context"
-	"match/internal/repositories"
+	"match/domain"
 )
 
 type (
 	GetAllSportSectionService interface {
 		//TODO возвращать доменный объект
-		GetSportsList(ctx context.Context) ([]*repositories.SportSections, error)
+		GetSportsList(ctx context.Context) ([]domain.SportSection, error)
 	}
 
 	SportService struct {
@@ -22,6 +22,9 @@ func (s *SportService) GetAllSportSection(ctx context.Context) ([]string, error)
 		return nil, err
 	} else {
 		var ans []string
+		for _, el := range cnt {
+			ans = append(ans, el.RuName)
+		}
 		return ans, nil
 
 	}
