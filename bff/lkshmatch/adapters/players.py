@@ -1,22 +1,30 @@
 import aiohttp
 
-from lkshmatch.domain.repositories.player_repository import PlayerRepository
-from lkshmatch.adapters.core import (ValidateRegisterPlayer, PlayerAddInfo, UnknownError, RegisterPlayer,
-                                     PlayerRegisterInfo, PlayerAlreadyRegister, GetPlayerId, API_URL)
+import core_client
+from core_client.api.default import register_player
+from core_client.models import *
+from lkshmatch.adapters.core import (
+    API_URL,
+    GetPlayerId,
+    PlayerAddInfo,
+    PlayerAlreadyRegister,
+    PlayerRegisterInfo,
+    RegisterPlayer,
+    UnknownError,
+    ValidateRegisterPlayer,
+)
 from lkshmatch.adapters.sport_sections import PlayerNotFoundResponse
+from lkshmatch.domain.repositories.player_repository import PlayerRepository
+from lkshmatch.config import settings
+
+core_client_url = f'{settings.get("CORE_HOST")}:{settings.get("CORE_PORT")}'
 
 
-class RestGetPlayerId(GetPlayerId):
-    async def get_player_id(self, user: PlayerAddInfo) -> int:
-        async with aiohttp.ClientSession() as session:
-            query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
-            response = await session.get(f'{API_URL}/register_user', params=query)
-
-            if response.status != 200:
-                raise UnknownError
-
-            data = await response.json()
-            return int(data['id'])
+# class RestGetPlayerId(GetPlayerId):
+#     async def get_player_id(self, user: PlayerAddInfo) -> int:
+#         client = core_client.Client(base_url=core_client_url)
+#
+#         core_client.api.default.
 
 
 class RestValidateRegisterPlayer(ValidateRegisterPlayer):
@@ -35,14 +43,17 @@ class RestValidateRegisterPlayer(ValidateRegisterPlayer):
 
 class RestRegisterPlayer(RegisterPlayer):
     async def register_user(self, user: PlayerAddInfo) -> PlayerRegisterInfo:
-        async with aiohttp.ClientSession() as session:
-            query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
-            response = await session.get(f'{API_URL}/register_user', params=query)
+        client = core_client.Client(base_url=core_client_url)
+        response = await register_player.asyncio(
+            client=client,
+            tg_username=user.tg_username,
+            tg_id=user.tg_id,
+            name='Зубенко Михаил Петрович'
+        )
 
-            if response.status == 409:
-                raise PlayerAlreadyRegister
-            if response.status != 200:
-                raise UnknownError
-
-            data = await response.json()
-            return PlayerRegisterInfo(data["name"], int(data['id']))
+        if isinstance(response, RegisterPlayerResponse400):
+            raise PlayerAlreadyRegister
+        elif isinstance(response, RegisterPlayerResponse200):
+            return PlayerRegisterInfo(response.name, int(response.id))
+        else:
+            raise UnknownError
