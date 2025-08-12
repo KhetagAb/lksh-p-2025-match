@@ -39,7 +39,9 @@ services:
 
   # Telegram бот (опционально, можно запускать отдельно)
   match-bot:
-    build: .
+    build:
+      context: .
+      dockerfile: lkshmatch/Dockerfile
     container_name: match-bot
     restart: unless-stopped
     environment:
@@ -47,14 +49,12 @@ services:
       - MATCH_CORE_HOST=127.0.0.1
       - MATCH_CORE_PORT=32442
       - MATCH_TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
-      - MONGODB_URL=mongodb://admin:password123@mongodb:27017/match?authSource=admin
+      - MATCH_MONGO_URI=mongodb://admin:password123@mongodb:27017/lkshmatch?authSource=admin
     depends_on:
       - mongodb
     networks:
       - match-network
-    volumes:
-      - ./config.toml:/app/bff/config.toml:ro
-    command: [ "python", "-m", "lkshmatch.main" ]
+    command: [ "python", "lkshmatch/main.py" ]
 
 volumes:
   mongodb_data:

@@ -1,15 +1,10 @@
-from dataclasses import dataclass
 from typing import List
-
 from pymongo import MongoClient
+from lkshmatch.domain.repositories.admin_repository import AdminRepository, Admin
 
 DATABASE_NAME = "match"
 
-@dataclass
-class Admin:
-    tg_id: int
-
-class MongoAdminRepository:
+class MongoAdminRepository(AdminRepository):
     def __init__(self, mongo_client: MongoClient):
         self.client: MongoClient = mongo_client
 
