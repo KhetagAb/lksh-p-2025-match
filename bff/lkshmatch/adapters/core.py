@@ -15,6 +15,9 @@ class PlayerNotFound(Exception):
     pass
 
 
+class PlayerAlreadyRegister(Exception):
+    pass
+
 class TeamIsFull(Exception):
     pass
 
@@ -80,6 +83,10 @@ class RegisterPlayer(ABC):
     async def register_user(self, user: PlayerAddInfo) -> PlayerRegisterInfo:
         raise NotImplementedError
 
+class GetPlayerId(ABC):
+    @abstractmethod
+    async def get_player_id(self, user: PlayerAddInfo) -> int:
+        raise NotImplementedError
 
 class GetSportSections(ABC):
     @abstractmethod
@@ -97,6 +104,8 @@ class RegisterPlayerInSpotrSection(ABC):
     @abstractmethod
     async def register_player_in_sport_section(self, section: SportSection, user: PlayerRegisterInfo) -> None:
         raise NotImplementedError
+
+
 
 
 class CreateTournament(ABC):
@@ -137,4 +146,30 @@ class RemoveTournament(ABC):
 class ModifyTournament(ABC):
     @abstractmethod
     async def modify_tournament(self, tournament: Tournament) -> None:
+        raise NotImplementedError
+
+
+class CreateTeam(ABC):
+    @abstractmethod
+    async def create_team(self, section: SportSection, user: PlayerRegisterInfo, name_team: str) -> None:
+        raise NotImplementedError
+
+class GetTeams(ABC):
+    @abstractmethod
+    async def teams(self, section: SportSection) -> list[Team]:
+        raise NotImplementedError
+
+class JoinTeam(ABC):
+    @abstractmethod
+    async def join_team(self, team: Team, user: PlayerRegisterInfo) -> int:
+        raise NotImplementedError
+
+class LeaveTeam(ABC):
+    @abstractmethod
+    async def leave_team(self, team: Team, user: PlayerRegisterInfo) -> None:
+        raise NotImplementedError
+
+class Approve(ABC):
+    @abstractmethod
+    async def approve(self, team: Team, user: PlayerRegisterInfo):
         raise NotImplementedError

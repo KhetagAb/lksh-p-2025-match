@@ -1,24 +1,34 @@
 import aiohttp
 
-from bff.lkshmatch.adapters.core import ValidateRegisterPlayer, PlayerAddInfo, UnknownError, RegisterPlayer, \
-    PlayerRegisterInfo, API_URL
+from bff.lkshmatch.adapters.core import (ValidateRegisterPlayer, PlayerAddInfo, UnknownError, RegisterPlayer,
+    PlayerRegisterInfo, PlayerAlreadyRegister, GetPlayerId, API_URL)
 from bff.lkshmatch.adapters.sport_sections import PlayerNotFoundResponse
+from bff.lkshmatch.repositories.player import PlayerRepositories
 
-
-class RestValidateRegisterPlayer(ValidateRegisterPlayer):
-    async def validate_register_user(self, user: PlayerAddInfo) -> str:
+class RestGetPlayerId(GetPlayerId):
+    async def get_player_id(self, user: PlayerAddInfo) -> int:
         async with aiohttp.ClientSession() as session:
             query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
-            response = await session.get(f'{API_URL}/validate_register_user', params=query)
+            response = await session.get(f'{API_URL}/register_user', params=query)
 
-            data = await response.json()
-
-            if response.status == 404 and data.count("detail") != 0:
-                raise PlayerNotFoundResponse
             if response.status != 200:
                 raise UnknownError
 
-            return data["name"]
+            data = await response.json()
+            return int(data['id'])
+
+class RestValidateRegisterPlayer(ValidateRegisterPlayer):
+    async def validate_register_user(self, user: PlayerAddInfo) -> str:
+            players = PlayerRepositories.get_player()
+
+            ans = ""
+            for i in players:
+                if i.tg_username == user.tg_username:
+                    ans = i.name
+            if ans == "":
+                raise PlayerNotFoundResponse
+
+            return ans
 
 
 class RestRegisterPlayer(RegisterPlayer):
@@ -27,6 +37,8 @@ class RestRegisterPlayer(RegisterPlayer):
             query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
             response = await session.get(f'{API_URL}/register_user', params=query)
 
+            if response.status == 409:
+                raise PlayerAlreadyRegister
             if response.status != 200:
                 raise UnknownError
 
