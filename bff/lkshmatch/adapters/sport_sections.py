@@ -3,6 +3,7 @@ import aiohttp
 from bff.lkshmatch.adapters.core import GetSportSections, SportSection, UnknownError, GetPlayersBySportSections, \
     PlayerRegisterInfo, RegisterPlayerInSpotrSection, PlayerNotFound, API_URL
 
+from bff.lkshmatch.admin.admin_privilege import PrivilegeChecker
 
 class PlayerNotFoundResponse(PlayerNotFound):
     pass
@@ -44,7 +45,9 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
 
 # TODO remove
 class RestRegisterPlayerInSportSection(RegisterPlayerInSpotrSection):
-    async def register_player_in_sport_sectoin(self, section: SportSection, user: PlayerRegisterInfo) -> None:
+    async def register_player_in_sport_section(self, section: SportSection, user: PlayerRegisterInfo) -> None:
+
+        # проверка на админа
         async with aiohttp.ClientSession() as session:
             query = {"name_section": section.en_name, "user_id": user.id}
             response = await session.get(f'{API_URL}/register_player_in_sport_section', params=query)
