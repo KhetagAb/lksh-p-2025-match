@@ -132,7 +132,8 @@ async def start(mess: types.Message) -> None:
         return
     try:
         safe_username = username if username is not None else "unknown_user"
-        msg = await app_container.get(LKSHStudentsRepository).validate_register_user(
+        repo = app_container.get(LKSHStudentsRepository)
+        msg = await repo.validate_register_user(
             Player(safe_username, int(user_id))
         )
     except PlayerNotFound:

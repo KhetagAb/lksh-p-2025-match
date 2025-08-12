@@ -10,16 +10,12 @@ class MongoLKSHStudentsRepository(LKSHStudentsRepository):
     def __init__(self, mongo_client: MongoClient):
         self.mongo_client = mongo_client
 
-    async def get_players(self) -> list[Student]:
-        return list(self.mongo_client[DATABASE_NAME]["players"].find())
+    async def get_students(self) -> list[Student]:
+        return list(self.mongo_client[DATABASE_NAME]["students"].find())
 
     async def validate_register_user(self, user: Player) -> str:
-        players = await self.get_players()
-        ans = ""
-        for i in players:
-            if i.tg_username == user.tg_username:
-                ans = i.name
-        if ans == "":
-            raise PlayerNotFound
-
-        return ans
+        students = await self.get_students()
+        for student in students:
+            if student['tg_username'] == user.tg_username:
+                return student['name']
+        raise PlayerNotFound
