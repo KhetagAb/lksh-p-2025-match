@@ -1,6 +1,6 @@
 from bff.lkshmatch.adapters.players import RestValidateRegisterPlayer, RestRegisterPlayer, PlayerAddInfo
 from bff.lkshmatch.adapters.sport_sections import SportSection, RestGetSportSections, RestGetPlayersBySportSections
-from bff.lkshmatch.adapters.core import NameTeamReserveError, UnknownError
+from bff.lkshmatch.adapters.core import NameTeamReserveError, UnknownError, PlayerNotFound, TeamIsFull
 import logging
 from telegram import Bot, Update
 from fastapi import APIRouter, Request, FastAPI
@@ -266,7 +266,7 @@ async def make_request_to_add_in_team(mess: types.Message, sport: SportSection) 
         team = mess.text[len(f"{sport.en_name}: "):]
         try:
             add_person_to_team(team, mess.from_user.id)
-        except rest.TeamIsFull:
+        except TeamIsFull:
 
         return True
     return False
