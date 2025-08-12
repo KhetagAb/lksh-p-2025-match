@@ -1,0 +1,27 @@
+{% extends "basic_interface.html" %}
+
+{% block title %}
+Регистрация на секции через google-таблицы
+{% endblock %}
+
+{% block content %}
+
+<h2>Регистрация на секции через google-таблицы</h2>
+<p>
+    {{ error }}
+</p>
+<ul>
+    <li>Создайте google-таблицу</li>
+    <li>В настройках доступа добавьте {{ service_account_name }}</li>
+    <li>Заполните таблицу: в первом столбце должны быть username-ы учеников </li>
+</ul>
+<form method="post">
+  <label for="table_url">Ссылка на таблицу</label><br>
+  <input type="text" id="table_url" name="table_url"><br>
+  <label for="section_name">Название секции</label><br>
+  <input type="text" id="section_name" name="section_name"><br>
+  <input type="submit" value="Отправить">
+</form> 
+<a href="/">Main page</a>
+
+{% endblock %}

@@ -44,7 +44,7 @@ class RestGetPlayersBySportSections(GetPlayersBySportSections):
 
 # TODO remove
 class RestRegisterPlayerInSportSection(RegisterPlayerInSpotrSection):
-    async def register_player_in_sport_sectoin(self, section: SportSection, user: PlayerRegisterInfo) -> None:
+    async def register_player_in_sport_section(self, section: SportSection, user: PlayerRegisterInfo) -> None:
         async with aiohttp.ClientSession() as session:
             query = {"name_section": section.en_name, "user_id": user.id}
             response = await session.get(f'{API_URL}/register_player_in_sport_section', params=query)

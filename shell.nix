@@ -20,6 +20,9 @@ pkgs.mkShell {
         dynaconf
         dishka
         python-jose
+        httplib2
+        google-api-python-client
+        oauth2client
         (pkgs.python3Packages.mkPythonEditablePackage {
           pname = pyproject.project.name;
           version = pyproject.project.version;

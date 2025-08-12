@@ -10,10 +10,11 @@ from jose import JWTError, jwt
 from starlette.middleware.base import (BaseHTTPMiddleware,
                                        RequestResponseEndpoint)
 
-from lkshmatch.adapters.sport_sections import GetPlayersBySportSections, GetSportSections
+from lkshmatch.adapters.core import GetPlayersBySportSections, GetSportSections
 from lkshmatch.di import all_providers
 
 from .auth import auth_router
+from .table_adapter import table_adapter_router
 from .vars import ALGORITHM, BOT_TOKEN_HASH, COOKIE_NAME, JWT_SECRET_KEY
 
 app = FastAPI()
@@ -23,6 +24,7 @@ templates = Jinja2Templates("bff/lkshmatch/webapp/templates")
 # static_files = HTMLStaticFiles(directory='site/')
 
 app.include_router(auth_router, prefix="/auth")
+app.include_router(table_adapter_router, prefix="/table")
 # app.mount('/', static_files, name='static')
 
 # await add_user.add_user(user=PlayerAddInfo("lol"))
