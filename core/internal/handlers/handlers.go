@@ -9,6 +9,26 @@ type ServerInterface struct {
 	registerPlayer *RegisterPlayerHandler
 }
 
+func (s *ServerInterface) GetCoreSportGetSport(ctx echo.Context, sport string) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *ServerInterface) GetCoreSportsGet(ctx echo.Context) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *ServerInterface) GetCoreSportsGetAll(ctx echo.Context) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *ServerInterface) CreateTournament(ctx echo.Context, params server.CreateTournamentParams) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s *ServerInterface) RegisterPlayer(ctx echo.Context, params server.RegisterPlayerParams) error {
 	return s.registerPlayer.RegisterUser(ctx, params)
 }
