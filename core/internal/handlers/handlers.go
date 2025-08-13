@@ -1,13 +1,15 @@
 package handlers
 
 import (
-	"github.com/labstack/echo/v4"
 	"match/internal/generated/server"
+
+	"github.com/labstack/echo/v4"
 )
 
 type ServerInterface struct {
-	registerPlayer   *RegisterPlayerHandler
-	createTournament *CreateTournamentHandler
+	registerPlayer                  *RegisterPlayerHandler
+	createTournament                *CreateTournamentHandler
+	getCoreActivityBySportSectionID *GetCoreActivityBySportSectionIDHandler
 }
 
 func (s ServerInterface) GetCoreActivityById(ctx echo.Context, id int64) error {
@@ -17,7 +19,7 @@ func (s ServerInterface) GetCoreActivityById(ctx echo.Context, id int64) error {
 
 func (s ServerInterface) GetCoreActivityBySportSectionId(ctx echo.Context, id int64) error {
 	//TODO implement me
-	panic("implement me")
+	return s.getCoreActivityBySportSectionID.GetCoreActivityBySportSectionID(ctx, id)
 }
 
 func (s ServerInterface) PostCoreActivityIdEnroll(ctx echo.Context, id string) error {
@@ -37,9 +39,10 @@ func (s ServerInterface) GetCoreSportList(ctx echo.Context) error {
 
 var _ server.ServerInterface = &ServerInterface{}
 
-func NewServerInterface(registerPlayer *RegisterPlayerHandler, createTournament *CreateTournamentHandler) *ServerInterface {
+func NewServerInterface(registerPlayer *RegisterPlayerHandler, createTournament *CreateTournamentHandler, getCoreActivityBySportSectionID *GetCoreActivityBySportSectionIDHandler) *ServerInterface {
 	return &ServerInterface{
-		registerPlayer:   registerPlayer,
-		createTournament: createTournament,
+		registerPlayer:                  registerPlayer,
+		createTournament:                createTournament,
+		getCoreActivityBySportSectionID: getCoreActivityBySportSectionID,
 	}
 }
