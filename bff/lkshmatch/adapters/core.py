@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import NewType
-from bff.lkshmatch.config import settings
+from config import settings
 
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)

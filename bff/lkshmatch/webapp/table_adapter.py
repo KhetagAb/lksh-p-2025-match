@@ -13,9 +13,9 @@ from googleapiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
 from urllib.parse import urlparse, parse_qs
 
-from bff.lkshmatch.adapters.core import RegisterPlayerInSpotrSection, UnknownError, SportSection, PlayerRegisterInfo
-
+from adapters.core import RegisterPlayerInSpotrSection, UnknownError, SportSection, PlayerRegisterInfo
 from .vars import CREDENTIALS_FILE, SERVICE_ACCOUNT_NAME
+from .root import templates
 
 class TableIsEmptyError(Exception):
     def __init__(self):
@@ -27,7 +27,6 @@ class RegisterInSectionInfo(BaseModel):
     table_url: str
     section_name: str
 
-templates = Jinja2Templates("bff/lkshmatch/webapp/templates")
 table_adapter_router = APIRouter()
 credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, ['https://www.googleapis.com/auth/spreadsheets',
                                                                                   'https://www.googleapis.com/auth/drive'])
@@ -117,24 +116,3 @@ async def register_on_section_with_table_post(
         'service_account_name': SERVICE_ACCOUNT_NAME,
         'username': 'UU'
     }, name='table/register_in_section.html')
-
-
-
-# sheet_url = 'https://docs.google.com/spreadsheets/d/1bR5o4IVU3RNWPiFA2pq0Wivm5hTxPdkK1FBq8XF04Qo/edit?pli=1&gid=1017497761#gid=1017497761'
-# sheet_data = get_sheet_data_from_url(sheet_url)
-# spreadsheetId = sheet_data['spreadsheetId']
-# sheetName = sheet_data['sheetName']
-
-# results = service.spreadsheets().values().get(spreadsheetId = spreadsheetId, 
-#                                      range=sheetName+"!A1:D4").execute() 
-# sheet_values = results['values']
-# print(sheet_values)
-
-# results = service.spreadsheets().values().batchUpdate(spreadsheetId = spreadsheetId, body = {
-#     "valueInputOption": "USER_ENTERED",
-#     "data": [
-#         {"range": sheetName+"!B2:C3",
-#          "majorDimension": "ROWS",     # сначала заполнять ряды, затем столбцы (т.е. самые внутренние списки в values - это ряды)
-#          "values": [["This is B2", "This is C2"], ["This is B3", "This is C3"]]}
-#     ]
-# }).execute()

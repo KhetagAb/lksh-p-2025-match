@@ -2,7 +2,7 @@ from typing import List
 
 import aiohttp
 
-from bff.lkshmatch.adapters.core import CreateTournament, API_URL, UnknownError, GetAllListTournament, Tournament, \
+from adapters.core import CreateTournament, API_URL, UnknownError, GetAllListTournament, Tournament, \
     TournamentInterval, SportSectionName, GetListTournament, RegisterTeamInTournament, TeamId, RemoveTournament, \
     ModifyTournament, UnregisterTeamInTournament
 

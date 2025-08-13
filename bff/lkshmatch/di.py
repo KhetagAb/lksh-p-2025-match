@@ -1,13 +1,13 @@
 from dishka import Provider, Scope, provide
 
-from bff.lkshmatch.adapters.core import (GetPlayersBySportSections,
+from adapters.core import (GetPlayersBySportSections,
                                      GetSportSections,
                                      RegisterPlayerInSpotrSection,
                                      RegisterPlayer, ValidateRegisterPlayer)
-from bff.lkshmatch.adapters.sport_sections import (RestGetPlayersBySportSections,
+from adapters.sport_sections import (RestGetPlayersBySportSections,
                                      RestGetSportSections,
                                      RestRegisterPlayerInSportSection)
-from bff.lkshmatch.adapters.players import(RestRegisterPlayer,
+from adapters.players import(RestRegisterPlayer,
                                      RestValidateRegisterPlayer)
 
 

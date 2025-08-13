@@ -1,7 +1,11 @@
 [test]
 CORE_HOST =  "127.0.0.1"
 CORE_PORT = 32441
+COOKIE_NAME = "auth-token" # Ключ, по которому расположен jwt-токен в куках. Использует webapp
+ALGORITHM = "HS256" # Алгоритм для создания jwt-токена. Использует webapp
 
 [prod]
 CORE_HOST =  "127.0.0.2"
 CORE_PORT = 32442
+COOKIE_NAME = "auth-token" # Ключ, по которому расположен jwt-токен в куках. Использует webapp
+ALGORITHM = "HS256" # Алгоритм для создания jwt-токена. Использует webapp

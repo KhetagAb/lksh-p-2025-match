@@ -1,12 +1,13 @@
 import hashlib
 import os
+from config import settings
 
 # Telegram auth
-JWT_SECRET_KEY = "hahaha"
-BOT_TOKEN_HASH = hashlib.sha256(os.environ["BOT_TOKEN"].encode())
-COOKIE_NAME = 'auth-token'
-ALGORITHM = "HS256"
+JWT_SECRET_KEY = os.environ['JWT_SECRET_KEY']
+BOT_TOKEN_HASH = hashlib.sha256(os.environ['BOT_TOKEN'].encode())
+ALGORITHM = settings.ALGORITHM
+COOKIE_NAME = settings.COOKIE_NAME
 
 # Google sheets
-CREDENTIALS_FILE = '../test-project-468709-cdaea0b70d4c.json'  # имя файла с закрытым ключом для google-таблиц
-SERVICE_ACCOUNT_NAME = 'test-646@test-project-468709.iam.gserviceaccount.com' # почта сервисного аккаунта
+CREDENTIALS_FILE = os.environ['CREDENTIALS_FILE']  # имя файла с закрытым ключом для google-таблиц
+SERVICE_ACCOUNT_NAME = os.environ['SERVICE_ACCOUNT_NAME'] # почта сервисного аккаунта

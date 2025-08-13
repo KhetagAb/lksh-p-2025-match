@@ -1,6 +1,6 @@
 import aiohttp
 
-from bff.lkshmatch.adapters.core import GetSportSections, SportSection, UnknownError, GetPlayersBySportSections, \
+from adapters.core import GetSportSections, SportSection, UnknownError, GetPlayersBySportSections, \
     PlayerRegisterInfo, RegisterPlayerInSpotrSection, PlayerNotFound, API_URL
 
 

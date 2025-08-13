@@ -1,8 +1,8 @@
 import aiohttp
 
-from bff.lkshmatch.adapters.core import ValidateRegisterPlayer, PlayerAddInfo, UnknownError, RegisterPlayer, \
+from adapters.core import ValidateRegisterPlayer, PlayerAddInfo, UnknownError, RegisterPlayer, \
     PlayerRegisterInfo, API_URL
-from bff.lkshmatch.adapters.sport_sections import PlayerNotFoundResponse
+from .sport_sections import PlayerNotFoundResponse
 
 
 class RestValidateRegisterPlayer(ValidateRegisterPlayer):
