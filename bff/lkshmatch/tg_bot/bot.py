@@ -261,8 +261,8 @@ async def setname_team(mess: types.Message, sport: SportSection) -> bool:
     return False
 
 
-async def create_team(mess: types.Message, sport: SportSection) -> bool:
-    if f"create_{sport.name}" == mess.text:
+async def create_team(mess: types.Message, activity: SportSection) -> bool:
+    if f"create_{activity.en_name}" == mess.text:
         team = ""
         try:
             team = register_new_team(sport, mess.from_user.id)  # type: ignore
@@ -274,7 +274,7 @@ async def create_team(mess: types.Message, sport: SportSection) -> bool:
             return True
         await bot.send_message(
             mess.chat.id,
-            f"Вы зарегистрировали новую команду. Название: {team}. Если захотите изменить название команды на новое_название, введите <set_name_{sport.name}_{team}: новое_название>.",
+            f"Вы зарегистрировали новую команду. Название: {team}. Если захотите изменить название команды на новое_название, введите <set_name_{activity.en_name}_{team}: новое_название>.",
         )
         return True
     return False
@@ -295,11 +295,13 @@ async def signup_to_sport(mess: types.Message, sport: SportSection) -> bool:
     return False
 
 
-
 async def signup_to_activity(mess: types.Message, activity: SportSection) -> bool:
-    if f"{sport.en_name}: " in mess.text:  # type: ignore
-        activity = mess.text[len(f"{sport.en_name}: ") :]  # type: ignore
-
+    if mess.text == activity:  # type: ignore
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        signup_button = types.KeyboardButton(f"signup_{activity.en_name}")
+        create_button = types.KeyboardButton(f"create_{activity.en_name}")
+        markup.add(signup_button, create_button)
+        await bot.send_message(mess.chat.id, f"Для записи в уже существующую команду, нажмите <signup_{activity.en_name}>, для создания новой команды, нажмите <create_{activity.en_name}>", reply_markup=markup)
     return False
 
 
@@ -321,6 +323,8 @@ async def answer_to_buttons(mess: types.Message) -> None:
         for activity in await app_container.get(CoreSportAdapter).get_activities():
             if signup_to_activity(mess, activity):
                 return
-            if await setname_team(mess, sport):
+            if create_team(mess, activity):
+                return
+            if await setname_team(mess, activity):
                 return
     await bot.send_message(mess.chat.id, "Я вас не понимаю.")
