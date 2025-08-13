@@ -6,9 +6,9 @@ create table players
     id          bigserial primary key,
     name        varchar(64) not null,
     tg_username varchar(32) not null,
-    tg_id       bigint      not null
+    tg_id       bigint      not null,
+	constraint players_tg_id_unique unique (tg_id)
 );
-alter table players add constraint players_tg_id_unique unique (tg_id);
 
 create table teams
 (
