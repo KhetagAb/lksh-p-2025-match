@@ -10,27 +10,27 @@ type ServerInterface struct {
 	createTournament *CreateTournamentHandler
 }
 
-func (s *ServerInterface) RegisterPlayer(ctx echo.Context, params server.RegisterPlayerParams) error {
+func (s ServerInterface) GetCoreActivityBySportSport(ctx echo.Context, sport string) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ServerInterface) GetCoreSportGetSport(ctx echo.Context, sport string) error {
+func (s ServerInterface) GetCoreActivityId(ctx echo.Context, id int64) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ServerInterface) GetCoreSportsGet(ctx echo.Context) error {
+func (s ServerInterface) PostCoreActivityIdEnroll(ctx echo.Context, id string) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ServerInterface) GetCoreSportsGetAll(ctx echo.Context) error {
+func (s ServerInterface) RegisterPlayer(ctx echo.Context) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ServerInterface) CreateTournament(ctx echo.Context, params server.CreateTournamentParams) error {
+func (s ServerInterface) GetCoreSportList(ctx echo.Context) error {
 	//TODO implement me
 	panic("implement me")
 }
