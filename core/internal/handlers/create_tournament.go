@@ -39,13 +39,12 @@ func (h *CreateTournamentHandler) CreateTournament(ectx echo.Context, params ser
 		params.Name, params.Sport, params.StartDate, params.EndDate, params.RegistrationDeadline)
 	tournament := domain.Tournament{Name: params.Name, SportSectionID: params.Sport, RegistrationDeadline: params.RegistrationDeadline, StartDate: params.StartDate, EndDate: params.EndDate}
 	id, err := h.createTournamentService.CreateTournament(ctx, tournament)
-	if err != nil {
-		return InternalErrorResponse(ectx, err.Error())
-	}
 	var tournamentAlreadyExists *domain.TournamentAlreadyExists
 	httpCode := 201
 	if errors.As(err, &tournamentAlreadyExists) {
 		httpCode = 200
+	} else if err != nil {
+		return InternalErrorResponse(ectx, err.Error())
 	}
 	return ectx.JSON(httpCode, server.TournamentCreationResponse{Id: id})
 
