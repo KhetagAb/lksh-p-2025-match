@@ -9,6 +9,10 @@
 *.dylib
 core/bin/
 
+# codegen
+/core/internal/generated/
+
+
 # Test binary, built with `go test -c`
 *.test
 
@@ -37,11 +41,9 @@ go.work.sum
  .idea/
  .vscode/
 /.idea
-/core/internal/generated/app/wire_gen.go
 
 # Python
 __pycache__/
 
 # Core
-/core/internal/generated/server/
 /bff/core_client/
