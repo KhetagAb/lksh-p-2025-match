@@ -6,7 +6,12 @@ import (
 )
 
 type ServerInterface struct {
-	registerPlayer *RegisterPlayerHandler
+	registerPlayer   *RegisterPlayerHandler
+	createTournament *CreateTournamentHandler
+}
+
+func (s *ServerInterface) CreateTournament(ctx echo.Context, params server.CreateTournamentParams) error {
+	return s.createTournament.CreateTournament(ctx, params)
 }
 
 func (s *ServerInterface) GetCoreSportGetSport(ctx echo.Context, sport string) error {
@@ -24,10 +29,10 @@ func (s *ServerInterface) GetCoreSportsGetAll(ctx echo.Context) error {
 	panic("implement me")
 }
 
-func (s *ServerInterface) CreateTournament(ctx echo.Context, params server.CreateTournamentParams) error {
-	//TODO implement me
-	panic("implement me")
-}
+//func (s *ServerInterface) CreateTournament(ctx echo.Context, params server.CreateTournamentParams) error {
+//	//TODO implement me
+//	panic("implement me")
+//}
 
 func (s *ServerInterface) RegisterPlayer(ctx echo.Context, params server.RegisterPlayerParams) error {
 	return s.registerPlayer.RegisterUser(ctx, params)
@@ -35,8 +40,9 @@ func (s *ServerInterface) RegisterPlayer(ctx echo.Context, params server.Registe
 
 var _ server.ServerInterface = &ServerInterface{}
 
-func NewServerInterface(registerPlayer *RegisterPlayerHandler) *ServerInterface {
+func NewServerInterface(registerPlayer *RegisterPlayerHandler, createTournament *CreateTournamentHandler) *ServerInterface {
 	return &ServerInterface{
-		registerPlayer: registerPlayer,
+		registerPlayer:   registerPlayer,
+		createTournament: createTournament,
 	}
 }

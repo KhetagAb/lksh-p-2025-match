@@ -1,4 +1,4 @@
-package handlers
+package sport
 
 import (
 	"context"

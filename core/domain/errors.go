@@ -36,6 +36,22 @@ func PlayerAlreadyExistsError(msg string, args ...interface{}) error {
 	}
 }
 
+type TournamentAlreadyExists struct {
+	Code    string
+	Message string
+}
+
+func (e *TournamentAlreadyExists) Error() string {
+	return fmt.Sprintf("Error code %s: %s", e.Code, e.Message)
+}
+
+func TournamentAlreadyExistsError(msg string, args ...interface{}) error {
+	return &PlayerAlreadyExists{
+		Code:    NotFound,
+		Message: fmt.Sprintf(msg, args...),
+	}
+}
+
 const (
 	NotFound         = "NOT_FOUND"
 	InvalidOperation = "INVALID_OPERATION"
