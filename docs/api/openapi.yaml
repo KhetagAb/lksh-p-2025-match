@@ -79,7 +79,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -193,9 +194,7 @@ components:
         captain:
           $ref: "#/components/schemas/Player"
         members:
-          type: array
-          items:
-            $ref: "#/components/schemas/PlayerList"
+          $ref: "#/components/schemas/PlayerList"
 
     TeamList:
       type: array
