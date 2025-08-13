@@ -1,7 +1,11 @@
 [test]
 CORE_HOST =  "match-core"
 CORE_PORT = 8080
+COOKIE_NAME = "auth-token" # Ключ, по которому расположен jwt-токен в куках. Использует webapp
+ALGORITHM = "HS256" # Алгоритм для создания jwt-токена. Использует webapp
 
 [prod]
 CORE_HOST =  "match-core"
 CORE_PORT = 8080
+COOKIE_NAME = "auth-token" # Ключ, по которому расположен jwt-токен в куках. Использует webapp
+ALGORITHM = "HS256" # Алгоритм для создания jwt-токена. Использует webapp

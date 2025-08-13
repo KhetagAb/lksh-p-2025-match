@@ -6,5 +6,5 @@ settings: Dynaconf = Dynaconf(
     environments=True,
     load_dotenv=True,
     default_env="prod",
-    env="test"
+    env="test",
 )

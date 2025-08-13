@@ -8,3 +8,9 @@ dishka
 pymongo
 httpx
 aiohttp
+dishka
+httplib2
+google-api-python-client
+oauth2client
+aiohttp
+openapi-python-client

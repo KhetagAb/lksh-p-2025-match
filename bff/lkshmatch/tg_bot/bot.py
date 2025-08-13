@@ -2,12 +2,22 @@ import logging
 import os
 import random
 
-from lkshmatch.adapters.base import InsufficientRights, NameTeamReserveError, Player, PlayerNotFound, PlayerToRegister, SportSection, TeamIsFull, TeamNotFound, UnknownError
-from lkshmatch.adapters.core.players import CorePlayerAdapter
-from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 
+from lkshmatch.adapters.base import (
+    InsufficientRights,
+    NameTeamReserveError,
+    Player,
+    PlayerNotFound,
+    PlayerToRegister,
+    SportSection,
+    TeamIsFull,
+    TeamNotFound,
+    UnknownError,
+)
+from lkshmatch.adapters.core.players import CorePlayerAdapter
+from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
 from lkshmatch.di import app_container
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
@@ -111,14 +121,12 @@ def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboa
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     data_for_buttons = []
     if role == "user":
-        data_for_buttons = ["/create_team", "/teams",
-                            "/join_team", "/approve_member_join"]
+        data_for_buttons = ["/create_team", "/teams", "/join_team", "/approve_member_join"]
     elif role == "captain":
         data_for_buttons = ["/teams", "/approve_member_join", "/delete_team"]
     elif role == "admin":
         pass
-    buttons = map(types.KeyboardButton, map(
-        lambda x: f"{x} {sport}", data_for_buttons))
+    buttons = map(types.KeyboardButton, map(lambda x: f"{x} {sport}", data_for_buttons))
     markup.add(*buttons)
     return markup
 
@@ -133,9 +141,7 @@ async def start(mess: types.Message) -> None:
     try:
         safe_username = username if username is not None else "unknown_user"
         repo = app_container.get(LKSHStudentsRepository)
-        msg = await repo.validate_register_user(
-            Player(safe_username, int(user_id))
-        )
+        msg = await repo.validate_register_user(Player(safe_username, int(user_id)))
     except PlayerNotFound:
         msg = "Извините, но вас нет в списках. Подойдите в 4-ый комповник."
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -169,7 +175,9 @@ async def processing_of_registration(mess: types.Message) -> bool:
         else:
             username = "unknown_user"
             user_id = 0  # or handle appropriately
-        response = await app_container.get(CorePlayerAdapter).register_user(PlayerToRegister(username, user_id, "TESTNAME_FIX"))
+        response = await app_container.get(CorePlayerAdapter).register_user(
+            PlayerToRegister(username, user_id, "TESTNAME_FIX")
+        )
         if mess.from_user is not None:
             add_matching(mess.from_user.id, response)
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -199,9 +207,7 @@ async def processing_of_registration(mess: types.Message) -> bool:
 async def processing_select_sport(mess: types.Message, sport: SportSection) -> bool:
     if sport.name == mess.text:
         try:
-            list_of_all_participants = await app_container.get(CoreSportAdapter).get_players_by_sport_sections(
-                sport
-            )
+            list_of_all_participants = await app_container.get(CoreSportAdapter).get_players_by_sport_sections(sport)
             # TODO: id -> name
             msg = [participant.core_id for participant in list_of_all_participants]
             await bot.send_message(mess.chat.id, f"Список участников секции {sport.name}:\n" + "\n".join(msg))
@@ -227,8 +233,7 @@ async def setname_team(mess: types.Message, sport: SportSection) -> bool:
     setname_string = f"set_name_{sport.name}_"
     if mess.text is not None and setname_string == mess.text[: len(setname_string)]:
         try:
-            team = mess.text[len(
-                f"set_name_{sport.name}_"): mess.text.find(": ")]
+            team = mess.text[len(f"set_name_{sport.name}_") : mess.text.find(": ")]
         except Exception as ue:
             print(ue)
             await bot.send_message(mess.chat.id, "Вы не ввели текущее название команды.")
@@ -293,7 +298,7 @@ async def signup_to_sport(mess: types.Message, sport: SportSection) -> bool:
 
 async def make_request_to_add_in_team(mess: types.Message, sport: SportSection) -> bool:
     if f"{sport.en_name}: " in mess.text:  # type: ignore
-        team = mess.text[len(f"{sport.en_name}: "):]  # type: ignore
+        team = mess.text[len(f"{sport.en_name}: ") :]  # type: ignore
         try:
             add_person_to_team(team, mess.from_user.id)  # type: ignore
         except TeamIsFull:

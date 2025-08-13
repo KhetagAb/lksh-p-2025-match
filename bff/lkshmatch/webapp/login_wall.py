@@ -1,12 +1,12 @@
 from fastapi import Request
 from fastapi.requests import Request
 from fastapi.responses import Response
-from fastapi.templating import Jinja2Templates
 from jose import JWTError, jwt
-
-from .vars import JWT_SECRET_KEY, COOKIE_NAME, ALGORITHM
 from mainWebapp import app
+
 from .root import templates
+from .vars import ALGORITHM, COOKIE_NAME, JWT_SECRET_KEY
+
 
 @app.middleware("http")
 async def dispatch(request: Request, call_next) -> Response:
@@ -14,9 +14,7 @@ async def dispatch(request: Request, call_next) -> Response:
         return await call_next(request)
 
     token = request.cookies.get(COOKIE_NAME)
-    login_wall = templates.TemplateResponse(
-        "auth/login.html", context={"request": request}
-    )
+    login_wall = templates.TemplateResponse("auth/login.html", context={"request": request})
     if not token:
         return login_wall
 

@@ -6,7 +6,8 @@ from fastapi.requests import Request
 from fastapi.responses import PlainTextResponse, RedirectResponse
 from jose import jwt
 
-from .vars import BOT_TOKEN_HASH, JWT_SECRET_KEY, COOKIE_NAME, ALGORITHM
+from .vars import ALGORITHM, BOT_TOKEN_HASH, COOKIE_NAME, JWT_SECRET_KEY
+
 auth_router = APIRouter()
 
 

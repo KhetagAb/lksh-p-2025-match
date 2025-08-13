@@ -32,16 +32,13 @@ class MongoProvider(Provider):
 
 class MongoRepositoryProvider(Provider):
     scope = Scope.APP
-    mongo_admin_repository = provide(
-        MongoAdminRepository, provides=AdminRepository)
-    mongo_player_repository = provide(
-        MongoLKSHStudentsRepository, provides=LKSHStudentsRepository)
+    mongo_admin_repository = provide(MongoAdminRepository, provides=AdminRepository)
+    mongo_player_repository = provide(MongoLKSHStudentsRepository, provides=LKSHStudentsRepository)
 
 
 class RestAdapterProvider(Provider):
     scope = Scope.APP
-    core_player_adapter = provide(
-        CorePlayerAdapter, provides=PlayerAdapter)
+    core_player_adapter = provide(CorePlayerAdapter, provides=PlayerAdapter)
 
 
 def all_providers() -> List[Provider]:
@@ -51,13 +48,15 @@ def all_providers() -> List[Provider]:
     mongo_username = os.getenv("MONGODB_ROOT_USERNAME")
     mongo_password = os.getenv("MONGODB_ROOT_PASSWORD")
     mongo_database = os.getenv("MONGODB_DATABASE")
-    
+
     if not all([mongo_username, mongo_password, mongo_database]):
         raise ValueError("MongoDB credentials are not properly set in environment variables")
-    
-    mongo_uri = f'mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_database}?authSource=admin'
+
+    mongo_uri = (
+        f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_database}?authSource=admin"
+    )
     print(f"MongoDB URI: {mongo_uri}")
-    
+
     return [MongoProvider(mongo_uri), MongoRepositoryProvider(), RestAdapterProvider()]
 
 
