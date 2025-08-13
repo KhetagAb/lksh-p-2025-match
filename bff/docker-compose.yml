@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: match-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    ports:
+      - "${MONGODB_EXPOSE_PORT}:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongodb/mongo-init-scripts:/docker-entrypoint-initdb.d:ro
+
+  # Веб-приложение lkshmatch
+  #  lkshmatch-web:
+  #    build: .
+  #    container_name: lkshmatch-web
+  #    restart: unless-stopped
+  #    ports:
+  #      - "8000:8000"
+  #    environment:
+  #      - MATCH_ENV=prod
+  #      - MATCH_CORE_HOST=127.0.0.1
+  #      - MATCH_CORE_PORT=32442
+  #      - MATCH_TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+  #      - MONGODB_URL=mongodb://admin:password123@mongodb:27017/lkshmatch?authSource=admin
+  #    depends_on:
+  #      - mongodb
+  #    networks:
+  #      - lkshmatch-network
+  #    volumes:
+  #      - ./config.toml:/app/bff/config.toml:ro
+
+  # Telegram бот (опционально, можно запускать отдельно)
+  match-bot:
+    build:
+      context: .
+      dockerfile: lkshmatch/Dockerfile
+    container_name: match-bot
+    environment:
+      - MATCH_CORE_HOST=match-core
+      - MATCH_CORE_PORT=8080
+      - MATCH_TELEGRAM_TOKEN=${MATCH_TELEGRAM_TOKEN}
+    depends_on:
+      - mongodb
+    networks:
+      - default
+      - match-shared-network
+    command: [ "python", "lkshmatch/main.py" ]
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  match-shared-network:
+    external: true

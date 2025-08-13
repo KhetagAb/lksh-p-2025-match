@@ -1,10 +1,24 @@
-FROM golang:1.23.8
+FROM golang:1.24.6 AS builder
 
-COPY . /app
 WORKDIR /app
 
-RUN go build -o bin/match cmd/main.go
+COPY core/go.mod core/go.sum ./
 
-CMD ["bin/match"]
+RUN go mod download
+
+COPY core/ .
+COPY docs/api/openapi.yaml ./openapi.yaml
+
+RUN make codegen
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/match cmd/main.go
+
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+
+COPY --from=builder /app/bin/match .
+
+CMD ["./match"]
 
 EXPOSE 8080

@@ -41,3 +41,7 @@ go.work.sum
 
 # Python
 __pycache__/
+
+# Core
+/core/internal/generated/server/
+/bff/core_client/

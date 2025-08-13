@@ -1,5 +1,5 @@
 <div>
-    <img src="images/logo.png">
+    <img src="docs/images/logo.png">
 </div>
 
 # Match

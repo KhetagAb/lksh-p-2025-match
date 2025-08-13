@@ -1,0 +1,21 @@
+[project]
+name = "lkshmatch"
+version = "0.0.1"
+requires-python = "~=3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic",
+    "dynaconf",
+    "pytelegrambotapi",
+    "dishka",
+]
+
+[tool.setuptools]
+package-dir = { "" = "" }
+
+[tool.black]
+line-length = 79
+
+[tool.autoflake]
+remove-all-unused-imports = true

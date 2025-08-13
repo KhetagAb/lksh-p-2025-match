@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := quickstart
 
+mode := dev
+
 quickstart: check
 	make build mode=dev
 	make start mode=dev
@@ -9,17 +11,24 @@ build: check
 	go mod tidy
 	go build -o bin/match cmd/main.go
 
-start: check
+start:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans
 
-up: check
+up:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans -d
 
-test: check
+stop:
+	docker-compose -f docker-compose.$(mode).yml stop --build --force-recreate --remove-orphans -d
+
+test:
 	docker-compose -f docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
-migrate: check
-	goose -dir migrations postgres $(uri) up
+upgrade:
+	go tool github.com/pressly/goose/v3/cmd/goose -dir migrations postgres $(uri) up
+
+codegen:
+	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config api/config.yaml api/openapi.yaml
+	cd internal/generated/app && go tool github.com/google/wire/cmd/wire .
 
 run-local:
 	bin/match
