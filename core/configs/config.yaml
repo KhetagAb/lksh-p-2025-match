@@ -14,11 +14,3 @@ postgres:
   password: "postgres"
   port: 5432
   db: "postgres"
-
-web:
-  host: "1.1.1.1"
-  password: <placeholder>
-  port: 22
-
-tg:
-  token: <placeholder>

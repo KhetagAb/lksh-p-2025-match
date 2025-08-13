@@ -1,7 +1,0 @@
-[test]
-CORE_HOST =  "127.0.0.1"
-CORE_PORT = 32441
-
-[prod]
-CORE_HOST =  "127.0.0.2"
-CORE_PORT = 32442

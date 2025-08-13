@@ -1,0 +1,7 @@
+[test]
+CORE_HOST =  "match-core"
+CORE_PORT = 8080
+
+[prod]
+CORE_HOST =  "match-core"
+CORE_PORT = 8080

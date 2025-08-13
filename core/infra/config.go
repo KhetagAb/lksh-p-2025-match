@@ -15,20 +15,13 @@ type (
 		App      AppConfig      `mapstructure:"app"`
 		HTTP     HTTPConfig     `mapstructure:"http"`
 		Postgres PostgresConfig `mapstructure:"postgres"`
-		Web      WebConfig      `mapstructure:"web"`
 	}
 
 	PostgresConfig struct {
+		Host     string `mapstructure:"host"`
 		Name     string `mapstructure:"name"`
-		Port     int    `mapstructure:"port"`
 		Password string `mapstructure:"password"`
-		Host     string `mapstructure:"host"`
-		Database string `mapstructure:"db"`
-	}
-
-	WebConfig struct {
-		Host     string `mapstructure:"host"`
-		Password string `mapstructure:"password"`
+		Database string `mapstructure:"database"`
 		Port     int    `mapstructure:"port"`
 	}
 
