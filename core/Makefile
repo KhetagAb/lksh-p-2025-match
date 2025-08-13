@@ -18,7 +18,10 @@ up:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans -d
 
 stop:
-	docker-compose -f docker-compose.$(mode).yml stop --build --force-recreate --remove-orphans -d
+	docker-compose -f docker-compose.$(mode).yml stop
+
+down:
+	docker-compose -f docker-compose.$(mode).yml down -v
 
 test:
 	docker-compose -f docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
