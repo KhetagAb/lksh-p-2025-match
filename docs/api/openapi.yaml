@@ -18,10 +18,10 @@ paths:
               $ref: '#/components/schemas/RegisterPlayerRequest'
       responses:
         "200":
-          $ref: '#/components/responses/ErrorResponse'
+          $ref: '#/components/responses/PlayerRegistrationResponse'
         "201":
           $ref: '#/components/responses/PlayerRegistrationResponse'
-        "400":
+        "500":
           $ref: '#/components/responses/ErrorResponse'
 
   /core/sport/list:
