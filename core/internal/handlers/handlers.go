@@ -10,12 +10,12 @@ type ServerInterface struct {
 	createTournament *CreateTournamentHandler
 }
 
-func (s ServerInterface) GetCoreActivityBySportSport(ctx echo.Context, sport string) error {
+func (s ServerInterface) GetCoreActivityById(ctx echo.Context, id int64) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s ServerInterface) GetCoreActivityId(ctx echo.Context, id int64) error {
+func (s ServerInterface) GetCoreActivityBySportSectionId(ctx echo.Context, id int64) error {
 	//TODO implement me
 	panic("implement me")
 }

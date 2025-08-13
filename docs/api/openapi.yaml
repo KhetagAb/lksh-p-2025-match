@@ -142,6 +142,9 @@ components:
     Player:
       description: "Структура описывающая пользователя"
       type: object
+      required:
+        - coreId
+        - tgId
       properties:
         coreId:
           type: integer
@@ -156,13 +159,17 @@ components:
 
     SportSection:
       type: object
+      required:
+        - id
+        - name
+        - ru_name
       properties:
         id:
           type: integer
           format: int64
         name:
           type: string
-        en_name:
+        ru_name:
           type: string
     SportSectionList:
       type: array
@@ -172,6 +179,11 @@ components:
     Team:
       description: "Команда с игроками"
       type: object
+      required:
+        - id
+        - name
+        - captain
+        - members
       properties:
         id:
           type: integer
@@ -198,6 +210,10 @@ components:
 
     Activity:
       type: "object"
+      required:
+        - id
+        - title
+        - creator
       properties:
         id:
           type: integer
@@ -257,6 +273,8 @@ components:
         application/json:
           schema:
             type: object
+            required:
+              - teams
             properties:
               teams:
                 $ref: "#/components/schemas/TeamList"
@@ -289,6 +307,8 @@ components:
         application/json:
           schema:
             type: "object"
+            required:
+              - id
             properties:
               id:
                 type: integer
