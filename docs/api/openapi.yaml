@@ -193,9 +193,7 @@ components:
         captain:
           $ref: "#/components/schemas/Player"
         members:
-          type: array
-          items:
-            $ref: "#/components/schemas/PlayerList"
+          $ref: "#/components/schemas/PlayerList"
 
     TeamList:
       type: array
