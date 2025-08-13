@@ -27,7 +27,7 @@ upgrade:
 	go tool github.com/pressly/goose/v3/cmd/goose -dir migrations postgres $(uri) up
 
 codegen:
-	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config api/config.yaml api/openapi.yaml
+	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config api/config.yaml ../docs/api/openapi.yaml
 	cd internal/generated/app && go tool github.com/google/wire/cmd/wire .
 
 run-local:
