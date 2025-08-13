@@ -52,6 +52,7 @@ class CoreActivityAdapter(ActivityAdapter):
         return activity_result
 
 
+
     async def make_team_in_activity(self, core_id: CoreID) -> Team:
         response = await post_core_activity_id_enroll.asyncio(
             client=self.client,
