@@ -6,7 +6,7 @@ import (
 	"match/domain"
 )
 
-func (s *ActivityService) GetCoreActivityByID(ctx context.Context, tgID, id int64) (*domain.Activity, *domain.Player, error) {
+func (s *ActivityService) GetCoreTeamsByActivityID(ctx context.Context, tgID, id int64) (*domain.Activity, *domain.Player, error) {
 	activity, err := s.activityRepository.GetActivityByID(ctx, id)
 
 	if err != nil {

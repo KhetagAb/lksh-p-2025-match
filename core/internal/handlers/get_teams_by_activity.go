@@ -10,27 +10,28 @@ import (
 )
 
 type (
-	GetCoreActivityByIDService interface {
-		GetCoreActivityByID(ctx context.Context, id int64) (domain.Activity, domain.Player, error)
+	GetTeamsByActivityID interface {
+		GetCoreTeamsByActivityID(ctx context.Context, id int64) (*domain.Activity, *domain.Player, error)
 	}
 
-	GetCoreActivityByIDHandler struct {
-		getCoreActivityByIDService GetCoreActivityByIDService
+	GetTeamsByActivityIDHandler struct {
+		activityService GetTeamsByActivityID
 	}
 )
 
-func NewGetCoreActivityByIDHandler(
-	getCoreActivityByIDService GetCoreActivityByIDService,
-) *GetCoreActivityByIDHandler {
-	return &GetCoreActivityByIDHandler{
-		getCoreActivityByIDService: getCoreActivityByIDService,
+func NewGetTeamsByActivityIDHandler(
+	activityService GetTeamsByActivityID,
+) *GetTeamsByActivityIDHandler {
+	return &GetTeamsByActivityIDHandler{
+		activityService: activityService,
 	}
 }
 
-func (h *GetCoreActivityByIDHandler) GetCoreActivityByID(ectx echo.Context, id int64) error {
+func (h *GetTeamsByActivityIDHandler) GetCoreActivityByID(ectx echo.Context, activityID int64) error {
 	ctx := context.Background()
-	logger.Infof(ctx, "Getting Activity by ID (%d)", id)
-	domainActivity, domainCreator, err := h.getCoreActivityByIDService.GetCoreActivityByID(ctx, id)
+
+	logger.Infof(ctx, "Getting activity by ID=%d", activityID)
+	domainActivity, domainCreator, err := h.activityService.GetCoreTeamsByActivityID(ctx, activityID)
 	if err != nil {
 		logger.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
 		return InternalErrorResponse(ectx, err.Error())

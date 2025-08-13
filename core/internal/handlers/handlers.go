@@ -7,24 +7,22 @@ import (
 )
 
 type ServerInterface struct {
-	registerPlayer                  *RegisterPlayerHandler
-	createTournament                *CreateTournamentHandler
-	getCoreActivityByID             *GetCoreActivityByIDHandler
-	getCoreActivityBySportSectionID *GetCoreActivityBySportSectionIDHandler
-	postCoreActivityIDEnroll        *PostCoreActivityIDEnrollHandler
+	registerPlayer              *RegisterPlayerHandler
+	getTeamsByIDActivity        *GetTeamsByActivityIDHandler
+	getActivityBySportSectionID *GetActivityBySportSectionIDHandler
+	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
 }
 
-func (s ServerInterface) GetCoreActivityById(ctx echo.Context, id int64) error {
-	return s.getCoreActivityByID.GetCoreActivityByID(ctx, id)
+func (s ServerInterface) GetCoreTeamsByActivityId(ctx echo.Context, id int64) error {
+	return s.getTeamsByIDActivity.GetCoreActivityByID(ctx, id)
 }
 
 func (s ServerInterface) GetCoreActivityBySportSectionId(ctx echo.Context, id int64) error {
-	return s.getCoreActivityBySportSectionID.GetCoreActivityBySportSectionID(ctx, id)
+	return s.getTeamsByIDActivity.GetCoreActivityByID(ctx, id)
 }
 
-func (s ServerInterface) PostCoreActivityIdEnroll(ctx echo.Context, id string) error {
-	//TODO implement me
-	panic("implement me")
+func (s ServerInterface) PostCoreActivityIdEnroll(ctx echo.Context, id int64) error {
+	return s.enrollPlayerInActivity.EnrollPlayerInActivity(ctx, id)
 }
 
 func (s ServerInterface) RegisterPlayer(ctx echo.Context) error {
@@ -39,10 +37,16 @@ func (s ServerInterface) GetCoreSportList(ctx echo.Context) error {
 
 var _ server.ServerInterface = &ServerInterface{}
 
-func NewServerInterface(registerPlayer *RegisterPlayerHandler, createTournament *CreateTournamentHandler, getCoreActivityBySportSectionID *GetCoreActivityBySportSectionIDHandler) *ServerInterface {
+func NewServerInterface(
+	registerPlayer *RegisterPlayerHandler,
+	getTeamsByIDActivity *GetTeamsByActivityIDHandler,
+	getActivityBySportSectionID *GetActivityBySportSectionIDHandler,
+	enrollPlayerInActivity *EnrollPlayerInActivityHandler,
+) *ServerInterface {
 	return &ServerInterface{
-		registerPlayer:                  registerPlayer,
-		createTournament:                createTournament,
-		getCoreActivityBySportSectionID: getCoreActivityBySportSectionID,
+		registerPlayer:              registerPlayer,
+		getTeamsByIDActivity:        getTeamsByIDActivity,
+		getActivityBySportSectionID: getActivityBySportSectionID,
+		enrollPlayerInActivity:      enrollPlayerInActivity,
 	}
 }

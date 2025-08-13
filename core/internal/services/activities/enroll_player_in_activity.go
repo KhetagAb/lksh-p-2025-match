@@ -6,7 +6,7 @@ import (
 	"match/domain"
 )
 
-func (s *ActivityService) PostCoreActivityIDEnroll(ctx context.Context, activityID, playerTgID int64) (*domain.Team, error) {
+func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*domain.Team, error) {
 	// Checking existance of given Activity
 	_, err := s.activityRepository.GetActivityByID(ctx, activityID)
 	if err != nil {

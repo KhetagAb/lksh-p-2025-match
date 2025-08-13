@@ -33,7 +33,7 @@ paths:
         "200":
           $ref: '#/components/responses/AllSportSections'
 
-  /core/activity/by/{id}:
+  /core/teams/by_activity/{id}:
     get:
       tags:
         - "Activities"
@@ -47,7 +47,7 @@ paths:
             format: int64
       responses:
         "200":
-          $ref: '#/components/responses/ActivityResponse'
+          $ref: '#/components/responses/ActivityTeamsResponse'
         "400":
           $ref: '#/components/responses/ErrorResponse'
 
@@ -266,8 +266,8 @@ components:
             additionalProperties: false
 
 
-    ActivityResponse:
-      description: "Активность со всеми командами"
+    ActivityTeamsResponse:
+      description: "Список команд, записанных на активность"
       content:
         application/json:
           schema:
@@ -320,7 +320,7 @@ components:
                 description: Core-идентификатор
 
     CreatedTeamResponse:
-      description: "Команда, которая была создана"
+      description: "Созданная команда"
       content:
         application/json:
           schema:

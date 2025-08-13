@@ -7,7 +7,7 @@ import (
 
 type (
 	ActivityRepository interface {
-		ListActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]domain.Activity, error)
+		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]domain.Activity, error)
 		GetActivityByID(ctx context.Context, id int64) (*domain.Activity, error)
 	}
 

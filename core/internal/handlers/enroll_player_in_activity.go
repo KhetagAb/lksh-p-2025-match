@@ -10,24 +10,24 @@ import (
 )
 
 type (
-	PostCoreActivityIDEnrollService interface {
-		PostCoreActivityIDEnroll(ctx context.Context, activityID, playerTgID int64) (*domain.Team, error)
+	EnrollPlayerInActivity interface {
+		EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*domain.Team, error)
 	}
 
-	PostCoreActivityIDEnrollHandler struct {
-		postCoreActivityIDEnrollService PostCoreActivityIDEnrollService
+	EnrollPlayerInActivityHandler struct {
+		activityService EnrollPlayerInActivity
 	}
 )
 
-func NewPostCoreActivityIDEnrollHandler(
-	postCoreActivityIDEnrollService PostCoreActivityIDEnrollService,
-) *PostCoreActivityIDEnrollHandler {
-	return &PostCoreActivityIDEnrollHandler{
-		postCoreActivityIDEnrollService: postCoreActivityIDEnrollService,
+func NewEnrollPlayerInActivityHandler(
+	activityService EnrollPlayerInActivity,
+) *EnrollPlayerInActivityHandler {
+	return &EnrollPlayerInActivityHandler{
+		activityService: activityService,
 	}
 }
 
-func (h *PostCoreActivityIDEnrollHandler) PostCoreActivityIDEnroll(ectx echo.Context, id int64) error {
+func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context, id int64) error {
 	ctx := context.Background()
 
 	var requestBody server.PostCoreActivityIdEnrollJSONRequestBody
@@ -45,7 +45,7 @@ func (h *PostCoreActivityIDEnrollHandler) PostCoreActivityIDEnroll(ectx echo.Con
 	}
 
 	logger.Infof(ctx, "Creating Team by tgID (%d)", id)
-	domainTeam, err := h.postCoreActivityIDEnrollService.PostCoreActivityIDEnroll(ctx, id, *requestBody.TgId)
+	domainTeam, err := h.activityService.EnrollPlayerInActivity(ctx, id, *requestBody.TgId)
 	if err != nil {
 		logger.Errorf(ctx, "Internal server error while trying to create team: %v", err)
 		return InternalErrorResponse(ectx, err.Error())
@@ -62,7 +62,7 @@ func (h *PostCoreActivityIDEnrollHandler) PostCoreActivityIDEnroll(ectx echo.Con
 	resultTeam := server.Team{
 		Id:      domainTeam.ID,
 		Name:    domainTeam.Name,
-		Members: []server.PlayerList{[]server.Player{player}},
+		Members: []server.Player{player},
 		Captain: player,
 	}
 
