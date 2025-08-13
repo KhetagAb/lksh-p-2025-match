@@ -4,70 +4,18 @@ info:
   description: Client for app core part
   version: 1.0.0
 paths:
-  /core/tournament/create:
-    post:
-      operationId: createTournament
-      summary: "Создает турнир"
-      parameters:
-        - name: sport
-          in: query
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: registration_deadline
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date-time
-
-        - name: start_date
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date-time
-        - name: end_date
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date-time
-      responses:
-        "201":
-          $ref: '#/components/responses/TournamentCreationResponse'
-        "400":
-          $ref: '#/components/responses/ErrorResponse'
-        "409":
-          $ref: '#/components/responses/ErrorResponse'
-
   /core/player/register:
-    get:
+    post:
+      tags:
+        - "Players"
       operationId: registerPlayer
       summary: "Регистрирует пользователя"
-      parameters:
-        - name: tg_username
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: name
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: tg_id
-          in: query
-          required: true
-          schema:
-            type: integer
-            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPlayerRequest'
       responses:
         "200":
           $ref: '#/components/responses/ErrorResponse'
@@ -76,16 +24,38 @@ paths:
         "400":
           $ref: '#/components/responses/ErrorResponse'
 
-  /core/sports/get:
+  /core/sport/list:
     get:
-      summary: "Возращает список всех возможных существующих видов спорта"
+      tags:
+        - "Sport sections"
+      summary: "Возвращает список всех существующих видов спорта"
       responses:
         "200":
-          $ref: '#/components/responses/SportSectionList'
+          $ref: '#/components/responses/AllSportSections'
 
-  /core/sport/get/{sport}:
+  /core/activity/{id}:
     get:
-      summary: "Возвращает для определенного спорта массив пользователей, которые участвуют в данном виде спорта"
+      tags:
+        - "Activities"
+      summary: "Получение активности по идентификатору"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          $ref: '#/components/responses/ActivityResponse'
+        "400":
+          $ref: '#/components/responses/ErrorResponse'
+
+  /core/activity/by_sport/{sport}:
+    get:
+      tags:
+        - "Activities"
+      summary: "Возвращает список всех активностей по спорту"
       parameters:
         - name: sport
           in: path
@@ -94,13 +64,77 @@ paths:
             type: string
       responses:
         "200":
-          $ref: '#/components/responses/SportSectionPlayers'
-  /core/sports/get/all:
-    get:
-      summary: "Возвращает словаль, где для каждого существующего вида спорта соотносится массив пользователей"
+          $ref: '#/components/responses/ActivityListResponse'
+        "400":
+          $ref: '#/components/responses/ErrorResponse'
+
+  /core/activity/{id}/enroll:
+    post:
+      tags:
+        - "Activities"
+      summary: "Создает команду из одного человека на активность"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityEnrollPlayerRequest'
       responses:
         "200":
-          $ref: '#/components/responses/SportSectionPlayers'
+          $ref: '#/components/responses/CreatedTeamResponse'
+        "400":
+          $ref: '#/components/responses/ErrorResponse'
+
+#  /core/activity/create:
+#    post:
+#      tags:
+#        - "Activities"
+#      operationId: createTournament
+#      summary: "Создает турнир"
+#      parameters:
+#        - name: sport
+#          in: query
+#          required: true
+#          schema:
+#            type: integer
+#            format: int64
+#        - name: name
+#          in: query
+#          required: true
+#          schema:
+#            type: string
+#        - name: registration_deadline
+#          in: query
+#          required: true
+#          schema:
+#            type: string
+#            format: date-time
+#
+#        - name: start_date
+#          in: query
+#          required: true
+#          schema:
+#            type: string
+#            format: date-time
+#        - name: end_date
+#          in: query
+#          required: true
+#          schema:
+#            type: string
+#            format: date-time
+#      responses:
+#        "201":
+#          $ref: '#/components/responses/TournamentCreationResponse'
+#        "400":
+#          $ref: '#/components/responses/ErrorResponse'
+#        "409":
+#          $ref: '#/components/responses/ErrorResponse'
 
 components:
   schemas:
@@ -108,10 +142,10 @@ components:
       description: "Структура описывающая пользователя"
       type: object
       properties:
-        tgId:
+        coreId:
           type: integer
           format: int64
-        coreId:
+        tgId:
           type: integer
           format: int64
     PlayerList:
@@ -119,26 +153,125 @@ components:
       items:
         $ref: "#/components/schemas/Player"
 
+    SportSectionList:
+      type: array
+      items:
+        type: string
 
-    PlayersBySport:
-      description: "Словарь из вида спорта в массив пользователей, которые на него записаны"
+    Team:
+      description: "Команда с игроками"
       type: object
-      additionalProperties:
-        $ref: "#/components/schemas/PlayerList"
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        captain:
+          $ref: "#/components/schemas/Player"
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlayerList"
+
+    TeamList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Team"
+
+    #    PlayersBySport:
+    #      description: "Словарь из вида спорта в массив пользователей, которые на него записаны"
+    #      type: object
+    #      additionalProperties:
+    #        $ref: "#/components/schemas/PlayerList"
+
+    Activity:
+      type: "object"
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Идентификатор активности
+        title:
+          type: string
+        description:
+          type: string
+        creator:
+          $ref: "#/components/schemas/Player"
+
+    # Requests
+    RegisterPlayerRequest:
+      type: object
+      required:
+        - tg_username
+        - name
+        - tg_id
+      properties:
+        tg_username:
+          type: string
+        name:
+          type: string
+        tg_id:
+          type: integer
+          format: int64
+
+    ActivityEnrollPlayerRequest:
+      type: object
+      required:
+        - tg_id
+      properties:
+        tgId:
+          type: integer
+          format: int64
 
 
   responses:
-    TournamentCreationResponse:
+    AllSportSections:
+      description: "Массив, в котором содержатся названия всех существующих видов спорта"
       content:
         application/json:
           schema:
-            type: "object"
+            type: object
+            required:
+              - sports_sections
             properties:
-              id:
-                type: integer
-                format: int64
-                description: Идентификатор турнира
-      description: ""
+              sports_sections:
+                $ref: "#/components/schemas/SportSectionList"
+            additionalProperties: false
+
+
+    ActivityResponse:
+      description: "Активность со всеми командами"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              teams:
+                $ref: "#/components/schemas/TeamList"
+
+
+    ActivityListResponse:
+      description: "Список активностей"
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Activity'
+
+    #    TournamentCreationResponse:
+    #      content:
+    #        application/json:
+    #          schema:
+    #            type: "object"
+    #            properties:
+    #              id:
+    #                type: integer
+    #                format: int64
+    #                description: Идентификатор турнира
+    #      description: ""
+
     PlayerRegistrationResponse:
       description: "Информация о регистрации пользователя"
       content:
@@ -151,25 +284,12 @@ components:
                 format: int64
                 description: Core-идентификатор
 
-    SportSectionPlayers:
-      description: "Словарь где ключ это вид спорта а значение это масиив id игроков которые принимают участие в данном виде спорта"
+    CreatedTeamResponse:
+      description: "Команда, которая была создана"
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/PlayersBySport"
-
-
-    SportSectionList:
-      description: "Массив, в котором содержатся названия всех существующих видов спорта"
-      content:
-        application/json:
-          schema:
-            type: "object"
-            properties:
-              sports_sections:
-                type: array
-                items:
-                  type: string
+            $ref: "#/components/schemas/Team"
 
     ErrorResponse:
       content:
