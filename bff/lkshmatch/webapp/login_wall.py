@@ -2,7 +2,7 @@ from fastapi import Request
 from fastapi.requests import Request
 from fastapi.responses import Response
 from jose import JWTError, jwt
-from mainWebapp import app
+from lkshmatch.webapp.mainWebapp import app
 
 from .root import templates
 from .vars import ALGORITHM, COOKIE_NAME, JWT_SECRET_KEY

@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-WORKDIR /app
+WORKDIR /webapp
 
 COPY lkshmatch/requirements.txt ./
 
@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir --upgrade -i https://pypi.tuna.tsinghua.edu.cn/si
 
 COPY . .
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/webapp
 ENV MATCH_ENV=prod
 
-CMD ["python", "main.py"]
+CMD ["python", "mainWebapp.py"]

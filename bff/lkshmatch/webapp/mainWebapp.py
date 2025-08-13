@@ -3,7 +3,7 @@ from dishka.integrations.fastapi import setup_dishka
 
 from fastapi import FastAPI
 
-from .di import all_providers
+from ..di import all_providers
 from lkshmatch.webapp.auth import auth_router
 from lkshmatch.webapp.root import root_router
 from lkshmatch.webapp.table_adapter import table_adapter_router
@@ -19,4 +19,5 @@ app.include_router(table_adapter_router, prefix="/table")
 app.include_router(root_router, prefix="")
 
 if __name__ == "__main__":
+    print("RUN WEBAPP")
     uvicorn.run(app, host="127.0.0.1", port=80)

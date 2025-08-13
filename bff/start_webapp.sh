@@ -1,4 +1,4 @@
 # !/usr/bin/bash
 
 export $(grep -v '^#' .env | xargs)
-python -m lkshmatch.mainWebapp
+python -m lkshmatch.webapp.mainWebapp
