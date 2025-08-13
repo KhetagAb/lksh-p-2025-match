@@ -6,37 +6,40 @@ import (
 )
 
 type ServerInterface struct {
-	registerPlayer *RegisterPlayerHandler
+	registerPlayer   *RegisterPlayerHandler
+	createTournament *CreateTournamentHandler
 }
 
-func (s *ServerInterface) GetCoreSportGetSport(ctx echo.Context, sport string) error {
+func (s ServerInterface) GetCoreActivityById(ctx echo.Context, id int64) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ServerInterface) GetCoreSportsGet(ctx echo.Context) error {
+func (s ServerInterface) GetCoreActivityBySportSectionId(ctx echo.Context, id int64) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ServerInterface) GetCoreSportsGetAll(ctx echo.Context) error {
+func (s ServerInterface) PostCoreActivityIdEnroll(ctx echo.Context, id string) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ServerInterface) CreateTournament(ctx echo.Context, params server.CreateTournamentParams) error {
+func (s ServerInterface) RegisterPlayer(ctx echo.Context) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s *ServerInterface) RegisterPlayer(ctx echo.Context, params server.RegisterPlayerParams) error {
-	return s.registerPlayer.RegisterUser(ctx, params)
+func (s ServerInterface) GetCoreSportList(ctx echo.Context) error {
+	//TODO implement me
+	panic("implement me")
 }
 
 var _ server.ServerInterface = &ServerInterface{}
 
-func NewServerInterface(registerPlayer *RegisterPlayerHandler) *ServerInterface {
+func NewServerInterface(registerPlayer *RegisterPlayerHandler, createTournament *CreateTournamentHandler) *ServerInterface {
 	return &ServerInterface{
-		registerPlayer: registerPlayer,
+		registerPlayer:   registerPlayer,
+		createTournament: createTournament,
 	}
 }
