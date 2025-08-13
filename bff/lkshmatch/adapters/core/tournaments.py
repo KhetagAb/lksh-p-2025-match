@@ -4,22 +4,14 @@ import aiohttp
 from pymongo import MongoClient
 
 import core_client
-from core_client.api.default import register_player, create_tournament
 from lkshmatch.adapters.base import (
     API_URL,
     Admin,
-    CreateTournament,
-    GetAllListTournament,
-    GetListTournament,
-    ModifyTournament,
-    RegisterTeamInTournament,
-    RemoveTournament,
     SportSectionName,
     TeamId,
     Tournament,
     TournamentInterval,
     UnknownError,
-    UnregisterTeamInTournament,
     TournamentAdminAdapter,
     TournamentAdapter
 )
