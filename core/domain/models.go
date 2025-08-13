@@ -1,8 +1,6 @@
 package domain
 
-import (
-	"time"
-)
+import "time"
 
 type Player struct {
 	ID         int64
@@ -17,18 +15,26 @@ type SportSection struct {
 	RuName string
 }
 
-type Tournament struct {
-	ID                   int64
-	Name                 string
-	SportSectionID       int64
-	RegistrationDeadline time.Time
-	StartDate            time.Time
-	EndDate              time.Time
+type Activity struct {
+	ID             int64
+	Title          string
+	Description    string
+	SportSectionID int64
+	CreatorID      int64
+}
+
+type Meeting struct {
+	ID         int64
+	ActivityID int64
+	Title      string
+	Date       time.Time
+	Details    string
+	Status     string
 }
 
 type Team struct {
-	ID        int64
-	Name      string
-	TourID    int64
-	CaptainID int64
+	ID         int64
+	Name       string
+	CaptainID  int64
+	ActivityID int64
 }
