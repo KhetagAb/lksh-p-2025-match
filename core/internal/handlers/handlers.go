@@ -6,7 +6,12 @@ import (
 )
 
 type ServerInterface struct {
-	registerPlayer *RegisterPlayerHandler
+	registerPlayer   *RegisterPlayerHandler
+	createTournament *CreateTournamentHandler
+}
+
+func (s *ServerInterface) CreateTournament(ctx echo.Context, params server.CreateTournamentParams) error {
+	return s.createTournament.createTournamentService(ctx, params)
 }
 
 func (s *ServerInterface) GetCoreSportGetSport(ctx echo.Context, sport string) error {

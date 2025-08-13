@@ -22,25 +22,25 @@ type Tournaments struct {
 	pool *pgxpool.Pool
 }
 
-func NewTournamentsRepository(pool *pgxpool.Pool) *Tournaments {
+func NewTournamentsRepository(
+	pool *pgxpool.Pool,
+) *Tournaments {
 	return &Tournaments{pool: pool}
 }
 
 func (t *Tournaments) CreateTournament(
 	ctx context.Context,
-	name string,
-	sportSectionID int64,
-	registrationDeadline, startDate, endDate time.Time,
+	tournament domain.Tournament,
 ) (*int64, error) {
 	var id int64
 	err := t.pool.QueryRow(
 		ctx,
 		createTournamentQuery,
-		name,
-		sportSectionID,
-		registrationDeadline,
-		startDate,
-		endDate,
+		tournament.Name,
+		tournament.SportSectionID,
+		tournament.RegistrationDeadline,
+		tournament.StartDate,
+		tournament.EndDate,
 	).Scan(&id)
 
 	if err != nil {
@@ -84,7 +84,7 @@ func (t *Tournaments) DeleteTournamentByID(ctx context.Context, id int64) error 
 		return &domain.InvalidOperationError{Code: domain.InvalidOperation, Message: err.Error()}
 	}
 	if tag.RowsAffected() != 1 {
-		return &domain.NotFoundError{Code: domain.NotFound, Message: "tournament not found"}
+		return &domain.NotFoundError{Code: domain.NotFound, Message: "tournaments not found"}
 	}
 	return nil
 }

@@ -70,10 +70,10 @@ paths:
             format: int64
       responses:
         "200":
-          $ref: '#/components/responses/ErrorResponse'
+          $ref: '#/components/responses/PlayerRegistrationResponse'
         "201":
           $ref: '#/components/responses/PlayerRegistrationResponse'
-        "400":
+        "500":
           $ref: '#/components/responses/ErrorResponse'
 
   /core/sports/get:
