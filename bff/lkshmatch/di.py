@@ -43,12 +43,12 @@ class RestAdapterProvider(Provider):
 
 def all_providers() -> List[Provider]:
     # fixme
-    mongo_host = os.getenv("MONGODB_HOST", "mongodb")
-    mongo_port = os.getenv("MONGODB_PORT", "27017")
-    mongo_username = os.getenv("MONGODB_ROOT_USERNAME")
-    mongo_password = os.getenv("MONGODB_ROOT_PASSWORD")
-    mongo_database = os.getenv("MONGODB_DATABASE")
-
+    mongo_host = settings.get("MONGODB_HOST")
+    mongo_port = settings.get("MONGODB_PORT")
+    mongo_username = settings.get("MONGODB_ROOT_USERNAME")
+    mongo_password = settings.get("MONGODB_ROOT_PASSWORD")
+    mongo_database = settings.get("MONGODB_DATABASE")
+    
     if not all([mongo_username, mongo_password, mongo_database]):
         raise ValueError("MongoDB credentials are not properly set in environment variables")
 

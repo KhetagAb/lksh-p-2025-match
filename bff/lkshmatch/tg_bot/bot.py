@@ -20,6 +20,8 @@ from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
 from lkshmatch.di import app_container
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
+from bff.lkshmatch.config import settings
+
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
 #     webhook_url = settings.get("WEBHOOK_URL")
@@ -39,7 +41,7 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 #     await bot.process_new_updates([types.Update.de_json(await req.json())])
 
 
-token = os.getenv("TELEGRAM_TOKEN")
+token = settings.get("TELEGRAM_TOKEN")
 logging.info(f"TELEGRAM_TOKEN: {token}")
 
 if token is None:
