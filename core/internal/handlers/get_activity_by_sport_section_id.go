@@ -19,7 +19,7 @@ type (
 	}
 )
 
-func NewGetCoreActivityBySportSportHandler(
+func NewGetCoreActivityBySportSectionIDHandler(
 	getCoreActivityBySportSectionIDService GetCoreActivityBySportSectionIDService,
 ) *GetCoreActivityBySportSectionIDHandler {
 	return &GetCoreActivityBySportSectionIDHandler{
@@ -29,7 +29,7 @@ func NewGetCoreActivityBySportSportHandler(
 
 func (h *GetCoreActivityBySportSectionIDHandler) GetCoreActivityBySportSectionID(ectx echo.Context, id int64) error {
 	ctx := context.Background()
-	logger.Infof(ctx, "Getting Activity by SportSection ID (%d)", id)
+	logger.Infof(ctx, "Getting ActivityList by SportSection ID (%d)", id)
 	domainActivityList, domainCreatorList, err := h.getCoreActivityBySportSectionIDService.GetCoreActivityBySportSectionID(ctx, id)
 	if err != nil {
 		logger.Errorf(ctx, "Internal server error while trying to find activity: %v", err)

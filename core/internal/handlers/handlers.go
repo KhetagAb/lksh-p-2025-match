@@ -9,16 +9,16 @@ import (
 type ServerInterface struct {
 	registerPlayer                  *RegisterPlayerHandler
 	createTournament                *CreateTournamentHandler
+	getCoreActivityByID             *GetCoreActivityByIDHandler
 	getCoreActivityBySportSectionID *GetCoreActivityBySportSectionIDHandler
+	postCoreActivityIDEnroll        *PostCoreActivityIDEnrollHandler
 }
 
 func (s ServerInterface) GetCoreActivityById(ctx echo.Context, id int64) error {
-	//TODO implement me
-	panic("implement me")
+	return s.getCoreActivityByID.GetCoreActivityByID(ctx, id)
 }
 
 func (s ServerInterface) GetCoreActivityBySportSectionId(ctx echo.Context, id int64) error {
-	//TODO implement me
 	return s.getCoreActivityBySportSectionID.GetCoreActivityBySportSectionID(ctx, id)
 }
 
