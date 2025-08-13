@@ -1,24 +1,29 @@
-import os
 from typing import List
 
-import aiohttp
-from pymongo import MongoClient
-
 import core_client
-from core_client.api.activities import get_core_activity_by_sport_section_id, get_core_activity_by_id, \
-    post_core_activity_id_enroll
-from lkshmatch.adapters.base import (
-    SportSectionName,
-    TeamId,
-    ActivityAdapter,
-    UnknownError,
-    Activity, Team, TgID, CoreID
-
+from core_client.api.activities import (
+    get_core_activity_by_id,
+    get_core_activity_by_sport_section_id,
+    post_core_activity_id_enroll,
 )
-from lkshmatch.admin.admin_privilege import PrivilegeChecker
-from lkshmatch.domain.repositories.admin_repository import AdminRepository
+from core_client.models import (
+    ActivityEnrollPlayerRequest,
+    GetCoreActivityByIdResponse200,
+    GetCoreActivityByIdResponse400,
+    GetCoreActivityBySportSectionIdResponse200,
+    GetCoreActivityBySportSectionIdResponse400, PostCoreActivityIdEnrollResponse400,
+    PostCoreActivityIdEnrollResponse200,
+)
+from lkshmatch.adapters.base import (
+    Activity,
+    ActivityAdapter,
+    CorePlayer,
+    InvalidParameters,
+    Team,
+    TgID,
+    UnknownError,
+)
 from lkshmatch.config import settings
-from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 
 
 class CoreActivityAdapter(ActivityAdapter):
@@ -28,37 +33,76 @@ class CoreActivityAdapter(ActivityAdapter):
         self.client = core_client.Client(base_url=core_client_url)
 
     async def get_activities_by_sport_section(self, sport_section_id: int) -> List[Activity]:
-        response = await get_core_activity_by_sport_section_id.asyncio(
-            client=self.client,
-            id=sport_section_id.id
-        )
-        if response is None:
-            raise UnknownError("get all activity return null response")
-        activity_result = []
-        for activity in response:
-            activity_result.append(activity)
-        return activity_result
+        response = await get_core_activity_by_sport_section_id.asyncio(client=self.client, id=sport_section_id)
+        if isinstance(response, GetCoreActivityBySportSectionIdResponse400):
+            raise InvalidParameters(f"get activity by sport section id returns 400 response: {response.message}")
+        if not isinstance(response, GetCoreActivityBySportSectionIdResponse200):
+            raise UnknownError("get activity by sport section id returns unknown response")
+        activities = []
+        for activity in response.activities:
+            activities.append(
+                Activity(
+                    id=activity.id,
+                    title=activity.title,
+                    description=activity.description,
+                    creator=CorePlayer(
+                        core_id=activity.creator.core_id,
+                        tg_id=activity.creator.tg_id,
+                    ),
+                )
+            )
+        return activities
 
-    async def get_activity_by_id(self, sport_section_id: int) -> List[Team]:
-        response = await get_core_activity_by_id.asyncio(
-            client=self.client,
-            id=sport_section_id.id
-        )
-        if response is None:
-            raise UnknownError("this section return null response")
-        activity_result = []
-        for activity in response:
-            activity_result.append(activity)
-        return activity_result
+    async def get_activity_by_id(self, activity_id: int) -> List[Team]:
+        response = await get_core_activity_by_id.asyncio(client=self.client, id=activity_id)
+        if isinstance(response, GetCoreActivityByIdResponse400):
+            raise InvalidParameters(f"get activity by id returns 400 response: {response.message}")
+        if not isinstance(response, GetCoreActivityByIdResponse200):
+            raise UnknownError("get activity by id returns unknown response")
+        teams = []
+        # TODO:issue98
+        for team in response.teams:
+            teams.append(
+                Team(
+                    id=team.id,
+                    name=team.name,
+                    capitan=CorePlayer(
+                        core_id=team.captain.core_id,
+                        tg_id=team.captain.tg_id,
+                    ),
+                    members=[
+                        CorePlayer(
+                            core_id=member.core_id,
+                            tg_id=member.tg_id,
+                        )
+                        for member in team.members
+                    ],
+                )
+            )
+        return teams
 
-
-
-    async def make_team_in_activity(self, core_id: CoreID) -> Team:
+    async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:
         response = await post_core_activity_id_enroll.asyncio(
-            client=self.client,
-            id=core_id.id
+            client=self.client, id=activity_id, body=ActivityEnrollPlayerRequest(tg_id=player_tg_id)
         )
-        if response is None:
-            raise UnknownError("this team return null response")
+        if isinstance(response, PostCoreActivityIdEnrollResponse400):
+            raise InvalidParameters(f"enroll player in activity returns 400 response: {response.message}")
+        if not isinstance(response, PostCoreActivityIdEnrollResponse200):
+            raise UnknownError("enroll player in activity  returns unknown response")
 
-        return response
+        team = response.team
+        return Team(
+            id=team.id,
+            name=team.name,
+            capitan=CorePlayer(
+                core_id=team.captain.core_id,
+                tg_id=team.captain.tg_id,
+            ),
+            members=[
+                CorePlayer(
+                    core_id=member.core_id,
+                    tg_id=member.tg_id,
+                )
+                for member in team.members
+            ],
+        )

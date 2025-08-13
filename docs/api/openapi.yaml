@@ -284,9 +284,14 @@ components:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Activity'
+            type: object
+            required:
+              - activities
+            properties:
+              activities:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
 
     #    TournamentCreationResponse:
     #      content:
@@ -319,7 +324,12 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Team"
+            type: "object"
+            required:
+              - team
+            properties:
+              team:
+                $ref: "#/components/schemas/Team"
 
     ErrorResponse:
       content:

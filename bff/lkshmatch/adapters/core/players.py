@@ -9,7 +9,7 @@ from lkshmatch.adapters.base import (
     CoreID,
     Player,
     PlayerAdapter,
-    PlayerAlreadyRegister,
+    PlayerAlreadyRegistered,
     PlayerNotFound,
     PlayerToRegister,
     UnknownError,
@@ -41,11 +41,8 @@ class CorePlayerAdapter(PlayerAdapter):
             body=RegisterPlayerRequest(tg_username=user.tg_username, name=user.name, tg_id=user.tg_id),
         )
 
-        if response is None:
-            raise UnknownError("register users return None")
-
         if isinstance(response, RegisterPlayerResponse200):
-            raise PlayerAlreadyRegister("player already register")
+            raise PlayerAlreadyRegistered("player already register")
         elif isinstance(response, RegisterPlayerResponse201):
             return response.id
         raise UnknownError("None response")

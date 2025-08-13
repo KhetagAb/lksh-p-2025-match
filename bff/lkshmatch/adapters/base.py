@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, NewType
+from typing import List, NewType, Optional
 
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)
@@ -12,7 +12,7 @@ class PlayerNotFound(Exception):
     pass
 
 
-class PlayerAlreadyRegister(Exception):
+class PlayerAlreadyRegistered(Exception):
     pass
 
 
@@ -32,22 +32,26 @@ class PlayerAlreadyRegister(Exception):
 # class TeamNotFound(Exception):
 #     pass
 #
-#
-class UnknownError(Exception):
-    pass
-
-
-#
 # class InsufficientRights(Exception):
 #     pass
 #
 #
+
+
+class InvalidParameters(Exception):
+    pass
+
+
+class UnknownError(Exception):
+    pass
+
+
 CoreID = int
 TgID = int
 
 
 @dataclass
-class TeamMember:
+class CorePlayer:
     core_id: CoreID
     tg_id: TgID
 
@@ -55,12 +59,7 @@ class TeamMember:
 @dataclass
 class Player:
     tg_username: str
-    tg_id: int
-
-
-@dataclass
-class CorePlayer(Player):
-    core_id: int
+    tg_id: TgID
 
 
 @dataclass
@@ -78,15 +77,17 @@ class SportSection:
 @dataclass
 class Activity:
     id: int
-    sport_name: SportSectionName
+    title: str
+    description: Optional[str]
+    creator: CorePlayer
 
 
 @dataclass
 class Team:
     id: int
     name: str
-    capitan: TeamMember
-    members: List[TeamMember]
+    capitan: CorePlayer
+    members: List[CorePlayer]
 
 
 # @dataclass
@@ -112,7 +113,7 @@ class PlayerAdapter(ABC):
 
 class SportAdapter(ABC):
     @abstractmethod
-    async def get_all_sections(self) -> List[SportSection]:
+    async def get_sport_list(self) -> List[SportSection]:
         raise NotImplementedError
 
 
@@ -135,12 +136,13 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_activity_by_id(self, sport_section_id: int) -> List[Team]:
+    async def get_activity_by_id(self, activity_id: int) -> List[Team]:
         raise NotImplementedError
 
     @abstractmethod
-    async def make_team_in_activity(self, core_id:CoreID ) -> Team:
+    async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:
         raise NotImplementedError
+
 
 # class TeamAdapter(ABC):
 #     @abstractmethod

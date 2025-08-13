@@ -12,7 +12,6 @@ from lkshmatch.adapters.base import (
     PlayerNotFound,
     PlayerToRegister,
     SportSection,
-    TeamIsFull,
     TeamNotFound,
     UnknownError,
 )
@@ -279,6 +278,7 @@ async def create_team(mess: types.Message, activity: SportSection) -> bool:
         return True
     return False
 
+
 async def signup_to_sport(mess: types.Message, sport: SportSection) -> bool:
     if f"signup_{sport.name}" == mess.text:
         buttons = []
@@ -288,7 +288,7 @@ async def signup_to_sport(mess: types.Message, sport: SportSection) -> bool:
         markup.add(*buttons)
         await bot.send_message(
             mess.chat.id,
-            f"Для выбора события, нажмите кнопку.",
+            "Для выбора события, нажмите кнопку.",
             reply_markup=markup,
         )
         return True
@@ -301,7 +301,11 @@ async def signup_to_activity(mess: types.Message, activity: SportSection) -> boo
         signup_button = types.KeyboardButton(f"signup_{activity.en_name}")
         create_button = types.KeyboardButton(f"create_{activity.en_name}")
         markup.add(signup_button, create_button)
-        await bot.send_message(mess.chat.id, f"Для записи в уже существующую команду, нажмите <signup_{activity.en_name}>, для создания новой команды, нажмите <create_{activity.en_name}>", reply_markup=markup)
+        await bot.send_message(
+            mess.chat.id,
+            f"Для записи в уже существующую команду, нажмите <signup_{activity.en_name}>, для создания новой команды, нажмите <create_{activity.en_name}>",
+            reply_markup=markup,
+        )
     return False
 
 
