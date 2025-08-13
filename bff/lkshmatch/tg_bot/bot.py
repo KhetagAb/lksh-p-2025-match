@@ -321,8 +321,6 @@ async def answer_to_buttons(mess: types.Message) -> None:
         for activity in await app_container.get(CoreSportAdapter).get_activities():
             if signup_to_activity(mess, activity):
                 return
-            if make_request_to_add_in_team(mess, sport):
-                return
             if await setname_team(mess, sport):
                 return
     await bot.send_message(mess.chat.id, "Я вас не понимаю.")
