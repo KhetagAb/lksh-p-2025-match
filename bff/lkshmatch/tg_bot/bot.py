@@ -43,7 +43,7 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 token = os.getenv("TELEGRAM_TOKEN")
 logging.info(f"TELEGRAM_TOKEN: {token}")
 
-if token == None:
+if token is None:
     raise ValueError("TG token required!")
 
 try:
@@ -68,12 +68,12 @@ async def make_sports_buttons() -> types.ReplyKeyboardMarkup:
     return markup
 
 
-# fixme что за?
+# предохранитель, чтобы юзер не мог регистрироваться по несколько раз
 async def fuse_not_nf(mess: types.Message) -> bool:
     return False
 
 
-# fixme что за?
+# предохранитель, чтобы юзер не мог ничего делать, если он не зареган
 async def fuse_nf(mess: types.Message) -> bool:
     return False
 
@@ -142,14 +142,14 @@ async def start(mess: types.Message) -> None:
         safe_username = username if username is not None else "unknown_user"
         repo = app_container.get(LKSHStudentsRepository)
         msg = await repo.validate_register_user(Player(safe_username, int(user_id)))
-    except PlayerNotFound:
-        msg = "Извините, но вас нет в списках. Подойдите в 4-ый комповник."
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button1 = types.KeyboardButton("Это я, регистрацию подтверждаю.")
         button2 = types.KeyboardButton("Нет, это не я. Отмена регистрации.")
         markup.add(button1, button2)
         await bot.send_message(mess.chat.id, f"{msg},\nмы нашли Вас в базе. Это вы?", reply_markup=markup)
         return
+    except PlayerNotFound:
+        msg = "Извините, но вас нет в списках. Подойдите в 4-ый комповник."
     except UnknownError as ue:
         print(ue)
         msg = standart_message_to_base_exception()
@@ -261,8 +261,8 @@ async def setname_team(mess: types.Message, sport: SportSection) -> bool:
     return False
 
 
-async def create_team(mess: types.Message, sport: SportSection) -> bool:
-    if f"create_{sport.name}" == mess.text:
+async def create_team(mess: types.Message, activity: SportSection) -> bool:
+    if f"create_{activity.en_name}" == mess.text:
         team = ""
         try:
             team = register_new_team(sport, mess.from_user.id)  # type: ignore
@@ -274,36 +274,34 @@ async def create_team(mess: types.Message, sport: SportSection) -> bool:
             return True
         await bot.send_message(
             mess.chat.id,
-            f"Вы зарегистрировали новую команду. Название: {team}. Если захотите изменить название команды на новое_название, введите <set_name_{sport.name}_{team}: новое_название>.",
+            f"Вы зарегистрировали новую команду. Название: {team}. Если захотите изменить название команды на новое_название, введите <set_name_{activity.en_name}_{team}: новое_название>.",
         )
         return True
     return False
-
 
 async def signup_to_sport(mess: types.Message, sport: SportSection) -> bool:
     if f"signup_{sport.name}" == mess.text:
         buttons = []
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        for team in get_list_of_all_teams(sport):
-            buttons.append(types.KeyboardButton(f"{sport.name}: {team}"))
+        for activity in get_list_of_all_activities(sport):
+            buttons.append(types.KeyboardButton(f"{activity}"))
         markup.add(*buttons)
         await bot.send_message(
             mess.chat.id,
-            f"Для выбора команды с названием название_команды нажмите кнопку <{sport.name}: название команды>",
+            f"Для выбора события, нажмите кнопку.",
             reply_markup=markup,
         )
         return True
     return False
 
 
-async def make_request_to_add_in_team(mess: types.Message, sport: SportSection) -> bool:
-    if f"{sport.en_name}: " in mess.text:  # type: ignore
-        team = mess.text[len(f"{sport.en_name}: ") :]  # type: ignore
-        try:
-            add_person_to_team(team, mess.from_user.id)  # type: ignore
-        except TeamIsFull:
-            pass
-        return True
+async def signup_to_activity(mess: types.Message, activity: SportSection) -> bool:
+    if mess.text == activity:  # type: ignore
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        signup_button = types.KeyboardButton(f"signup_{activity.en_name}")
+        create_button = types.KeyboardButton(f"create_{activity.en_name}")
+        markup.add(signup_button, create_button)
+        await bot.send_message(mess.chat.id, f"Для записи в уже существующую команду, нажмите <signup_{activity.en_name}>, для создания новой команды, нажмите <create_{activity.en_name}>", reply_markup=markup)
     return False
 
 
@@ -322,10 +320,11 @@ async def answer_to_buttons(mess: types.Message) -> None:
             return
         if signup_to_sport(mess, sport):
             return
-        if make_request_to_add_in_team(mess, sport):
-            return
-        if await setname_team(mess, sport):
-            return
-        if await setname_team(mess, sport):
-            return
+        for activity in await app_container.get(CoreSportAdapter).get_activities():
+            if signup_to_activity(mess, activity):
+                return
+            if create_team(mess, activity):
+                return
+            if await setname_team(mess, activity):
+                return
     await bot.send_message(mess.chat.id, "Я вас не понимаю.")
