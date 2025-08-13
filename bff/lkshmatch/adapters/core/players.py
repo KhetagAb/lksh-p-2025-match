@@ -1,4 +1,3 @@
-import logging
 import os
 
 from pymongo import MongoClient
@@ -28,9 +27,9 @@ class CorePlayerAdapter(PlayerAdapter):
         self.lksh_config = MongoLKSHStudentsRepository(mongo_client)
 
     async def validate_register_user(self, user: Player) -> PlayerToRegister:
-        print(f'validating user to be registered with username={user.tg_username} and id={user.tg_id}')
+        print(f"validating user to be registered with username={user.tg_username} and id={user.tg_id}")
         students = self.lksh_config.get_players()
-        print(f'found {len(students)} students in lksh base')
+        print(f"found {len(students)} students in lksh base")
         for student in students:
             if student.tg_username == user.tg_username:
                 return PlayerToRegister(tg_username=user.tg_username, tg_id=user.tg_id, name=student.name)
