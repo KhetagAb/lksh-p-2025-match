@@ -2,17 +2,17 @@ from typing import List
 
 import core_client
 from core_client.api.activities import (
-    get_core_activity_by_id,
     get_core_activity_by_sport_section_id,
-    post_core_activity_id_enroll,
+    post_core_activity_id_enroll, get_core_teams_by_activity_id,
 )
 from core_client.models import (
     ActivityEnrollPlayerRequest,
-    GetCoreActivityByIdResponse200,
-    GetCoreActivityByIdResponse400,
     GetCoreActivityBySportSectionIdResponse200,
-    GetCoreActivityBySportSectionIdResponse400, PostCoreActivityIdEnrollResponse400,
+    GetCoreActivityBySportSectionIdResponse400,
     PostCoreActivityIdEnrollResponse200,
+    PostCoreActivityIdEnrollResponse400,
+    GetCoreTeamsByActivityIdResponse400,
+    GetCoreTeamsByActivityIdResponse200,
 )
 from lkshmatch.adapters.base import (
     Activity,
@@ -53,12 +53,13 @@ class CoreActivityAdapter(ActivityAdapter):
             )
         return activities
 
-    async def get_activity_by_id(self, activity_id: int) -> List[Team]:
-        response = await get_core_activity_by_id.asyncio(client=self.client, id=activity_id)
-        if isinstance(response, GetCoreActivityByIdResponse400):
-            raise InvalidParameters(f"get activity by id returns 400 response: {response.message}")
-        if not isinstance(response, GetCoreActivityByIdResponse200):
-            raise UnknownError("get activity by id returns unknown response")
+    # TODO перенести в TeamsAdapter
+    async def get_teams_by_activity_id(self, activity_id: int) -> List[Team]:
+        response = await get_core_teams_by_activity_id.asyncio(client=self.client, id=activity_id)
+        if isinstance(response, GetCoreTeamsByActivityIdResponse400):
+            raise InvalidParameters(f"get teams by activity id returns 400 response: {response.message}")
+        if not isinstance(response, GetCoreTeamsByActivityIdResponse200):
+            raise UnknownError("get teams by activity id returns unknown response")
         teams = []
         # TODO:issue98
         for team in response.teams:

@@ -136,7 +136,7 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_activity_by_id(self, activity_id: int) -> List[Team]:
+    async def get_teams_by_activity_id(self, activity_id: int) -> List[Team]:
         raise NotImplementedError
 
     @abstractmethod
