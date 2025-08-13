@@ -123,9 +123,6 @@ class SportAdapter(ABC):
 #     ) -> None:
 #         raise NotImplementedError
 #
-#     @abstractmethod
-#     async def remove_tournament(self, activity: Activity, player_info: Admin) -> None:
-#         raise NotImplementedError
 #
 #     @abstractmethod
 #     async def modify_tournament(self, activity: Activity, player_info: Admin) -> None:
@@ -142,7 +139,7 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def make_team_in_activity(self, activity: Activity, team_id: TeamId, player_info: Player) -> None:
+    async def make_team_in_activity(self, core_id:CoreID ) -> Team:
         raise NotImplementedError
 
 # class TeamAdapter(ABC):
