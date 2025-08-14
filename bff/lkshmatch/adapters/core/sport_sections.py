@@ -12,5 +12,5 @@ class CoreSportAdapter(SportAdapter):
             raise UnknownError("get all sections return null response")
         sport_result = []
         for sport in response.sports_sections:
-            sport_result.append(SportSection(id=sport.id, name=sport.name, ru_name=sport.ru_name))
+            sport_result.append(map_sport_section)
         return sport_result
