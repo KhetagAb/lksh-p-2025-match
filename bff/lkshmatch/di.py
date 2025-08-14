@@ -67,8 +67,8 @@ def all_providers() -> List[Provider]:
     mongo_username = settings.get("MONGODB_ROOT_USERNAME")
     mongo_password = settings.get("MONGODB_ROOT_PASSWORD")
     mongo_database = settings.get("MONGODB_DATABASE")
-    core_host = settings.get('CORE_HOST')
-    core_port = settings.get('CORE_PORT')
+    core_host = settings.get("CORE_HOST")
+    core_port = settings.get("CORE_PORT")
 
     if not all([mongo_username, mongo_password, mongo_database]):
         raise ValueError("MongoDB credentials are not properly set in environment variables")
