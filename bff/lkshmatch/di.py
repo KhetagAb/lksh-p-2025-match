@@ -1,21 +1,19 @@
-import os
 from collections.abc import Iterable
-from typing import List
-
-import core_client
-from lkshmatch.config import settings
 
 from dishka import Container, Provider, Scope, make_container, provide
 from pymongo import MongoClient
 
-from lkshmatch.adapters.base import (PlayerAdapter, ActivityAdapter, SportAdapter)
-from lkshmatch.adapters.core.players import CorePlayerAdapter
+import core_client
+from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter
 from lkshmatch.adapters.core.activity import CoreActivityAdapter
+from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
+from lkshmatch.config import settings
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
 from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
+
 
 class CoreClientProvider(Provider):
     def __init__(self, core_host: str, core_port: str):
@@ -61,7 +59,7 @@ class RestAllAdapterProvider(Provider):
     core_sport_adapter = provide(CoreSportAdapter, provides=SportAdapter)
 
 
-def all_providers() -> List[Provider]:
+def all_providers() -> list[Provider]:
     mongo_host = settings.get("MONGODB_HOST")
     mongo_port = settings.get("MONGODB_PORT")
     mongo_username = settings.get("MONGODB_ROOT_USERNAME")
@@ -78,7 +76,12 @@ def all_providers() -> List[Provider]:
     )
     print(f"MongoDB URI: {mongo_uri}")
 
-    return [MongoProvider(mongo_uri), MongoRepositoryProvider(), RestAllAdapterProvider(), CoreClientProvider(core_host, core_port)]
+    return [
+        MongoProvider(mongo_uri),
+        MongoRepositoryProvider(),
+        RestAllAdapterProvider(),
+        CoreClientProvider(core_host, core_port),
+    ]
 
 
 app_container: Container = make_container(*all_providers())

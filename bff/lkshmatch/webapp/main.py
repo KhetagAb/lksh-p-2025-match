@@ -2,7 +2,6 @@ from dishka.integrations.fastapi import FromDishka, inject
 
 # from fastapi.responses import HTMLResponse, FileResponse
 from fastapi import FastAPI, Request
-from fastapi.requests import Request
 from fastapi.responses import RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 from jose import JWTError, jwt
@@ -84,10 +83,8 @@ async def dispatch(request: Request, call_next) -> Response:
         return login_wall
 
     try:
-        token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
+        jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
     except JWTError:
         return login_wall
-
-    user_id = token_parts["user_id"]
 
     return await call_next(request)

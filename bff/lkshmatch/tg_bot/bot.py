@@ -1,5 +1,4 @@
 import logging
-import os
 import random
 
 from telebot import types
@@ -17,10 +16,9 @@ from lkshmatch.adapters.base import (
 )
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
+from lkshmatch.config import settings
 from lkshmatch.di import app_container
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
-
-from lkshmatch.config import settings
 
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
@@ -134,7 +132,6 @@ def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboa
 
 @bot.message_handler(commands=["start"])
 async def start(mess: types.Message) -> None:
-    chat_id = mess.chat.id
     user_id = mess.from_user.id if mess.from_user is not None else 0
     username = mess.from_user.username if mess.from_user is not None else None
     if await fuse_not_nf(mess):
@@ -266,7 +263,7 @@ async def create_team(mess: types.Message, activity: SportSection) -> bool:
     if f"create_{activity.en_name}" == mess.text:
         team = ""
         try:
-            team = register_new_team(sport, mess.from_user.id)  # type: ignore
+            team = register_new_team(activity, mess.from_user.id)  # type: ignore
         except InsufficientRights:
             await bot.send_message(mess.chat.id, standard_message_to_insufficient_rights())
         except UnknownError as ue:
@@ -285,7 +282,9 @@ async def signup_to_sport(mess: types.Message, sport: SportSection) -> bool:
     if f"signup_{sport.name}" == mess.text:
         buttons = []
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        for activity in get_list_of_all_activities(sport):
+        # TODO: реализовать get_list_of_all_activities
+        activities = []  # get_list_of_all_activities(sport)
+        for activity in activities:
             buttons.append(types.KeyboardButton(f"{activity}"))
         markup.add(*buttons)
         await bot.send_message(
