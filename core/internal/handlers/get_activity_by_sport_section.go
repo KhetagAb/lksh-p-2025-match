@@ -29,25 +29,25 @@ func NewGetActivitiesBySportSectionIDHandler(
 
 func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ectx echo.Context, id int64) error {
 	ctx := context.Background()
-	logger.Infof(ctx, "Getting ActivityList by SportSection ID (%d)", id)
-	domainActivityList, domainCreatorList, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
+	logger.Infof(ctx, "Getting activities by SportSection ID (%d)", id)
+	activities, activityCreators, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
 	if err != nil {
 		logger.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
 		return InternalErrorResponse(ectx, err.Error())
 	}
 
-	logger.Infof(ctx, "%d activities have been found and extracted succesfully", len(domainActivityList))
+	logger.Infof(ctx, "%d activities have been found and extracted succesfully", len(activities))
 
-	var activities []server.Activity
-	for index, activity := range domainActivityList {
-		domainCreator := domainCreatorList[index]
-		resultActivityCreator := server.Player{CoreId: domainCreator.ID, TgId: domainCreator.TgID}
+	var resultActivities []server.Activity
+	for activityIndex, activity := range activities {
+		activityCreator := activityCreators[activityIndex]
+		resultActivityCreator := server.Player{CoreId: activityCreator.ID, TgId: activityCreator.TgID}
 		resultActivity := server.Activity{Id: activity.ID, Title: activity.Title, Description: &activity.Description, Creator: resultActivityCreator}
 
-		activities = append(activities, resultActivity)
+		resultActivities = append(resultActivities, resultActivity)
 	}
 
 	return ectx.JSON(200, server.ActivityListResponse{
-		Activities: activities,
+		Activities: resultActivities,
 	})
 }
