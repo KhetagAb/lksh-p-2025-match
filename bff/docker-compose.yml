@@ -40,9 +40,9 @@ services:
       dockerfile: lkshmatch/Dockerfile
     container_name: match-bot
     environment:
+# FIXME:issue
       - MATCH_CORE_HOST=match-core
       - MATCH_CORE_PORT=8080
-      - MATCH_TELEGRAM_TOKEN=${MATCH_TELEGRAM_TOKEN}
     depends_on:
       - mongodb
     networks:

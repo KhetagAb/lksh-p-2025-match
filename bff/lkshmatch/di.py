@@ -18,7 +18,7 @@ from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 class CoreClientProvider(Provider):
     def __init__(self, core_host: str, core_port: str):
         super().__init__()
-        self.url = f"{core_host}:{core_port}"
+        self.url = f"http://{core_host}:{core_port}"
 
     @provide(scope=Scope.APP)
     def core_client(self) -> Iterable[core_client.Client]:
@@ -74,8 +74,6 @@ def all_providers() -> list[Provider]:
     mongo_uri = (
         f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_database}?authSource=admin"
     )
-    print(f"MongoDB URI: {mongo_uri}")
-
     return [
         MongoProvider(mongo_uri),
         MongoRepositoryProvider(),

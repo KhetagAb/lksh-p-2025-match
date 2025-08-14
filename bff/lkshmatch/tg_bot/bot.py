@@ -125,7 +125,7 @@ async def start(mess: types.Message) -> None:
         button1 = types.KeyboardButton("Это я, регистрацию подтверждаю.")
         button2 = types.KeyboardButton("Нет, это не я. Отмена регистрации.")
         markup.add(button1, button2)
-        await bot.send_message(mess.chat.id, f"{msg},\nмы нашли Вас в базе. Это вы?", reply_markup=markup)
+        await bot.send_message(mess.chat.id, f"{msg}, мы нашли Вас. Это вы?", reply_markup=markup)
         return
     except PlayerNotFound:
         msg = "Извините, но вас нет в списках. Подойдите в 4-ый комповник."
