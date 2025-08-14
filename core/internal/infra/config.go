@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -9,6 +10,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
+
+func NewContextProvider() context.Context {
+	return context.Background()
+}
 
 type (
 	Config struct {

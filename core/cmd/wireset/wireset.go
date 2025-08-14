@@ -1,7 +1,6 @@
 package wireset
 
 import (
-	"context"
 	"match/internal/application/handlers"
 	"match/internal/application/repositories"
 	"match/internal/application/services/activities"
@@ -15,12 +14,8 @@ import (
 	"github.com/google/wire"
 )
 
-func NewContextProvider() context.Context {
-	return context.Background()
-}
-
 var All = wire.NewSet(
-	NewContextProvider,
+	infra.NewContextProvider,
 
 	infra.NewConfig,
 	infra.NewPgxPool,

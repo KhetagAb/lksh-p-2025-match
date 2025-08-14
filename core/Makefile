@@ -32,8 +32,12 @@ migrate:
 	go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_EXPOSED_PORT}/${POSTGRES_DB} up
 
 codegen:
+# TODO:issue
 	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml
-	go tool github.com/google/wire/cmd/wire ./cmd/wireset && mkdir internal/generated/wireset && mv cmd/wireset/wire_gen.go internal/generated/wireset
+	rm -rf internal/generated/wireset/
+	mkdir -p internal/generated/wireset
+	go tool github.com/google/wire/cmd/wire ./cmd/wireset
+	mv cmd/wireset/wire_gen.go internal/generated/wireset
 
 run-local:
 	bin/match
