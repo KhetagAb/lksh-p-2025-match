@@ -16,26 +16,24 @@ class PlayerAlreadyRegistered(Exception):
     pass
 
 
-#
-# class TeamIsFull(Exception):
-#     pass
-#
-#
-# class NameTeamReserveError(Exception):
-#     pass
-#
-#
-# class PlayerAlreadyInTeam(Exception):
-#     pass
-#
-#
-# class TeamNotFound(Exception):
-#     pass
-#
-# class InsufficientRights(Exception):
-#     pass
-#
-#
+class TeamIsFull(Exception):
+    pass
+
+
+class NameTeamReserveError(Exception):
+    pass
+
+
+class PlayerAlreadyInTeam(Exception):
+    pass
+
+
+class TeamNotFound(Exception):
+    pass
+
+
+class InsufficientRights(Exception):
+    pass
 
 
 class InvalidParameters(Exception):
