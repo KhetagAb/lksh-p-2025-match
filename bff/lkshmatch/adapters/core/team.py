@@ -1,21 +1,27 @@
 import aiohttp
+from pymongo import MongoClient
 
-from lkshmatch.adapters.core import (
+import core_client
+from lkshmatch.adapters.base import (
     API_URL,
-    Approve,
-    CreateTeam,
-    JoinTeam,
-    LeaveTeam,
     PlayerAlreadyInTeam,
     PlayerRegisterInfo,
     SportSection,
     Team,
+    TeamAdapter,
     TeamIsFull,
     UnknownError,
 )
+from lkshmatch.config import settings
 
 
-class RestCreateTeam(CreateTeam):
+class CoreTeamAdapter(TeamAdapter):
+    def __init__(self):
+        # TODO DI
+        core_client_url = f"{settings.get('CORE_HOST')}:{settings.get('CORE_PORT')}"
+        mongo_client = MongoClient(host=os.getenv("MATCH_MONGO_URI"))
+        self.client = core_client.Client(base_url=core_client_url)
+
     async def create_team(self, section: SportSection, user: PlayerRegisterInfo, name_team: str) -> None:
         async with aiohttp.ClientSession() as session:
             query = {"name_sport_section": section.en_name, "name_team": name_team, "id": user.id}
@@ -29,8 +35,6 @@ class RestCreateTeam(CreateTeam):
             if response.status != 200:
                 raise UnknownError
 
-
-class RestGetTeams(Team):
     async def teams(self, section: SportSection) -> list[Team]:
         async with aiohttp.ClientSession() as session:
             query = {"name_sport_section": section.en_name}
@@ -45,8 +49,6 @@ class RestGetTeams(Team):
                 data_team.append(Team(data["name"], data["id"], section.en_name, data["capitan_id"]))
             return data_team
 
-
-class RestJoinTeam(JoinTeam):
     async def join_team(self, team: Team, user: PlayerRegisterInfo) -> int:
         async with aiohttp.ClientSession() as session:
             query = {"id_team": team.id, "id_user": user.id}
@@ -65,8 +67,6 @@ class RestJoinTeam(JoinTeam):
 
             return data["id_capitan"]
 
-
-class RestLeaveTeam(LeaveTeam):
     async def leave_team(self, team: Team, user: PlayerRegisterInfo) -> None:
         async with aiohttp.ClientSession() as session:
             query = {"id_team": team.id, "id_user": user.id}
@@ -75,8 +75,6 @@ class RestLeaveTeam(LeaveTeam):
             if response.status != 200:
                 raise UnknownError
 
-
-class RestApprove(Approve):
     async def approve(self, team: Team, user: PlayerRegisterInfo):
         async with aiohttp.ClientSession() as session:
             query = {"id_team": team.id, "id_user": user.id}

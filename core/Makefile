@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := quickstart
 
+include .env
+export
 mode := dev
 
 quickstart: check
@@ -18,16 +20,19 @@ up:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans -d
 
 stop:
-	docker-compose -f docker-compose.$(mode).yml stop --build --force-recreate --remove-orphans -d
+	docker-compose -f docker-compose.$(mode).yml stop
+
+down:
+	docker-compose -f docker-compose.$(mode).yml down -v
 
 test:
 	docker-compose -f docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
 upgrade:
-	go tool github.com/pressly/goose/v3/cmd/goose -dir migrations postgres $(uri) up
+	goose -dir migrations postgres postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_EXPOSED_PORT}/${POSTGRES_DB} up
 
 codegen:
-	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config api/config.yaml api/openapi.yaml
+	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config api/config.yaml ../docs/api/openapi.yaml
 	cd internal/generated/app && go tool github.com/google/wire/cmd/wire .
 
 run-local:

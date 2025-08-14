@@ -1,34 +1,26 @@
 from typing import List
 
-import aiohttp
+import core_client
+from core_client.api.sport_sections import get_core_sport_list
+from lkshmatch.adapters.base import SportAdapter, SportSection, UnknownError
+from lkshmatch.config import settings
 
-from lkshmatch.adapters.base import CorePlayer, SportAdapter, SportSection
+
+class PlayerRegisterInfo:
+    pass
 
 
 class CoreSportAdapter(SportAdapter):
-    async def get_sections(self) -> List[SportSection]:
-        async with aiohttp.ClientSession() as session:
-            response = await session.get(f"{API_URL}/get_sections")
-            if response.status != 200:
-                raise UnknownError
+    def __init__(self):
+        # TODO DI
+        core_client_url = f"{settings.get('CORE_HOST')}:{settings.get('CORE_PORT')}"
+        self.client = core_client.Client(base_url=core_client_url)
 
-            data = await response.json()
-            return [SportSection(name, en_name) for name, en_name in data]
-
-    async def get_players_by_sport_sections(self, section: SportSection) -> List[CorePlayer]:
-        async with aiohttp.ClientSession() as session:
-            query = {"name_section": section.en_name}
-            response = await session.get(f"{API_URL}/get_players_by_sport_sections", params=query)
-            if response.status != 200:
-                raise UnknownError
-
-            data = await response.json()
-            return [PlayerRegisterInfo(name, id_player) for name, id_player in data]
-
-    async def register_player_in_sport_section(self, section: SportSection, user: CorePlayer) -> None:
-        # проверка на админа
-        async with aiohttp.ClientSession() as session:
-            query = {"name_section": section.en_name, "user_id": user.id}
-            response = await session.get(f"{API_URL}/register_player_in_sport_section", params=query)
-            if response.status != 200:
-                raise UnknownError
+    async def get_sport_list(self) -> List[SportSection]:
+        response = await get_core_sport_list.asyncio(client=self.client)
+        if response is None:
+            raise UnknownError("get all sections return null response")
+        sport_result = []
+        for sport in response.sports_sections:
+            sport_result.append(SportSection(id=sport.id, name=sport.name, ru_name=sport.ru_name))
+        return sport_result

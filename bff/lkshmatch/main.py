@@ -8,7 +8,7 @@ from lkshmatch.tg_bot.bot import bot as telegram_bot
 
 def print_loaded_settings():
     print("Loaded settings:")
-    for key, value in settings.as_dict().items():  # type: ignore
+    for key, value in settings.as_dict().items():
         print(f"{key} = {value!r}")
 
 
