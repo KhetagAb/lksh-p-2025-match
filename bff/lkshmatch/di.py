@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from typing import List
 
 import core_client
+from lkshmatch.config import settings
 
 from dishka import Container, Provider, Scope, make_container, provide
 from pymongo import MongoClient
