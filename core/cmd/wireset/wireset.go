@@ -3,14 +3,14 @@ package wireset
 import (
 	"context"
 	"github.com/google/wire"
-	"match/infra"
-	"match/internal/generated/server"
-	"match/internal/handlers"
-	"match/internal/repositories"
-	"match/internal/services/players"
-	"match/internal/services/sport"
-	"match/internal/services/tournaments"
-	"match/internal/transport"
+	"match/internal/application/handlers"
+	"match/internal/application/repositories"
+	"match/internal/application/services/players"
+	"match/internal/application/services/sport"
+	"match/internal/application/services/tournaments"
+	"match/internal/application/transport"
+	"match/internal/generated/presentation"
+	"match/internal/infra"
 )
 
 func NewContextProvider() context.Context {
@@ -23,7 +23,7 @@ var All = wire.NewSet(
 	infra.NewConfig,
 	infra.NewPgxPool,
 
-	wire.Bind(new(server.ServerInterface), new(*handlers.ServerInterface)),
+	wire.Bind(new(presentation.ServerInterface), new(*handlers.ServerInterface)),
 	transport.CreateServer,
 
 	repositories.NewPlayersRepository,
