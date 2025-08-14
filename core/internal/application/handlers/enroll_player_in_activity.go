@@ -65,5 +65,7 @@ func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context
 		Captain: player,
 	}
 
-	return ectx.JSON(200, resultTeam)
+	return ectx.JSON(200, server.CreatedTeamResponse{
+		Team: resultTeam,
+	})
 }

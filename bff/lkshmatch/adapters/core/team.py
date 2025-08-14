@@ -1,16 +1,3 @@
-import aiohttp
-
-import core_client
-from lkshmatch.adapters.base import (
-    PlayerAlreadyInTeam,
-    SportSection,
-    Team,
-    TeamAdapter,
-    TeamIsFull,
-    UnknownError,
-)
-
-
 # class CoreTeamAdapter(TeamAdapter):
 #     def __init__(self, core_client: core_client.Client):
 #         self.client = core_client
