@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	_ "embed"
+	"fmt"
 	domain "match/internal/domain/dao"
 	"match/internal/domain/services"
 
@@ -130,7 +131,10 @@ func (r *Teams) DeleteTeamByID(ctx context.Context, id int64) error {
 func (r *Teams) AddPlayerToTeam(ctx context.Context, playerID, teamID int64) error {
 	_, err := r.pool.Exec(ctx, addPlayerToTeamQuery, playerID, teamID)
 	if err != nil {
-		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
+		return &services.InvalidOperationError{
+			Code:    services.InvalidOperation,
+			Message: fmt.Sprintf("failed to add player to team: %v", err),
+		}
 	}
 	return nil
 }
