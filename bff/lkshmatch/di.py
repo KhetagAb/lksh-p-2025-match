@@ -5,12 +5,15 @@ from typing import List
 from dishka import Container, Provider, Scope, make_container, provide
 from pymongo import MongoClient
 
-from lkshmatch.adapters.base import PlayerAdapter
-from lkshmatch.adapters.core.players import CorePlayerAdapter
+from lkshmatch.adapters.base import PlayerAdapter, TeamAdapter, ActivityAdapter, SportAdapter
+from lkshmatch.adapters.stub_core.players import StubPlayerAdapter
+from lkshmatch.adapters.stub_core.team import StubTeamAdapter
+from lkshmatch.adapters.stub_core.activity import StubActivityAdapter
+from lkshmatch.adapters.stub_core.sport_sections import StubSportAdapter
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
-from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
+from lkshmatch.repositories.mongo.stub_students import MongoLKSHStudentsRepository
 
 
 class MongoProvider(Provider):
@@ -38,7 +41,10 @@ class MongoRepositoryProvider(Provider):
 
 class RestAdapterProvider(Provider):
     scope = Scope.APP
-    core_player_adapter = provide(CorePlayerAdapter, provides=PlayerAdapter)
+    core_player_adapter = provide(StubPlayerAdapter, provides=PlayerAdapter)
+    core_team_adapter = provide(StubTeamAdapter, provides=TeamAdapter)
+    core_activity_adapter = provide(StubActivityAdapter, provides=ActivityAdapter)
+    core_sport_adapter = provide(StubSportAdapter, provides=SportAdapter)
 
 
 def all_providers() -> List[Provider]:

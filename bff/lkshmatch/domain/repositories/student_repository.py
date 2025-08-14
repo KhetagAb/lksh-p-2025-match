@@ -14,9 +14,5 @@ class Student:
 
 class LKSHStudentsRepository(ABC):
     @abstractmethod
-    async def get_students(self) -> List[Student]:
-        raise NotImplementedError
-
-    @abstractmethod
     async def validate_register_user(self, user: Player) -> str:
         raise NotImplementedError

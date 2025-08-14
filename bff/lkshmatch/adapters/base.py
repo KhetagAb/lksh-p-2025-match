@@ -16,26 +16,26 @@ class PlayerAlreadyRegistered(Exception):
     pass
 
 
-#
-# class TeamIsFull(Exception):
-#     pass
-#
-#
-# class NameTeamReserveError(Exception):
-#     pass
-#
-#
-# class PlayerAlreadyInTeam(Exception):
-#     pass
-#
-#
-# class TeamNotFound(Exception):
-#     pass
-#
-# class InsufficientRights(Exception):
-#     pass
-#
-#
+
+class TeamIsFull(Exception):
+    pass
+
+
+class NameTeamReserveError(Exception):
+    pass
+
+
+class PlayerAlreadyInTeam(Exception):
+    pass
+
+
+class TeamNotFound(Exception):
+    pass
+
+class InsufficientRights(Exception):
+    pass
+
+
 
 
 class InvalidParameters(Exception):
@@ -144,23 +144,23 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
 
-# class TeamAdapter(ABC):
-#     @abstractmethod
-#     async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     async def teams(self, section: SportSection) -> list[Team]:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     async def join_team(self, team: Team, user: Player) -> int:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     async def leave_team(self, team: Team, user: Player) -> None:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     async def approve(self, team: Team, user: Player):
-#         raise NotImplementedError
+class TeamAdapter(ABC):
+    @abstractmethod
+    async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def teams(self, section: SportSection) -> list[Team]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def join_team(self, team: Team, user: Player) -> int:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def leave_team(self, team: Team, user: Player) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def approve(self, team: Team, user: Player):
+        raise NotImplementedError
