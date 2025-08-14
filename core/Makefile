@@ -33,7 +33,7 @@ migrate:
 
 codegen:
 	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml
-	go tool github.com/google/wire/cmd/wire ./cmd/wireset && mv cmd/wireset/wire_gen.go internal/generated
+	go tool github.com/google/wire/cmd/wire ./cmd/wireset && mkdir internal/generated/wireset && mv cmd/wireset/wire_gen.go internal/generated/wireset
 
 run-local:
 	bin/match
