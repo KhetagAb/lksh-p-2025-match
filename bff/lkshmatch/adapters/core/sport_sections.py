@@ -11,10 +11,8 @@ class PlayerRegisterInfo:
 
 
 class CoreSportAdapter(SportAdapter):
-    def __init__(self):
-        # TODO DI
-        core_client_url = f"{settings.get('CORE_HOST')}:{settings.get('CORE_PORT')}"
-        self.client = core_client.Client(base_url=core_client_url)
+    def __init__(self, core_client: core_client.Client):
+        self.client = core_client
 
     async def get_sport_list(self) -> List[SportSection]:
         response = await get_core_sport_list.asyncio(client=self.client)

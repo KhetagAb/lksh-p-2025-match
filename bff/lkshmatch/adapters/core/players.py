@@ -19,12 +19,9 @@ from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 
 
 class CorePlayerAdapter(PlayerAdapter):
-    def __init__(self):
-        # TODO DI
-        core_client_url = f"{settings.get('CORE_HOST')}:{settings.get('CORE_PORT')}"
-        mongo_client = MongoClient(host=settings.get("MONGODB_MONGO_URI"))
-        self.client = core_client.Client(base_url=core_client_url)
-        self.lksh_config = MongoLKSHStudentsRepository(mongo_client)
+    def __init__(self, lksh_config: MongoLKSHStudentsRepository, core_client: core_client.Client):
+        self.client = core_client
+        self.lksh_config = lksh_config
 
     async def validate_register_user(self, user: Player) -> PlayerToRegister:
         print(f"validating user to be registered with username={user.tg_username} and id={user.tg_id}")
