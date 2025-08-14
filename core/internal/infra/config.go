@@ -67,7 +67,7 @@ func LoadConfig(path string) (*Config, error) {
 	return &cfg, nil
 }
 
-const defaultConfigPath = "configs/config.yaml"
+const defaultConfigPath = "config/config.yaml"
 
 func NewConfig() *Config {
 	configPath := os.Getenv("CONFIG_PATH")
