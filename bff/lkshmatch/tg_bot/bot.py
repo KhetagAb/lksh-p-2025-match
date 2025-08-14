@@ -240,7 +240,7 @@ async def setname_team(mess: types.Message, activity: Activity) -> bool:
     return False
 
 
-async def create_team(mess: types.Message, activity: Activity) -> bool:
+async def enroll_player_in_activity(mess: types.Message, activity: Activity) -> bool:
     if f"create {activity.title}" == mess.text:
         team = ""
         try:
@@ -303,7 +303,7 @@ async def answer_to_buttons(mess: types.Message) -> None:
                 return
             if await signup_to_activity(mess, activity):
                 return
-            if await create_team(mess, activity):
+            if await enroll_player_in_activity(mess, activity):
                 return
             if await setname_team(mess, activity):
                 return
