@@ -10,9 +10,7 @@
 core/bin/
 
 # codegen
-core/internal/generated/app/wire_gen.go
-core/internal/generated/server
-
+core/internal/generated/
 
 # Test binary, built with `go test -c`
 *.test

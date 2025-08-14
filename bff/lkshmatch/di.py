@@ -1,5 +1,4 @@
 from collections.abc import Iterable
-from typing import List
 
 from dishka import Container, Provider, Scope, make_container, provide
 from pymongo import MongoClient
@@ -60,7 +59,7 @@ class RestAllAdapterProvider(Provider):
     core_sport_adapter = provide(CoreSportAdapter, provides=SportAdapter)
 
 
-def all_providers() -> List[Provider]:
+def all_providers() -> list[Provider]:
     mongo_host = settings.get("MONGODB_HOST")
     mongo_port = settings.get("MONGODB_PORT")
     mongo_username = settings.get("MONGODB_ROOT_USERNAME")

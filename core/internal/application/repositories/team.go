@@ -1,0 +1,71 @@
+package repositories
+
+import (
+	"context"
+	_ "embed"
+	domain2 "match/internal/domain/dao"
+	"match/internal/domain/services"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+//go:embed queries/team/create.sql
+var createTeamQuery string
+
+//go:embed queries/team/get-by-id.sql
+var getTeamByIDQuery string
+
+//go:embed queries/team/delete.sql
+var deleteTeamQuery string
+
+type Teams struct {
+	pool *pgxpool.Pool
+}
+
+func NewTeamsRepository(pool *pgxpool.Pool) *Teams {
+	return &Teams{pool: pool}
+}
+
+func (r *Teams) CreateTeam(
+	ctx context.Context,
+	name string,
+	captainID, tournamentID int64,
+) (*int64, error) {
+	var id int64
+	err := r.pool.QueryRow(ctx, createTeamQuery, name, captainID, tournamentID).Scan(&id)
+	if err != nil {
+		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
+	}
+	return &id, nil
+}
+
+func (r *Teams) GetTeamByID(ctx context.Context, id int64) (*domain2.Team, error) {
+	var (
+		name         string
+		captainID    int64
+		tournamentID int64
+	)
+
+	err := r.pool.QueryRow(ctx, getTeamByIDQuery, id).Scan(&id, &name, &captainID, &tournamentID)
+	if err != nil {
+		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
+	}
+
+	return &domain2.Team{
+		ID:        id,
+		Name:      name,
+		CaptainID: captainID,
+		TourID:    tournamentID,
+	}, nil
+}
+
+func (r *Teams) DeleteTeamByID(ctx context.Context, id int64) error {
+	tag, err := r.pool.Exec(ctx, deleteTeamQuery, id)
+	if err != nil {
+		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
+	}
+	if tag.RowsAffected() != 1 {
+		return &services.NotFoundError{Code: services.NotFound, Message: "team not found"}
+	}
+	return nil
+}

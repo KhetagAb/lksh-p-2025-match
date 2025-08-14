@@ -1,5 +1,3 @@
-from typing import List
-
 import core_client
 from core_client.api.activities import (
     get_core_activity_by_sport_section_id,
@@ -10,6 +8,8 @@ from core_client.models import (
     ActivityEnrollPlayerRequest,
     GetCoreActivityBySportSectionIdResponse200,
     GetCoreActivityBySportSectionIdResponse400,
+    GetCoreTeamsByActivityIdResponse200,
+    GetCoreTeamsByActivityIdResponse400,
     PostCoreActivityIdEnrollResponse200,
     PostCoreActivityIdEnrollResponse400,
 )
@@ -28,7 +28,7 @@ class CoreActivityAdapter(ActivityAdapter):
     def __init__(self, coreclient: core_client.Client):
         self.client = coreclient
 
-    async def get_activities_by_sport_section(self, sport_section_id: int) -> List[Activity]:
+    async def get_activities_by_sport_section(self, sport_section_id: int) -> list[Activity]:
         response = await get_core_activity_by_sport_section_id.asyncio(client=self.client, id=sport_section_id)
         if isinstance(response, GetCoreActivityBySportSectionIdResponse400):
             raise InvalidParameters(f"get activity by sport section id returns 400 response: {response.message}")
@@ -50,7 +50,7 @@ class CoreActivityAdapter(ActivityAdapter):
         return activities
 
     # TODO перенести в TeamsAdapter
-    async def get_teams_by_activity_id(self, activity_id: int) -> List[Team]:
+    async def get_teams_by_activity_id(self, activity_id: int) -> list[Team]:
         response = await get_core_teams_by_activity_id.asyncio(client=self.client, id=activity_id)
         if isinstance(response, GetCoreTeamsByActivityIdResponse400):
             raise InvalidParameters(f"get teams by activity id returns 400 response: {response.message}")

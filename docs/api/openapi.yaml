@@ -51,7 +51,7 @@ paths:
         "400":
           $ref: '#/components/responses/ErrorResponse'
 
-  /core/activity/by_sport_section/{id}:
+  /core/activities/by_sport_section/{id}:
     get:
       tags:
         - "Activities"

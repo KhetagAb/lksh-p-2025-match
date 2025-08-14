@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List
 
 
 @dataclass
@@ -10,5 +9,5 @@ class Admin:
 
 class AdminRepository(ABC):
     @abstractmethod
-    def get_admins(self) -> List[Admin]:
+    def get_admins(self) -> list[Admin]:
         raise NotImplementedError
