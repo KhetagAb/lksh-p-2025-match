@@ -10,17 +10,17 @@ from lkshmatch.adapters.base import (
     PlayerToRegister,
     UnknownError,
 )
-from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
+from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
 class CorePlayerAdapter(PlayerAdapter):
-    def __init__(self, lksh_config: MongoLKSHStudentsRepository, core_client: core_client.Client):
+    def __init__(self, lksh_config: LKSHStudentsRepository, core_client: core_client.Client):
         self.client = core_client
         self.lksh_config = lksh_config
 
     async def validate_register_user(self, user: Player) -> PlayerToRegister:
         print(f"validating user to be registered with username={user.tg_username} and id={user.tg_id}")
-        students = self.lksh_config.get_players()
+        students = await self.lksh_config.get_students()
         print(f"found {len(students)} students in lksh base")
         for student in students:
             if student.tg_username == user.tg_username:
