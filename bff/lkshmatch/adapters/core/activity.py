@@ -1,15 +1,17 @@
 import core_client
 from core_client.api.activities import (
+    get_core_activities_by_sport_section_id,
     get_core_teams_by_activity_id,
-    post_core_activity_id_enroll, get_core_activities_by_sport_section_id,
+    post_core_activity_id_enroll,
 )
 from core_client.models import (
     ActivityEnrollPlayerRequest,
+    GetCoreActivitiesBySportSectionIdResponse200,
+    GetCoreActivitiesBySportSectionIdResponse400,
     GetCoreTeamsByActivityIdResponse200,
     GetCoreTeamsByActivityIdResponse400,
     PostCoreActivityIdEnrollResponse200,
-    PostCoreActivityIdEnrollResponse400, GetCoreActivitiesBySportSectionIdResponse400,
-    GetCoreActivitiesBySportSectionIdResponse200,
+    PostCoreActivityIdEnrollResponse400,
 )
 from lkshmatch.adapters.base import (
     Activity,
