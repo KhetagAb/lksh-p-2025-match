@@ -16,6 +16,11 @@ type (
 	RegisterPlayerHandler struct {
 		registerPlayerService RegisterPlayerService
 	}
+	UserInfo struct {
+		TgUsername string `json:"tg_username"`
+		Name       string `json:"name"`
+		TgId       int64  `json:"tg_id"`
+	}
 )
 
 func NewRegisterPlayerHandler(
