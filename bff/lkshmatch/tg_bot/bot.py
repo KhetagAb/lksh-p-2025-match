@@ -20,7 +20,7 @@ from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
 from lkshmatch.di import app_container
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
-from bff.lkshmatch.config import settings
+from lkshmatch.config import settings
 
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
