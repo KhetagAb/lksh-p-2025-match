@@ -4,6 +4,7 @@ import (
 	"context"
 	"match/internal/application/handlers"
 	"match/internal/application/repositories"
+	"match/internal/application/services/activities"
 	"match/internal/application/services/players"
 	"match/internal/application/services/sport"
 	"match/internal/application/services/teams"
@@ -24,20 +25,25 @@ var All = wire.NewSet(
 	infra.NewConfig,
 	infra.NewPgxPool,
 
-	wire.Bind(new(server.ServerInterface), new(*handlers.ServerInterface)),
-	transport.CreateServer,
-
 	repositories.NewPlayersRepository,
+	repositories.NewSportSectionsRepository,
+	repositories.NewTeamsRepository,
+	repositories.NewActivitiesRepository,
+
 	wire.Bind(new(players.PlayerRepository), new(*repositories.Players)),
 	players.NewPlayerService,
 
-	repositories.NewSportSectionsRepository,
 	wire.Bind(new(sport.Repository), new(*repositories.SportSections)),
 	sport.NewSportSectionService,
 
-	repositories.NewTeamsRepository,
+	wire.Bind(new(teams.PlayerRepository), new(*repositories.Players)),
 	wire.Bind(new(teams.TeamRepository), new(*repositories.Teams)),
 	teams.NewTeamService,
+
+	wire.Bind(new(activities.ActivityRepository), new(*repositories.Activities)),
+	wire.Bind(new(activities.PlayerRepository), new(*repositories.Players)),
+	wire.Bind(new(activities.TeamRepository), new(*repositories.Teams)),
+	activities.NewActivityService,
 
 	wire.Bind(new(handlers.RegisterPlayerService), new(*players.PlayerService)),
 	handlers.NewRegisterPlayerHandler,
@@ -45,7 +51,12 @@ var All = wire.NewSet(
 	handlers.NewGetAllSportSectionHandler,
 	wire.Bind(new(handlers.GetTeamsByActivityID), new(*teams.TeamService)),
 	handlers.NewGetTeamsByActivityIDHandler,
+	wire.Bind(new(handlers.GetActivitiesBySportSectionID), new(*activities.ActivityService)),
 	handlers.NewGetActivitiesBySportSectionIDHandler,
+	wire.Bind(new(handlers.EnrollPlayerInActivity), new(*activities.ActivityService)),
 	handlers.NewEnrollPlayerInActivityHandler,
 	handlers.NewServerInterface,
+
+	wire.Bind(new(server.ServerInterface), new(*handlers.ServerInterface)),
+	transport.CreateServer,
 )

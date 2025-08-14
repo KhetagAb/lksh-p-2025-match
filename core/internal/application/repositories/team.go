@@ -24,6 +24,9 @@ var getTeamsByActivityIDQuery string
 //go:embed queries/team/get-players-by-team-id.sql
 var getTeamPlayersByIDQuery string
 
+//go:embed queries/team/add-player-to-team.sql
+var addPlayerToTeamQuery string
+
 type Teams struct {
 	pool *pgxpool.Pool
 }
@@ -120,6 +123,14 @@ func (r *Teams) DeleteTeamByID(ctx context.Context, id int64) error {
 	}
 	if tag.RowsAffected() != 1 {
 		return &services.NotFoundError{Code: services.NotFound, Message: "team not found"}
+	}
+	return nil
+}
+
+func (r *Teams) AddPlayerToTeam(ctx context.Context, playerID, teamID int64) error {
+	_, err := r.pool.Exec(ctx, addPlayerToTeamQuery, playerID, teamID)
+	if err != nil {
+		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
 	return nil
 }

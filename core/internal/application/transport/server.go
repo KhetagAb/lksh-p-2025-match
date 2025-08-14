@@ -29,6 +29,7 @@ func CreateServer(
 	}
 
 	server.RegisterHandlers(echo, serverInterface)
+	echo.GET("/ping", PingPong)
 
 	return srv
 }

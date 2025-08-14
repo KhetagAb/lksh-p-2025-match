@@ -17,7 +17,7 @@ type (
 	}
 
 	TeamRepository interface {
-		CreateTeam(ctx context.Context, name string, captain_id, activity_id int64) (*int64, error)
+		CreateTeam(ctx context.Context, name string, captainID, activityID int64) (*int64, error)
 		AddPlayerToTeam(ctx context.Context, teamID, playerID int64) error
 	}
 
