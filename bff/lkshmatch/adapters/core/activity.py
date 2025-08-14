@@ -11,8 +11,6 @@ from core_client.models import (
     GetCoreActivityBySportSectionIdResponse400,
     PostCoreActivityIdEnrollResponse200,
     PostCoreActivityIdEnrollResponse400,
-    GetCoreTeamsByActivityIdResponse400,
-    GetCoreTeamsByActivityIdResponse200,
 )
 from lkshmatch.adapters.base import (
     Activity,
