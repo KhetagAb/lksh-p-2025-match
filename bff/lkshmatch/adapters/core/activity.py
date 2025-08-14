@@ -25,10 +25,8 @@ from lkshmatch.config import settings
 
 
 class CoreActivityAdapter(ActivityAdapter):
-    def __init__(self):
-        # TODO DI
-        core_client_url = f"{settings.get('CORE_HOST')}:{settings.get('CORE_PORT')}"
-        self.client = core_client.Client(base_url=core_client_url)
+    def __init__(self, coreclient: core_client.Client):
+        self.client = coreclient
 
     async def get_activities_by_sport_section(self, sport_section_id: int) -> List[Activity]:
         response = await get_core_activity_by_sport_section_id.asyncio(client=self.client, id=sport_section_id)

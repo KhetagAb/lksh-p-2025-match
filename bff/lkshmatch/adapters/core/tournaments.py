@@ -28,7 +28,6 @@
 #         mongo_client = MongoClient(host=os.getenv("MATCH_MONGO_URI"))
 #         self.client = core_client.Client(base_url=core_client_url)
 #         self.lksh_config = MongoLKSHStudentsRepository(mongo_client)
-
 #     async def create_tournament(
 #             self, data_tournament: TournamentInterval, sport_name: SportSectionName, player_info: Admin
 #     ) -> None:
