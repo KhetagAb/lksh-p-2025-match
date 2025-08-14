@@ -3,14 +3,16 @@ from urllib.parse import parse_qs, urlparse
 
 import httplib2
 from dishka.integrations.fastapi import FromDishka, inject
-from fastapi import APIRouter, Form
-from fastapi.requests import Request
+from fastapi import APIRouter, Form, Request
 from googleapiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
 from pydantic import BaseModel
 
+from lkshmatch.adapters.base import ActivityAdapter, SportAdapter
+
+from .auth import get_user_id_from_token
 from .root import templates
-from .vars import CREDENTIALS_FILE, SERVICE_ACCOUNT_NAME
+from .vars import COOKIE_NAME, CREDENTIALS_FILE, SERVICE_ACCOUNT_NAME
 
 
 class TableIsEmptyError(Exception):
@@ -46,8 +48,22 @@ def get_sheet_data_from_url(sheet_url: str):
             sheetName = d["properties"]["title"]
             break
     if sheetName is None:
-        raise 
+        raise
     return {"spreadsheetId": spreadsheetId, "sheetName": sheetName}
+
+
+@table_adapter_router.get("/get_sport_sections")
+@inject
+async def get_sport_sections(request: Request, sport_adapter: FromDishka[SportAdapter]):
+    return sport_adapter.get_sport_list()
+
+
+@table_adapter_router.get("/get_activity_by_sport_section")
+@inject
+async def get_activity_by_sport_section(
+    request: Request, sport_section_id: int, activity_adapter: FromDishka[ActivityAdapter]
+):
+    return activity_adapter.get_activities_by_sport_section(sport_section_id)
 
 
 @table_adapter_router.get("/register_in_section")
@@ -63,10 +79,11 @@ async def register_on_section_with_table_get(request: Request):
 @inject
 async def register_on_section_with_table_post(
     request: Request,
-    # register_player_in_sport_section: FromDishka[RegisterPlayerInSpotrSecti0on],
+    activity_adapter: FromDishka[ActivityAdapter],
     table_url: Annotated[str, Form()],
-    section_name: Annotated[str, Form()],
+    activity_id: Annotated[str, Form()],
 ):
+    user_id = get_user_id_from_token(request.cookies.get(COOKIE_NAME))
     error = ""
     try:
         sheet_data = get_sheet_data_from_url(table_url)
@@ -96,9 +113,7 @@ async def register_on_section_with_table_post(
         return_values = ["" for i in range(len(sheet_values))]
         for i in range(len(sheet_values)):
             try:
-                # await register_player_in_sport_section.register_player_in_sport_section(
-                #     SportSection(section_name, section_name), PlayerRegisterInfo(name=sheet_values[i], id=42)
-                # )
+                await activity_adapter.enroll_player_in_activity(player_tg_id=user_id, activity_id=activity_id)
                 return_values[i] = "Зарегестрирован"
             except BaseException:
                 return_values[i] = "ОШИБКА"

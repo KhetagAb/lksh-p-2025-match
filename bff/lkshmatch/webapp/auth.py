@@ -1,8 +1,7 @@
 import hmac
 from typing import Annotated
 
-from fastapi import APIRouter, Query
-from fastapi.requests import Request
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import PlainTextResponse, RedirectResponse
 from jose import jwt
 
@@ -10,6 +9,9 @@ from .vars import ALGORITHM, BOT_TOKEN_HASH, COOKIE_NAME, JWT_SECRET_KEY
 
 auth_router = APIRouter()
 
+def get_user_id_from_token(token: str):
+    token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
+    return token_parts["user_id"]
 
 @auth_router.get("/telegram-callback")
 async def telegram_callback(

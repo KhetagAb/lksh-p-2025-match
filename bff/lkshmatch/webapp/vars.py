@@ -1,8 +1,6 @@
 import hashlib
 import os
 
-from lkshmatch.config import settings
-
 # Telegram auth
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 BOT_TOKEN_HASH = hashlib.sha256(os.getenv("BOT_TOKEN").encode())

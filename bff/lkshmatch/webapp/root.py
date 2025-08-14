@@ -1,10 +1,5 @@
-from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Request
-from fastapi.requests import Request
-from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-
-from lkshmatch.adapters.base import PlayerAdapter
 
 root_router = APIRouter()
 templates = Jinja2Templates("./lkshmatch/webapp/templates")
