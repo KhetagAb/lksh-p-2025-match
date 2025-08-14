@@ -9,6 +9,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from pydantic import BaseModel
 
 from lkshmatch.adapters.base import ActivityAdapter, SportAdapter
+from lkshmatch.di import app_container
 
 from .auth import get_user_id_from_token
 from .root import templates
@@ -54,16 +55,26 @@ def get_sheet_data_from_url(sheet_url: str):
 
 @table_adapter_router.get("/get_sport_sections")
 @inject
-async def get_sport_sections(request: Request, sport_adapter: FromDishka[SportAdapter]):
-    return sport_adapter.get_sport_list()
+async def get_sport_sections(request: Request):
+    try:
+        sport_adapter = app_container.get(SportAdapter)
+        sport_sections = await sport_adapter.get_sport_list()
+    except:
+        return None
+    return sport_sections
 
 
 @table_adapter_router.get("/get_activity_by_sport_section")
 @inject
 async def get_activity_by_sport_section(
-    request: Request, sport_section_id: int, activity_adapter: FromDishka[ActivityAdapter]
+    request: Request, sport_section_id: int
 ):
-    return activity_adapter.get_activities_by_sport_section(sport_section_id)
+    try:
+        activity_adapter = app_container.get(ActivityAdapter)
+        activities = await activity_adapter.get_activities_by_sport_section(sport_section_id)
+    except:
+        return None
+    return activities
 
 
 @table_adapter_router.get("/register_in_section")

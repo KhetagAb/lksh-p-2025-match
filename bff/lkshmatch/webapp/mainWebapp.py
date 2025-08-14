@@ -9,7 +9,6 @@ from lkshmatch.webapp.root import root_router
 from lkshmatch.webapp.table_adapter import table_adapter_router
 
 app = FastAPI()
-setup_dishka(app_container, app)
 
 app.include_router(auth_router, prefix="/auth")
 app.include_router(table_adapter_router, prefix="/table")
