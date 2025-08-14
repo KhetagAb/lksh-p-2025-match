@@ -2,24 +2,24 @@ package main
 
 import (
 	"fmt"
-	"match/internal/generated/app"
-	"match/pkg/logger"
+	g "match/internal/generated/"
+	"match/internal/infra"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 func main() {
-	logger.Init()
-	svc, err := app.InitializeApp()
+	infra.Init()
+	svc, err := g.app.InitializeApp()
 	if err != nil {
 		panic(fmt.Sprintf("failed to initialize server: %v", err))
 	}
 
-	server := svc.HttpServer
+	server := g.svc.HttpServer
 	go func() {
 		if err := server.StartServer(); err != nil {
-			logger.Errorf(svc.Ctx, "failed to start http server: %v", err)
+			infra.Errorf(svc.Ctx, "failed to start http server: %v", err)
 		}
 	}()
 
