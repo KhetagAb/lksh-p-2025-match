@@ -6,16 +6,22 @@ import (
 )
 
 type (
-	GetAllSportSectionService interface {
+	Repository interface {
 		GetSportsList(ctx context.Context) ([]domain.SportSection, error)
 	}
 
-	SportService struct {
-		repository GetAllSportSectionService
+	Service struct {
+		repository Repository
 	}
 )
 
-func (s *SportService) GetAllSportSection(ctx context.Context) ([]domain.SportSection, error) {
+func NewSportSectionService(repository Repository) *Service {
+	return &Service{
+		repository: repository,
+	}
+}
+
+func (s *Service) GetAllSportSection(ctx context.Context) ([]domain.SportSection, error) {
 	cnt, err := s.repository.GetSportsList(ctx)
 	if cnt == nil || err != nil {
 		return nil, err

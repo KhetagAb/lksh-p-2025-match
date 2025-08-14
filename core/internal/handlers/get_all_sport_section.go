@@ -14,14 +14,22 @@ type (
 	}
 
 	GetAllSportSectionHandler struct {
-		getAllSportSectionService GetAllSportSectionService
+		sportSectionService GetAllSportSectionService
 	}
 )
+
+func NewGetAllSportSectionHandler(
+	sportSectionService GetAllSportSectionService,
+) *GetAllSportSectionHandler {
+	return &GetAllSportSectionHandler{
+		sportSectionService: sportSectionService,
+	}
+}
 
 func (h *GetAllSportSectionHandler) GetAllSportSection(ectx echo.Context) error {
 	ctx := context.Background()
 	logger.Infof(ctx, "Trying to get the list of all sport sections")
-	allSections, err := h.getAllSportSectionService.GetAllSportSection(ctx)
+	allSections, err := h.sportSectionService.GetAllSportSection(ctx)
 	if err != nil {
 		logger.Infof(ctx, "An error occupied during getting the list of all sport sections: %v", err)
 		return ectx.JSON(500, err)

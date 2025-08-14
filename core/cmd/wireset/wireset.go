@@ -8,6 +8,7 @@ import (
 	"match/internal/handlers"
 	"match/internal/repositories"
 	"match/internal/services/players"
+	"match/internal/services/sport"
 	"match/internal/services/tournaments"
 	"match/internal/transport"
 )
@@ -33,7 +34,13 @@ var All = wire.NewSet(
 	wire.Bind(new(tournaments.TournamentRepository), new(*repositories.Tournaments)),
 	tournaments.NewTournamentService,
 
+	repositories.NewSportSectionsRepository,
+	wire.Bind(new(sport.Repository), new(*repositories.SportSections)),
+	sport.NewSportSectionService,
+
 	wire.Bind(new(handlers.RegisterPlayerService), new(*players.PlayerService)),
 	handlers.NewRegisterPlayerHandler,
+	wire.Bind(new(handlers.GetAllSportSectionService), new(*sport.Service)),
+	handlers.NewGetAllSportSectionHandler,
 	handlers.NewServerInterface,
 )

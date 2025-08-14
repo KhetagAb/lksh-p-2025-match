@@ -8,6 +8,7 @@ import (
 
 type ServerInterface struct {
 	registerPlayer              *RegisterPlayerHandler
+	getSportList                *GetAllSportSectionHandler
 	getTeamsByIDActivity        *GetTeamsByActivityIDHandler
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler
 	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
@@ -26,24 +27,24 @@ func (s ServerInterface) PostCoreActivityIdEnroll(ctx echo.Context, id int64) er
 }
 
 func (s ServerInterface) RegisterPlayer(ctx echo.Context) error {
-	//TODO implement me
-	panic("implement me")
+	return s.registerPlayer.RegisterUser(ctx)
 }
 
 func (s ServerInterface) GetCoreSportList(ctx echo.Context) error {
-	//TODO implement me
-	panic("implement me")
+	return s.getSportList.GetAllSportSection(ctx)
 }
 
 var _ server.ServerInterface = &ServerInterface{}
 
 func NewServerInterface(
 	registerPlayer *RegisterPlayerHandler,
+	getSportList *GetAllSportSectionHandler,
 	getTeamsByIDActivity *GetTeamsByActivityIDHandler,
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler,
 	enrollPlayerInActivity *EnrollPlayerInActivityHandler,
 ) *ServerInterface {
 	return &ServerInterface{
+		getSportList:                getSportList,
 		registerPlayer:              registerPlayer,
 		getTeamsByIDActivity:        getTeamsByIDActivity,
 		getActivityBySportSectionID: getActivityBySportSectionID,

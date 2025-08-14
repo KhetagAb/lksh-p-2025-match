@@ -50,7 +50,7 @@ func (s *SportSections) GetSportSectionByID(
 	return &domain.SportSection{ID: id, EnName: enName, RuName: ruName}, nil
 }
 
-func (s *SportSections) ListSportSections(
+func (s *SportSections) GetSportsList(
 	ctx context.Context,
 ) ([]domain.SportSection, error) {
 
