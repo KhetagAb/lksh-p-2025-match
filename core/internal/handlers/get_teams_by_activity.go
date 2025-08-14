@@ -27,7 +27,7 @@ func NewGetTeamsByActivityIDHandler(
 	}
 }
 
-func (h *GetTeamsByActivityIDHandler) GetCoreActivityByID(ectx echo.Context, activityID int64) error {
+func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, activityID int64) error {
 	ctx := context.Background()
 
 	logger.Infof(ctx, "Getting activity by ID=%d", activityID)

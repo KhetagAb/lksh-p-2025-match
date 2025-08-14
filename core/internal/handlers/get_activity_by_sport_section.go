@@ -10,27 +10,27 @@ import (
 )
 
 type (
-	GetActivityBySportSectionID interface {
-		GetActivityBySportSectionID(ctx context.Context, sportSectionID int64) ([]domain.Activity, []domain.Player, error)
+	GetActivitiesBySportSectionID interface {
+		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]domain.Activity, []domain.Player, error)
 	}
 
-	GetActivityBySportSectionIDHandler struct {
-		activityService GetActivityBySportSectionID
+	GetActivitiesBySportSectionIDHandler struct {
+		activityService GetActivitiesBySportSectionID
 	}
 )
 
-func NewGetActivityBySportSectionIDHandler(
-	activityService GetActivityBySportSectionID,
-) *GetActivityBySportSectionIDHandler {
-	return &GetActivityBySportSectionIDHandler{
+func NewGetActivitiesBySportSectionIDHandler(
+	activityService GetActivitiesBySportSectionID,
+) *GetActivitiesBySportSectionIDHandler {
+	return &GetActivitiesBySportSectionIDHandler{
 		activityService: activityService,
 	}
 }
 
-func (h *GetActivityBySportSectionIDHandler) GetActivityBySportSectionID(ectx echo.Context, id int64) error {
+func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ectx echo.Context, id int64) error {
 	ctx := context.Background()
 	logger.Infof(ctx, "Getting ActivityList by SportSection ID (%d)", id)
-	domainActivityList, domainCreatorList, err := h.activityService.GetActivityBySportSectionID(ctx, id)
+	domainActivityList, domainCreatorList, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
 	if err != nil {
 		logger.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
 		return InternalErrorResponse(ectx, err.Error())
