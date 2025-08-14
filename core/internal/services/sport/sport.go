@@ -7,7 +7,6 @@ import (
 
 type (
 	GetAllSportSectionService interface {
-		//TODO возвращать доменный объект
 		GetSportsList(ctx context.Context) ([]domain.SportSection, error)
 	}
 

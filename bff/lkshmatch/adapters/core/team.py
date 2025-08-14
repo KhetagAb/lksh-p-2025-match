@@ -2,17 +2,13 @@ import aiohttp
 from pymongo import MongoClient
 
 import core_client
-from lkshmatch.adapters.base import TeamAdapter
 from lkshmatch.adapters.base import (
     API_URL,
-    Approve,
-    CreateTeam,
-    JoinTeam,
-    LeaveTeam,
     PlayerAlreadyInTeam,
     PlayerRegisterInfo,
     SportSection,
     Team,
+    TeamAdapter,
     TeamIsFull,
     UnknownError,
 )
@@ -86,6 +82,3 @@ class CoreTeamAdapter(TeamAdapter):
 
             if response.status != 200:
                 raise UnknownError
-
-
-

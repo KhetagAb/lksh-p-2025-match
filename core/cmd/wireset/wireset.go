@@ -34,8 +34,6 @@ var All = wire.NewSet(
 	tournaments.NewTournamentService,
 
 	wire.Bind(new(handlers.RegisterPlayerService), new(*players.PlayerService)),
-	wire.Bind(new(handlers.CreateTournamentService), new(*tournaments.TournamentService)),
 	handlers.NewRegisterPlayerHandler,
 	handlers.NewServerInterface,
-	handlers.NewCreateTournamentHandler,
 )

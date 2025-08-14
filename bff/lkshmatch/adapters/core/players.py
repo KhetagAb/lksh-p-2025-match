@@ -3,13 +3,13 @@ import os
 from pymongo import MongoClient
 
 import core_client
-from core_client.api.default import register_player
-from core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201, RegisterPlayerResponse400
+from core_client.api.players import register_player
+from core_client.models import RegisterPlayerRequest, RegisterPlayerResponse200, RegisterPlayerResponse201
 from lkshmatch.adapters.base import (
     CoreID,
     Player,
     PlayerAdapter,
-    PlayerAlreadyRegister,
+    PlayerAlreadyRegistered,
     PlayerNotFound,
     PlayerToRegister,
     UnknownError,
@@ -37,27 +37,12 @@ class CorePlayerAdapter(PlayerAdapter):
 
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         response = await register_player.asyncio(
-            client=self.client, tg_username=user.tg_username, tg_id=user.tg_id, name=user.name
+            client=self.client,
+            body=RegisterPlayerRequest(tg_username=user.tg_username, name=user.name, tg_id=user.tg_id),
         )
 
-        if isinstance(response, RegisterPlayerResponse201):
-            return response.id
         if isinstance(response, RegisterPlayerResponse200):
-            raise PlayerAlreadyRegister
-        elif isinstance(response, RegisterPlayerResponse400):
-            # todo explain
-            raise ValueError("400 error")
-        else:
-            raise UnknownError
-
-    async def get_player_id(self, user: Player) -> CoreID:
-        pass  # TODO
-        # async with aiohttp.ClientSession() as session:
-        #     query = {"tg_username": user.tg_username, "tg_id": user.tg_id}
-        #     response = await session.get(f'{API_URL}/register_user', params=query)
-        #
-        #     if response.status != 200:
-        #         raise UnknownError
-        #
-        #     data = await response.json()
-        #     return int(data['id'])
+            raise PlayerAlreadyRegistered("player already register")
+        elif isinstance(response, RegisterPlayerResponse201):
+            return response.id
+        raise UnknownError("None response")

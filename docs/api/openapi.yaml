@@ -33,7 +33,7 @@ paths:
         "200":
           $ref: '#/components/responses/AllSportSections'
 
-  /core/activity/by/{id}:
+  /core/teams/by_activity/{id}:
     get:
       tags:
         - "Activities"
@@ -47,7 +47,7 @@ paths:
             format: int64
       responses:
         "200":
-          $ref: '#/components/responses/ActivityResponse'
+          $ref: '#/components/responses/ActivityTeamsResponse'
         "400":
           $ref: '#/components/responses/ErrorResponse'
 
@@ -79,7 +79,8 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
       requestBody:
         required: true
         content:
@@ -193,9 +194,7 @@ components:
         captain:
           $ref: "#/components/schemas/Player"
         members:
-          type: array
-          items:
-            $ref: "#/components/schemas/PlayerList"
+          $ref: "#/components/schemas/PlayerList"
 
     TeamList:
       type: array
@@ -267,8 +266,8 @@ components:
             additionalProperties: false
 
 
-    ActivityResponse:
-      description: "Активность со всеми командами"
+    ActivityTeamsResponse:
+      description: "Список команд, записанных на активность"
       content:
         application/json:
           schema:
@@ -285,9 +284,14 @@ components:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Activity'
+            type: object
+            required:
+              - activities
+            properties:
+              activities:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Activity'
 
     #    TournamentCreationResponse:
     #      content:
@@ -316,11 +320,16 @@ components:
                 description: Core-идентификатор
 
     CreatedTeamResponse:
-      description: "Команда, которая была создана"
+      description: "Созданная команда"
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Team"
+            type: "object"
+            required:
+              - team
+            properties:
+              team:
+                $ref: "#/components/schemas/Team"
 
     ErrorResponse:
       content:

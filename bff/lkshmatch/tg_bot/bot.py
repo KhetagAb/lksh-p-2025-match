@@ -12,7 +12,6 @@ from lkshmatch.adapters.base import (
     PlayerNotFound,
     PlayerToRegister,
     SportSection,
-    TeamIsFull,
     TeamNotFound,
     UnknownError,
 )
@@ -301,7 +300,15 @@ async def signup_to_activity(mess: types.Message, activity: SportSection) -> boo
         signup_button = types.KeyboardButton(f"signup_{activity.en_name}")
         create_button = types.KeyboardButton(f"create_{activity.en_name}")
         markup.add(signup_button, create_button)
+<<<<<<< HEAD
         await bot.send_message(mess.chat.id, f"Для записи в уже существующую команду, нажмите <signup_{activity.en_name}>, для создания новой команды, нажмите <create_{activity.en_name}>", reply_markup=markup)
+=======
+        await bot.send_message(
+            mess.chat.id,
+            f"Для записи в уже существующую команду, нажмите <signup_{activity.en_name}>, для создания новой команды, нажмите <create_{activity.en_name}>",
+            reply_markup=markup,
+        )
+>>>>>>> master
     return False
 
 
