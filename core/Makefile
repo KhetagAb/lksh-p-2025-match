@@ -1,11 +1,14 @@
 .DEFAULT_GOAL := quickstart
 mode := dev
-include .env
 
 quickstart: check
 	make build mode=dev
 	make start mode=dev
 	make clean mode=dev
+
+build: check
+	go mod tidy
+	go build -o bin/match cmd/main.go
 
 start:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans
@@ -22,7 +25,7 @@ down:
 test:
 	docker-compose -f docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
-build-local: codegen check
+build-local: codegen
 	go build -o bin/match cmd/main.go
 
 start-local: upgrade
