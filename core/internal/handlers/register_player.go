@@ -16,11 +16,6 @@ type (
 	RegisterPlayerHandler struct {
 		registerPlayerService RegisterPlayerService
 	}
-	UserInfo struct {
-		TgUsername string `json:"tg_username"`
-		Name       string `json:"name"`
-		TgId       int64  `json:"tg_id"`
-	}
 )
 
 func NewRegisterPlayerHandler(
@@ -39,15 +34,12 @@ func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context) error {
 		logger.Errorf(ctx, "Bad request: register user requires body")
 		return ectx.String(http.StatusBadRequest, "Invalid request body")
 	}
-
 	logger.Infof(ctx, "Registering player with tg: %v", request.TgUsername)
-
 	playerId, isRegistered, err := h.registerPlayerService.RegisterUser(ctx, request.Name, request.TgUsername, request.TgId)
 	if err != nil {
 		logger.Errorf(ctx, "Internal server error while trying to find %v: %v", request.TgUsername, err)
 		return InternalErrorResponse(ectx, err.Error())
 	}
-
 	if isRegistered {
 		logger.Infof(ctx, "Player %v registered", request.TgUsername)
 		return ectx.JSON(200, server.PlayerRegistrationResponse{Id: *playerId})
