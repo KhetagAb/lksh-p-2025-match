@@ -32,8 +32,8 @@ migrate:
 	goose -dir migrations postgres postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_EXPOSED_PORT}/${POSTGRES_DB} up
 
 codegen:
-	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config api/config.yaml ../docs/api/openapi.yaml
-	cd internal/generated/app && go tool github.com/google/wire/cmd/wire .
+	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml
+	cd internal/generated/ && go tool github.com/google/wire/cmd/wire .
 
 run-local:
 	bin/match

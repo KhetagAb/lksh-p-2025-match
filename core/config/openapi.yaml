@@ -1,0 +1,6 @@
+package: server
+output: internal/presentation/api.gen.go
+generate:
+  echo-server: true
+  models: true
+  embedded-spec: true
