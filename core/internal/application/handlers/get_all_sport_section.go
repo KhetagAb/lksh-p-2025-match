@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/labstack/echo/v4"
 	"match/internal/domain/dao"
+	"match/internal/generated/presentation"
 	"match/internal/infra"
-	"match/internal/presentation"
 )
 
 type (

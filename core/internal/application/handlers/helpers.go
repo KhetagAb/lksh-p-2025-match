@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/labstack/echo/v4"
-	"match/internal/presentation"
+	"match/internal/generated/presentation"
 )
 
 func InternalErrorResponse(ectx echo.Context, message string) error {

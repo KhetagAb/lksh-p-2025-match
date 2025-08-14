@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"match/internal/presentation"
+	"match/internal/generated/presentation"
 
 	"github.com/labstack/echo/v4"
 )

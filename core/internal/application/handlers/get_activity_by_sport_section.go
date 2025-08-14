@@ -4,8 +4,9 @@ import (
 	"context"
 	"github.com/labstack/echo/v4"
 	"match/internal/domain/dao"
+	"match/internal/generated"
+	"match/internal/generated/presentation"
 	"match/internal/infra"
-	"match/internal/presentation"
 )
 
 type (
@@ -46,7 +47,7 @@ func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ect
 		resultActivities = append(resultActivities, resultActivity)
 	}
 
-	return ectx.JSON(200, server.ActivityListResponse{
+	return ectx.JSON(200, generated.server{
 		Activities: resultActivities,
 	})
 }

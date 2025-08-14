@@ -9,8 +9,8 @@ import (
 	"match/internal/application/services/sport"
 	"match/internal/application/services/tournaments"
 	"match/internal/application/transport"
+	"match/internal/generated/presentation"
 	"match/internal/infra"
-	"match/internal/presentation"
 )
 
 func NewContextProvider() context.Context {

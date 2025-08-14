@@ -3,8 +3,8 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
+	"match/internal/generated/presentation"
 	"match/internal/infra"
-	"match/internal/presentation"
 	"net/http"
 )
 

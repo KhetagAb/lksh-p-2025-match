@@ -1,5 +1,5 @@
 package: server
-output: internal/presentation/api.gen.go
+output: internal/generated/presentation/api.gen.go
 generate:
   echo-server: true
   models: true
