@@ -45,3 +45,6 @@ __pycache__/
 # Core
 /core/internal/generated/server/
 /bff/core_client/
+
+# UV
+bff/uv.lock
