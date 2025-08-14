@@ -42,8 +42,8 @@ func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context) error {
 	}
 	if isRegistered {
 		infra.Infof(ctx, "Player %v registered", request.TgUsername)
-		return ectx.JSON(200, server.PlayerRegistrationResponse{Id: *playerId})
+		return ectx.JSON(201, server.PlayerRegistrationResponse{Id: *playerId})
 	}
 	infra.Infof(ctx, "Player %v has been already registered", request.TgUsername)
-	return ectx.JSON(201, server.PlayerRegistrationResponse{Id: *playerId})
+	return ectx.JSON(200, server.PlayerRegistrationResponse{Id: *playerId})
 }
