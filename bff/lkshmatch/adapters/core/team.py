@@ -1,5 +1,4 @@
 import aiohttp
-from pymongo import MongoClient
 
 import core_client
 from lkshmatch.adapters.base import (
@@ -12,7 +11,6 @@ from lkshmatch.adapters.base import (
     TeamIsFull,
     UnknownError,
 )
-from lkshmatch.config import settings
 
 
 class CoreTeamAdapter(TeamAdapter):

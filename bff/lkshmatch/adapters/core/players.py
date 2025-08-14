@@ -1,7 +1,3 @@
-import os
-
-from pymongo import MongoClient
-
 import core_client
 from core_client.api.players import register_player
 from core_client.models import RegisterPlayerRequest, RegisterPlayerResponse200, RegisterPlayerResponse201
@@ -14,12 +10,11 @@ from lkshmatch.adapters.base import (
     PlayerToRegister,
     UnknownError,
 )
-from lkshmatch.config import settings
-from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
+from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
 class CorePlayerAdapter(PlayerAdapter):
-    def __init__(self, lksh_config: MongoLKSHStudentsRepository, core_client: core_client.Client):
+    def __init__(self, lksh_config: LKSHStudentsRepository, core_client: core_client.Client):
         self.client = core_client
         self.lksh_config = lksh_config
 

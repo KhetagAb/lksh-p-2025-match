@@ -1,5 +1,4 @@
 import logging
-import os
 import random
 
 from telebot import types
@@ -17,10 +16,9 @@ from lkshmatch.adapters.base import (
 )
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
+from lkshmatch.config import settings
 from lkshmatch.di import app_container
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
-
-from lkshmatch.config import settings
 
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):

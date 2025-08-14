@@ -3,7 +3,8 @@ from typing import List
 import core_client
 from core_client.api.activities import (
     get_core_activity_by_sport_section_id,
-    post_core_activity_id_enroll, get_core_teams_by_activity_id,
+    get_core_teams_by_activity_id,
+    post_core_activity_id_enroll,
 )
 from core_client.models import (
     ActivityEnrollPlayerRequest,
@@ -21,7 +22,6 @@ from lkshmatch.adapters.base import (
     TgID,
     UnknownError,
 )
-from lkshmatch.config import settings
 
 
 class CoreActivityAdapter(ActivityAdapter):
