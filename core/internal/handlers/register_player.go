@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"match/internal/generated/server"
 	"match/pkg/logger"
+	"net/http"
 )
 
 type (
@@ -14,6 +15,11 @@ type (
 
 	RegisterPlayerHandler struct {
 		registerPlayerService RegisterPlayerService
+	}
+	UserInfo struct {
+		TgUsername string `json:"tg_username"`
+		Name       string `json:"name"`
+		TgId       int64  `json:"tg_id"`
 	}
 )
 
@@ -25,21 +31,27 @@ func NewRegisterPlayerHandler(
 	}
 }
 
-func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context, params server.RegisterPlayerParams) error {
+func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context) error {
 	ctx := context.Background()
+	request := new(server.RegisterPlayerRequest)
 
-	logger.Infof(ctx, "Validating player username: %v", params.TgUsername)
+	if err := ectx.Bind(request); err != nil {
+		logger.Errorf(ctx, "Bad request: register user requires body")
+		return ectx.String(http.StatusBadRequest, "Invalid request body")
+	}
 
-	playerId, isRegistered, err := h.registerPlayerService.RegisterUser(ctx, params.Name, params.TgUsername, params.TgId)
+	logger.Infof(ctx, "Registering player with tg: %v", request.TgUsername)
+
+	playerId, isRegistered, err := h.registerPlayerService.RegisterUser(ctx, request.Name, request.TgUsername, request.TgId)
 	if err != nil {
-		logger.Errorf(ctx, "Internal server error while trying to find %v: %v", params.TgUsername, err)
+		logger.Errorf(ctx, "Internal server error while trying to find %v: %v", request.TgUsername, err)
 		return InternalErrorResponse(ectx, err.Error())
 	}
 
-	logger.Infof(ctx, "Player %v has been found succesfully", params.TgUsername)
-	httpCode := 201
 	if isRegistered {
-		httpCode = 200
+		logger.Infof(ctx, "Player %v registered", request.TgUsername)
+		return ectx.JSON(200, server.PlayerRegistrationResponse{Id: *playerId})
 	}
-	return ectx.JSON(httpCode, server.PlayerRegistrationResponse{Id: playerId})
+	logger.Infof(ctx, "Player %v has been already registered", request.TgUsername)
+	return ectx.JSON(201, server.PlayerRegistrationResponse{Id: *playerId})
 }
