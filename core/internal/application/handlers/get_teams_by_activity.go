@@ -3,14 +3,14 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"match/internal/domain/dao"
-	"match/internal/generated/presentation"
+	domain "match/internal/domain/dao"
+	"match/internal/generated/server"
 	"match/internal/infra"
 )
 
 type (
 	GetTeamsByActivityID interface {
-		GetTeamsByActivityID(ctx context.Context, id int64) ([]dao.Team, []dao.Player, [][]dao.Player, error)
+		GetTeamsByActivityID(ctx context.Context, id int64) ([]domain.Team, []domain.Player, [][]domain.Player, error)
 	}
 
 	GetTeamsByActivityIDHandler struct {
@@ -37,17 +37,17 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 	}
 	infra.Infof(ctx, "%d teams have been found and extracted succesfully", 1)
 
-	resultTeams := presentation.TeamList{}
+	resultTeams := server.TeamList{}
 
 	// Mapping teams
 	{
 		for teamIndex, team := range teams {
 			// Mapping players
 			teamPlayers := players[teamIndex]
-			resultTeamPlayers := presentation.PlayerList{}
+			resultTeamPlayers := server.PlayerList{}
 
 			for _, player := range teamPlayers {
-				resultTeamPlayer := presentation.Player{
+				resultTeamPlayer := server.Player{
 					CoreId: player.ID,
 					TgId:   player.TgID,
 				}
@@ -56,12 +56,12 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 
 			// Mapping captain
 			teamCaptain := captains[teamIndex]
-			resultTeamCaptain := presentation.Player{
+			resultTeamCaptain := server.Player{
 				CoreId: teamCaptain.ID,
 				TgId:   teamCaptain.TgID,
 			}
 
-			resultTeam := presentation.Team{
+			resultTeam := server.Team{
 				Id:      team.ID,
 				Name:    team.Name,
 				Captain: resultTeamCaptain,
@@ -72,7 +72,7 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 		}
 	}
 
-	return ectx.JSON(200, presentation.ActivityTeamsResponse{
+	return ectx.JSON(200, server.ActivityTeamsResponse{
 		Teams: resultTeams,
 	})
 }

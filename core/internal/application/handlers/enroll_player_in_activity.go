@@ -3,14 +3,14 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"match/internal/domain/dao"
-	"match/internal/generated/presentation"
+	domain "match/internal/domain/dao"
+	"match/internal/generated/server"
 	"match/internal/infra"
 )
 
 type (
 	EnrollPlayerInActivity interface {
-		EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*dao.Team, error)
+		EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*domain.Team, error)
 	}
 
 	EnrollPlayerInActivityHandler struct {
@@ -29,16 +29,16 @@ func NewEnrollPlayerInActivityHandler(
 func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context, id int64) error {
 	ctx := context.Background()
 
-	var requestBody presentation.PostCoreActivityIdEnrollJSONRequestBody
+	var requestBody server.PostCoreActivityIdEnrollJSONRequestBody
 
 	if err := ectx.Bind(&requestBody); err != nil {
-		return ectx.JSON(400, &presentation.ErrorResponse{
+		return ectx.JSON(400, &server.ErrorResponse{
 			Message: "Invalid request body: " + err.Error(),
 		})
 	}
 
 	if requestBody.TgId == nil {
-		return ectx.JSON(400, &presentation.ErrorResponse{
+		return ectx.JSON(400, &server.ErrorResponse{
 			Message: "TgId is required",
 		})
 	}
@@ -53,15 +53,15 @@ func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context
 	infra.Infof(ctx, "Team created successfully [team_id=%d][team_name=%s][team_captain_id=%d][activity_id=%d]",
 		domainTeam.ID, domainTeam.Name, domainTeam.CaptainID, domainTeam.ActivityID)
 
-	player := presentation.Player{
+	player := server.Player{
 		CoreId: domainTeam.CaptainID,
 		TgId:   *requestBody.TgId,
 	}
 
-	resultTeam := presentation.Team{
+	resultTeam := server.Team{
 		Id:      domainTeam.ID,
 		Name:    domainTeam.Name,
-		Members: []presentation.Player{player},
+		Members: []server.Player{player},
 		Captain: player,
 	}
 

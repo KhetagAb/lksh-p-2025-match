@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"match/internal/generated/presentation"
+	"match/internal/generated/server"
 	"match/internal/infra"
 	"net/http"
 )
@@ -28,7 +28,7 @@ func NewRegisterPlayerHandler(
 
 func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context) error {
 	ctx := context.Background()
-	request := new(presentation.RegisterPlayerRequest)
+	request := new(server.RegisterPlayerRequest)
 
 	if err := ectx.Bind(request); err != nil {
 		infra.Errorf(ctx, "Bad request: register user requires body")
@@ -42,8 +42,8 @@ func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context) error {
 	}
 	if isRegistered {
 		infra.Infof(ctx, "Player %v registered", request.TgUsername)
-		return ectx.JSON(200, presentation.PlayerRegistrationResponse{Id: *playerId})
+		return ectx.JSON(200, server.PlayerRegistrationResponse{Id: *playerId})
 	}
 	infra.Infof(ctx, "Player %v has been already registered", request.TgUsername)
-	return ectx.JSON(201, presentation.PlayerRegistrationResponse{Id: *playerId})
+	return ectx.JSON(201, server.PlayerRegistrationResponse{Id: *playerId})
 }

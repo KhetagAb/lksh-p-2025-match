@@ -3,15 +3,14 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"match/internal/domain/dao"
-	"match/internal/generated"
-	"match/internal/generated/presentation"
+	domain "match/internal/domain/dao"
+	"match/internal/generated/server"
 	"match/internal/infra"
 )
 
 type (
 	GetActivitiesBySportSectionID interface {
-		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]dao.Activity, []dao.Player, error)
+		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]domain.Activity, []domain.Player, error)
 	}
 
 	GetActivitiesBySportSectionIDHandler struct {
@@ -38,16 +37,16 @@ func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ect
 
 	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activities))
 
-	var resultActivities []presentation.Activity
+	var resultActivities []server.Activity
 	for activityIndex, activity := range activities {
 		activityCreator := activityCreators[activityIndex]
-		resultActivityCreator := presentation.Player{CoreId: activityCreator.ID, TgId: activityCreator.TgID}
-		resultActivity := presentation.Activity{Id: activity.ID, Title: activity.Title, Description: &activity.Description, Creator: resultActivityCreator}
+		resultActivityCreator := server.Player{CoreId: activityCreator.ID, TgId: activityCreator.TgID}
+		resultActivity := server.Activity{Id: activity.ID, Title: activity.Title, Description: &activity.Description, Creator: resultActivityCreator}
 
 		resultActivities = append(resultActivities, resultActivity)
 	}
 
-	return ectx.JSON(200, generated.server{
+	return ectx.JSON(200, server.ActivityListResponse{
 		Activities: resultActivities,
 	})
 }

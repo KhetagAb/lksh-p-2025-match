@@ -2,15 +2,16 @@ package wireset
 
 import (
 	"context"
-	"github.com/google/wire"
 	"match/internal/application/handlers"
 	"match/internal/application/repositories"
 	"match/internal/application/services/players"
 	"match/internal/application/services/sport"
-	"match/internal/application/services/tournaments"
+	"match/internal/application/services/teams"
 	"match/internal/application/transport"
-	server "match/internal/generated/presentation"
+	"match/internal/generated/server"
 	"match/internal/infra"
+
+	"github.com/google/wire"
 )
 
 func NewContextProvider() context.Context {
@@ -30,17 +31,21 @@ var All = wire.NewSet(
 	wire.Bind(new(players.PlayerRepository), new(*repositories.Players)),
 	players.NewPlayerService,
 
-	repositories.NewTournamentsRepository,
-	wire.Bind(new(tournaments.TournamentRepository), new(*repositories.Tournaments)),
-	tournaments.NewTournamentService,
-
 	repositories.NewSportSectionsRepository,
 	wire.Bind(new(sport.Repository), new(*repositories.SportSections)),
 	sport.NewSportSectionService,
+
+	repositories.NewTeamsRepository,
+	wire.Bind(new(teams.TeamRepository), new(*repositories.Teams)),
+	teams.NewTeamService,
 
 	wire.Bind(new(handlers.RegisterPlayerService), new(*players.PlayerService)),
 	handlers.NewRegisterPlayerHandler,
 	wire.Bind(new(handlers.GetAllSportSectionService), new(*sport.Service)),
 	handlers.NewGetAllSportSectionHandler,
+	wire.Bind(new(handlers.GetTeamsByActivityID), new(*teams.TeamService)),
+	handlers.NewGetTeamsByActivityIDHandler,
+	handlers.NewGetActivitiesBySportSectionIDHandler,
+	handlers.NewEnrollPlayerInActivityHandler,
 	handlers.NewServerInterface,
 )

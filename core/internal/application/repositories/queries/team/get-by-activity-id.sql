@@ -4,4 +4,4 @@ SELECT
     captain_id,
     activity_id
 FROM teams
-WHERE id = $1;
+WHERE activity_id = $1;
