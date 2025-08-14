@@ -21,12 +21,9 @@ type (
 func (h *GetAllSportSectionHandler) GetAllSportSection(ectx echo.Context) error {
 	ctx := context.Background()
 	logger.Infof(ctx, "Trying to get the list of all sport sections")
-
 	allSections, err := h.getAllSportSectionService.GetAllSportSection(ctx)
-
 	if err != nil {
-
-		logger.Infof(ctx, "An error occupied during getting the list of all sport sections")
+		logger.Infof(ctx, "An error occupied during getting the list of all sport sections: %v", err)
 		return ectx.JSON(500, err)
 	}
 	logger.Infof(ctx, "The list of all sport sections has been succesfully received")
