@@ -21,9 +21,6 @@ services:
       context: .
       dockerfile: lkshmatch/webapp/Dockerfile
     container_name: match-web
-    environment:
-      - MATCH_CORE_HOST=match-core
-      - MATCH_CORE_PORT=8080
     ports:
       - "80:80"
     depends_on:

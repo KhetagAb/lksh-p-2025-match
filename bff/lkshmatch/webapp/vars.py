@@ -6,8 +6,8 @@ from lkshmatch.config import settings
 # Telegram auth
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 BOT_TOKEN_HASH = hashlib.sha256(os.getenv("BOT_TOKEN").encode())
-ALGORITHM = os.getenv("ALGORITHM")
-COOKIE_NAME = os.getenv("COOKIE_NAME")
+COOKIE_NAME = "auth-token"
+ALGORITHM = "HS256"
 
 # Google sheets
 CREDENTIALS_FILE = os.getenv("CREDENTIALS_FILE")  # имя файла с закрытым ключом для google-таблиц
