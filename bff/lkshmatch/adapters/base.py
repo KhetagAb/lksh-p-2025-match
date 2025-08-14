@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, NewType, Optional
+from typing import NewType, Optional
 
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)
@@ -14,7 +14,6 @@ class PlayerNotFound(Exception):
 
 class PlayerAlreadyRegistered(Exception):
     pass
-
 
 
 class TeamIsFull(Exception):
@@ -32,10 +31,9 @@ class PlayerAlreadyInTeam(Exception):
 class TeamNotFound(Exception):
     pass
 
+
 class InsufficientRights(Exception):
     pass
-
-
 
 
 class InvalidParameters(Exception):
@@ -87,7 +85,7 @@ class Team:
     id: int
     name: str
     capitan: CorePlayer
-    members: List[CorePlayer]
+    members: list[CorePlayer]
 
 
 # @dataclass
@@ -113,7 +111,7 @@ class PlayerAdapter(ABC):
 
 class SportAdapter(ABC):
     @abstractmethod
-    async def get_sport_list(self) -> List[SportSection]:
+    async def get_sport_list(self) -> list[SportSection]:
         raise NotImplementedError
 
 
@@ -132,11 +130,11 @@ class SportAdapter(ABC):
 
 class ActivityAdapter(ABC):
     @abstractmethod
-    async def get_activities_by_sport_section(self, sport_section_id: int) -> List[Activity]:
+    async def get_activities_by_sport_section(self, sport_section_id: int) -> list[Activity]:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_teams_by_activity_id(self, activity_id: int) -> List[Team]:
+    async def get_teams_by_activity_id(self, activity_id: int) -> list[Team]:
         raise NotImplementedError
 
     @abstractmethod
@@ -144,23 +142,23 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
 
-class TeamAdapter(ABC):
-    @abstractmethod
-    async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def teams(self, section: SportSection) -> list[Team]:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def join_team(self, team: Team, user: Player) -> int:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def leave_team(self, team: Team, user: Player) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def approve(self, team: Team, user: Player):
-        raise NotImplementedError
+# class TeamAdapter(ABC):
+#     @abstractmethod
+#     async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
+#         raise NotImplementedError
+#
+#     @abstractmethod
+#     async def teams(self, section: SportSection) -> list[Team]:
+#         raise NotImplementedError
+#
+#     @abstractmethod
+#     async def join_team(self, team: Team, user: Player) -> int:
+#         raise NotImplementedError
+#
+#     @abstractmethod
+#     async def leave_team(self, team: Team, user: Player) -> None:
+#         raise NotImplementedError
+#
+#     @abstractmethod
+#     async def approve(self, team: Team, user: Player):
+#         raise NotImplementedError

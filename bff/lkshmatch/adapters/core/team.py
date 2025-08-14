@@ -1,5 +1,4 @@
 import aiohttp
-from pymongo import MongoClient
 
 import core_client
 from lkshmatch.adapters.base import (
@@ -12,15 +11,11 @@ from lkshmatch.adapters.base import (
     TeamIsFull,
     UnknownError,
 )
-from lkshmatch.config import settings
 
 
 class CoreTeamAdapter(TeamAdapter):
-    def __init__(self):
-        # TODO DI
-        core_client_url = f"{settings.get('CORE_HOST')}:{settings.get('CORE_PORT')}"
-        mongo_client = MongoClient(host=os.getenv("MATCH_MONGO_URI"))
-        self.client = core_client.Client(base_url=core_client_url)
+    def __init__(self, core_client: core_client.Client):
+        self.client = core_client
 
     async def create_team(self, section: SportSection, user: PlayerRegisterInfo, name_team: str) -> None:
         async with aiohttp.ClientSession() as session:

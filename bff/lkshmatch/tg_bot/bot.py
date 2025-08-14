@@ -1,22 +1,24 @@
-import logging
-import os
-import random
 import asyncio
+import logging
 
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 
 from lkshmatch.adapters.base import (
+    Activity,
+    ActivityAdapter,
     InsufficientRights,
     NameTeamReserveError,
     Player,
+    PlayerAdapter,
     PlayerNotFound,
     PlayerToRegister,
+    SportAdapter,
     SportSection,
     TeamNotFound,
     UnknownError,
-    Activity, ActivityAdapter, SportAdapter, PlayerAdapter
 )
+from lkshmatch.config import settings
 from lkshmatch.di import app_container
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
@@ -39,7 +41,7 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 #     await bot.process_new_updates([types.Update.de_json(await req.json())])
 
 
-token = os.getenv("TELEGRAM_TOKEN")
+token = settings.get("TELEGRAM_TOKEN")
 logging.info(f"TELEGRAM_TOKEN: {token}")
 
 if token is None:
@@ -95,7 +97,7 @@ def standard_message_to_insufficient_rights() -> str:
 
 
 def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboardMarkup:
-    role = get_role(mess.from_user.id, sport)  # type: ignore
+    role = get_role(mess.from_user.id, sport)
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     data_for_buttons = []
     if role == "user":
@@ -111,7 +113,6 @@ def make_noregister_markup(mess: types.Message, sport: str) -> types.ReplyKeyboa
 
 @bot.message_handler(commands=["start"])
 async def start(mess: types.Message) -> None:
-    chat_id = mess.chat.id
     user_id = mess.from_user.id if mess.from_user is not None else 0
     username = mess.from_user.username if mess.from_user is not None else None
     if await fuse_not_nf(mess):
@@ -211,7 +212,7 @@ async def setname_team(mess: types.Message, activity: Activity) -> bool:
     setname_string = f"set_name_{activity.title}_"
     if mess.text is not None and setname_string == mess.text[: len(setname_string)]:
         try:
-            team = mess.text[len(f"set_name_{activity.title}_"): mess.text.find(": ")]
+            team = mess.text[len(f"set_name_{activity.title}_") : mess.text.find(": ")]
         except Exception as ue:
             print(ue)
             await bot.send_message(mess.chat.id, "Вы не ввели текущее название команды.")
@@ -263,7 +264,7 @@ async def signup_to_sport(mess: types.Message, sport: SportSection) -> bool:
         markup = await make_activity_buttons(sport)
         await bot.send_message(
             mess.chat.id,
-            f"Для выбора события, нажмите кнопку.",
+            "Для выбора события, нажмите кнопку.",
             reply_markup=markup,
         )
         return True
@@ -302,7 +303,7 @@ async def answer_to_buttons(mess: types.Message) -> None:
                 return
             if await signup_to_activity(mess, activity):
                 return
-            if await  create_team(mess, activity):
+            if await create_team(mess, activity):
                 return
             if await setname_team(mess, activity):
                 return

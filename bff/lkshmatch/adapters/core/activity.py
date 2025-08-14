@@ -1,18 +1,17 @@
-from typing import List
-
 import core_client
 from core_client.api.activities import (
-    get_core_activity_by_sport_section_id,
-    post_core_activity_id_enroll, get_core_teams_by_activity_id,
+    get_core_activities_by_sport_section_id,
+    get_core_teams_by_activity_id,
+    post_core_activity_id_enroll,
 )
 from core_client.models import (
     ActivityEnrollPlayerRequest,
-    GetCoreActivityBySportSectionIdResponse200,
-    GetCoreActivityBySportSectionIdResponse400,
+    GetCoreActivitiesBySportSectionIdResponse200,
+    GetCoreActivitiesBySportSectionIdResponse400,
+    GetCoreTeamsByActivityIdResponse200,
+    GetCoreTeamsByActivityIdResponse400,
     PostCoreActivityIdEnrollResponse200,
     PostCoreActivityIdEnrollResponse400,
-    GetCoreTeamsByActivityIdResponse400,
-    GetCoreTeamsByActivityIdResponse200,
 )
 from lkshmatch.adapters.base import (
     Activity,
@@ -23,20 +22,17 @@ from lkshmatch.adapters.base import (
     TgID,
     UnknownError,
 )
-from lkshmatch.config import settings
 
 
 class CoreActivityAdapter(ActivityAdapter):
-    def __init__(self):
-        # TODO DI
-        core_client_url = f"{settings.get('CORE_HOST')}:{settings.get('CORE_PORT')}"
-        self.client = core_client.Client(base_url=core_client_url)
+    def __init__(self, coreclient: core_client.Client):
+        self.client = coreclient
 
-    async def get_activities_by_sport_section(self, sport_section_id: int) -> List[Activity]:
-        response = await get_core_activity_by_sport_section_id.asyncio(client=self.client, id=sport_section_id)
-        if isinstance(response, GetCoreActivityBySportSectionIdResponse400):
+    async def get_activities_by_sport_section(self, sport_section_id: int) -> list[Activity]:
+        response = await get_core_activities_by_sport_section_id.asyncio(client=self.client, id=sport_section_id)
+        if isinstance(response, GetCoreActivitiesBySportSectionIdResponse400):
             raise InvalidParameters(f"get activity by sport section id returns 400 response: {response.message}")
-        if not isinstance(response, GetCoreActivityBySportSectionIdResponse200):
+        if not isinstance(response, GetCoreActivitiesBySportSectionIdResponse200):
             raise UnknownError("get activity by sport section id returns unknown response")
         activities = []
         for activity in response.activities:
@@ -54,7 +50,7 @@ class CoreActivityAdapter(ActivityAdapter):
         return activities
 
     # TODO перенести в TeamsAdapter
-    async def get_teams_by_activity_id(self, activity_id: int) -> List[Team]:
+    async def get_teams_by_activity_id(self, activity_id: int) -> list[Team]:
         response = await get_core_teams_by_activity_id.asyncio(client=self.client, id=activity_id)
         if isinstance(response, GetCoreTeamsByActivityIdResponse400):
             raise InvalidParameters(f"get teams by activity id returns 400 response: {response.message}")

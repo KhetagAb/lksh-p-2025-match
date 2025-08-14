@@ -1,9 +1,6 @@
-from typing import List
-
 import core_client
 from core_client.api.sport_sections import get_core_sport_list
 from lkshmatch.adapters.base import SportAdapter, SportSection, UnknownError
-from lkshmatch.config import settings
 
 
 class PlayerRegisterInfo:
@@ -11,12 +8,10 @@ class PlayerRegisterInfo:
 
 
 class CoreSportAdapter(SportAdapter):
-    def __init__(self):
-        # TODO DI
-        core_client_url = f"{settings.get('CORE_HOST')}:{settings.get('CORE_PORT')}"
-        self.client = core_client.Client(base_url=core_client_url)
+    def __init__(self, core_client: core_client.Client):
+        self.client = core_client
 
-    async def get_sport_list(self) -> List[SportSection]:
+    async def get_sport_list(self) -> list[SportSection]:
         response = await get_core_sport_list.asyncio(client=self.client)
         if response is None:
             raise UnknownError("get all sections return null response")
