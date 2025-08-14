@@ -9,7 +9,7 @@ import (
 	"match/internal/application/services/sport"
 	"match/internal/application/services/tournaments"
 	"match/internal/application/transport"
-	"match/internal/generated/presentation"
+	server "match/internal/generated/presentation"
 	"match/internal/infra"
 )
 
@@ -23,7 +23,7 @@ var All = wire.NewSet(
 	infra.NewConfig,
 	infra.NewPgxPool,
 
-	wire.Bind(new(presentation.ServerInterface), new(*handlers.ServerInterface)),
+	wire.Bind(new(server.ServerInterface), new(*handlers.ServerInterface)),
 	transport.CreateServer,
 
 	repositories.NewPlayersRepository,

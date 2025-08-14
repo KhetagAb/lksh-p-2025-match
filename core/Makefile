@@ -29,11 +29,11 @@ test:
 	docker-compose -f docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
 migrate:
-	goose -dir migrations postgres postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_EXPOSED_PORT}/${POSTGRES_DB} up
+	go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_EXPOSED_PORT}/${POSTGRES_DB} up
 
 codegen:
 	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml
-	cd cmd/wireset/ && go tool github.com/google/wire/cmd/wire . > internal/generated/wire.gen.go
+	go tool github.com/google/wire/cmd/wire ./cmd/wireset > internal/generated/wire.gen.go
 
 run-local:
 	bin/match

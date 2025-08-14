@@ -9,7 +9,6 @@ RUN go mod download
 COPY core/ .
 COPY docs/api/openapi.yaml ../docs/api/openapi.yaml
 
-RUN make migrate
 RUN make codegen
 RUN go build -o bin/match cmd/main.go
 
