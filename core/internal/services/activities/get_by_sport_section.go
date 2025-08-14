@@ -8,7 +8,6 @@ import (
 
 func (s *ActivityService) GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]domain.Activity, []domain.Player, error) {
 	activityList, err := s.activityRepository.GetActivitiesBySportSectionID(ctx, sportSectionID)
-
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot get list activities by sport section id [sport_section_id=%d]: %w", sportSectionID, err)
 	}
