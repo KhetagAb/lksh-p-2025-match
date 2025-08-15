@@ -1,4 +1,4 @@
-from core_client.models import RegisterPlayerRequest as api
+from core_client import models as api
 from lkshmatch.adapters import base as domain
 
 

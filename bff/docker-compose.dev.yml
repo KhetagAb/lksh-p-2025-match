@@ -36,8 +36,8 @@ services:
   # Telegram бот (опционально, можно запускать отдельно)
   match-bot:
     build:
-      context: .
-      dockerfile: lkshmatch/Dockerfile
+      context: ..
+      dockerfile: bff/dev.dockerfile
     container_name: match-bot
     environment:
 # FIXME:issue
