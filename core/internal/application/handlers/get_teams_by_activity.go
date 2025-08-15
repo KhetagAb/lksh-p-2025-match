@@ -2,15 +2,16 @@ package handlers
 
 import (
 	"context"
-	"github.com/labstack/echo/v4"
-	domain "match/internal/domain/dao"
+	"match/internal/domain/dto"
 	"match/internal/generated/server"
 	"match/internal/infra"
+
+	"github.com/labstack/echo/v4"
 )
 
 type (
 	GetTeamsByActivityID interface {
-		GetTeamsByActivityID(ctx context.Context, id int64) ([]domain.Team, []domain.Player, [][]domain.Player, error)
+		GetTeamsByActivityID(ctx context.Context, id int64) (dto.Teams, error)
 	}
 
 	GetTeamsByActivityIDHandler struct {
@@ -30,7 +31,7 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 	ctx := context.Background()
 
 	infra.Infof(ctx, "Getting activity by ID=%d", activityID)
-	teams, captains, players, err := h.teamService.GetTeamsByActivityID(ctx, activityID)
+	teamsDTO, err := h.teamService.GetTeamsByActivityID(ctx, activityID)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
 		return InternalErrorResponse(ectx, err.Error())
@@ -41,9 +42,9 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 
 	// Mapping teams
 	{
-		for teamIndex, team := range teams {
+		for _, teamDTO := range teamsDTO {
 			// Mapping players
-			teamPlayers := players[teamIndex]
+			teamPlayers := teamDTO.Players
 			resultTeamPlayers := server.PlayerList{}
 
 			for _, player := range teamPlayers {
@@ -55,15 +56,15 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 			}
 
 			// Mapping captain
-			teamCaptain := captains[teamIndex]
+			teamCaptain := teamDTO.Captain
 			resultTeamCaptain := server.Player{
 				CoreId: teamCaptain.ID,
 				TgId:   teamCaptain.TgID,
 			}
 
 			resultTeam := server.Team{
-				Id:      team.ID,
-				Name:    team.Name,
+				Id:      teamDTO.Team.ID,
+				Name:    teamDTO.Team.Name,
 				Captain: resultTeamCaptain,
 				Members: resultTeamPlayers,
 			}
