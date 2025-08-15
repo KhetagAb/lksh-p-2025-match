@@ -6,10 +6,6 @@ quickstart: check
 	make start mode=dev
 	make clean mode=dev
 
-build: check
-	go mod tidy
-	go build -o bin/match cmd/main.go
-
 start:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans
 
@@ -25,7 +21,7 @@ down:
 test:
 	docker-compose -f docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
-build-local: codegen
+build-local: codegen check
 	go build -o bin/match cmd/main.go
 
 start-local: upgrade
