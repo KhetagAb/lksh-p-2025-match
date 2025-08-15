@@ -1,22 +1,18 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, NewType
-
-from lkshmatch.config import settings
+from typing import NewType, Optional
 
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)
 SportSectionId = NewType("SportSectionId", int)
 SportSectionName = NewType("SportSectionName", str)
 
-API_URL = "http://" + str(settings.CORE_HOST) + ":" + str(settings.CORE_PORT)
-
 
 class PlayerNotFound(Exception):
     pass
 
 
-class PlayerAlreadyRegister(Exception):
+class PlayerAlreadyRegistered(Exception):
     pass
 
 
@@ -36,26 +32,32 @@ class TeamNotFound(Exception):
     pass
 
 
-class UnknownError(Exception):
-    pass
-
-
 class InsufficientRights(Exception):
     pass
 
 
+class InvalidParameters(Exception):
+    pass
+
+
+class UnknownError(Exception):
+    pass
+
+
 CoreID = int
+TgID = int
+
+
+@dataclass
+class CorePlayer:
+    core_id: CoreID
+    tg_id: TgID
 
 
 @dataclass
 class Player:
     tg_username: str
-    tg_id: int
-
-
-@dataclass
-class CorePlayer(Player):
-    core_id: int
+    tg_id: TgID
 
 
 @dataclass
@@ -65,34 +67,36 @@ class PlayerToRegister(Player):
 
 @dataclass
 class SportSection:
+    id: int
     name: str
+    ru_name: str
+
+
+@dataclass
+class Activity:
+    id: int
+    title: str
+    description: Optional[str]
+    creator: CorePlayer
 
 
 @dataclass
 class Team:
+    id: int
     name: str
-    id: int
-    name_sport_section: str
-    capitan_id: int
+    capitan: CorePlayer
+    members: list[CorePlayer]
 
 
-@dataclass
-class TournamentInterval:
-    registration_deadline : int
-    start: int
-    end: int
-
-
-
-@dataclass
-class Tournament:
-    id: int
-    sport_name: SportSectionName
-
-
-@dataclass
-class Admin:
-    tg_id: int
+# @dataclass
+# class TournamentInterval:
+#     registration_deadline: int
+#     start: int
+#     end: int
+#
+# @dataclass
+# class Admin:
+#     tg_id: int
 
 
 class PlayerAdapter(ABC):
@@ -104,79 +108,57 @@ class PlayerAdapter(ABC):
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         raise NotImplementedError
 
-    @abstractmethod
-    async def get_player_id(self, user: Player) -> CoreID:
-        raise NotImplementedError
-
 
 class SportAdapter(ABC):
     @abstractmethod
-    async def get_sections(self) -> List[SportSection]:
+    async def get_sport_list(self) -> list[SportSection]:
+        raise NotImplementedError
+
+
+# class TournamentAdminAdapter(ABC):
+#     @abstractmethod
+#     async def create_tournament(
+#         self, tournament_interval: TournamentInterval, sport_name: SportSectionName, player_info: Admin
+#     ) -> None:
+#         raise NotImplementedError
+#
+#
+#     @abstractmethod
+#     async def modify_tournament(self, activity: Activity, player_info: Admin) -> None:
+#         raise NotImplementedError
+
+
+class ActivityAdapter(ABC):
+    @abstractmethod
+    async def get_activities_by_sport_section(self, sport_section_id: int) -> list[Activity]:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_players_by_sport_sections(self, section: SportSection) -> List[CorePlayer]:
+    async def get_teams_by_activity_id(self, activity_id: int) -> list[Team]:
         raise NotImplementedError
 
     @abstractmethod
-    async def register_player_in_sport_section(self, section: SportSection, user: CorePlayer) -> None:
-        raise NotImplementedError
-
-    #@abstractmethod
-    #async def get_all_sections(self): -> List[SportSection[List[CorePlayer]]]:
-    #    raise NotImplementedError
-
-class TournamentAdminAdapter(ABC):
-    @abstractmethod
-    async def create_tournament(
-            self, tournament_interval: TournamentInterval, sport_name: SportSectionName, player_info: Admin
-    ) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def remove_tournament(self, tournament: Tournament, player_info: Admin) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def modify_tournament(self, tournament: Tournament, player_info: Admin) -> None:
+    async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:
         raise NotImplementedError
 
 
-class TournamentAdapter(ABC):
-    @abstractmethod
-    async def get_all_list_tournament(self) -> list[Tournament]:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def get_list_tournament(self, sport_name: SportSectionName) -> list[Tournament]:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def register_team_in_tournament(self, tournament: Tournament, team_id: TeamId, player_info: Player) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def unregister_team_in_tournament(self, tournament: Tournament, team_id: TeamId, player_info: Player) -> None:
-        raise NotImplementedError
-
-
-class TeamAdapter(ABC):
-    @abstractmethod
-    async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def teams(self, section: SportSection) -> list[Team]:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def join_team(self, team: Team, user: Player) -> int:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def leave_team(self, team: Team, user: Player) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def approve(self, team: Team, user: Player):
-        raise NotImplementedError
+# class TeamAdapter(ABC):
+#     @abstractmethod
+#     async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
+#         raise NotImplementedError
+#
+#     @abstractmethod
+#     async def teams(self, section: SportSection) -> list[Team]:
+#         raise NotImplementedError
+#
+#     @abstractmethod
+#     async def join_team(self, team: Team, user: Player) -> int:
+#         raise NotImplementedError
+#
+#     @abstractmethod
+#     async def leave_team(self, team: Team, user: Player) -> None:
+#         raise NotImplementedError
+#
+#     @abstractmethod
+#     async def approve(self, team: Team, user: Player):
+#         raise NotImplementedError
