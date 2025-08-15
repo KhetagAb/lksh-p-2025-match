@@ -31,7 +31,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: docker/setup-compose-action@v1
-      - run: cat .env.example >> .env.test
+      - run: cat core/.env.example >> core/.env.test
       - run: docker-compose -f core/docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
   bff_lint:
