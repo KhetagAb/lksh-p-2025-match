@@ -1,17 +1,11 @@
 .DEFAULT_GOAL := quickstart
-
-include .env
-export
 mode := dev
+include .env
 
 quickstart: check
 	make build mode=dev
 	make start mode=dev
 	make clean mode=dev
-
-build: check
-	go mod tidy
-	go build -o bin/match cmd/main.go
 
 start:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans
@@ -28,22 +22,21 @@ down:
 test:
 	docker-compose -f docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
-migrate:
-	go run github.com/pressly/goose/v3/cmd/goose -dir migrations postgres postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_EXPOSED_PORT}/${POSTGRES_DB} up
+build-local: codegen check
+	go build -o bin/match cmd/main.go
 
-codegen:
-# TODO:issue
-	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml
-	rm -rf internal/generated/wireset/
-	mkdir -p internal/generated/wireset
-	go tool github.com/google/wire/cmd/wire ./cmd/wireset
-	mv cmd/wireset/wire_gen.go internal/generated/wireset
-
-run-local:
+start-local: upgrade
 	bin/match
 
-test-local:
+test-local: codegen
 	go test
+
+upgrade:
+	goose -dir migrations postgres postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_EXPOSED_PORT}/${POSTGRES_DB} up
+
+codegen:
+	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config api/config.yaml ../docs/api/openapi.yaml
+	cd internal/generated/app && go tool github.com/google/wire/cmd/wire .
 
 check: # need to have golangci-lint installed
 	golangci-lint run

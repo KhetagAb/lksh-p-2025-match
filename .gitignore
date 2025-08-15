@@ -46,3 +46,6 @@ __pycache__/
 
 # Core
 /bff/core_client/
+
+# UV
+bff/uv.lock

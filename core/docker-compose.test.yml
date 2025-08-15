@@ -1,23 +1,14 @@
 services:
-  match-app:
-    container_name: match-core
+  tests:
+    container_name: tests
     build:
       context: ..
-      dockerfile: core/dev.dockerfile
-    ports:
-      - '8080:8080'
-    environment:
-      APP_POSTGRES_HOST: "postgres"
-      APP_POSTGRES_NAME: ${POSTGRES_USER}
-      APP_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      APP_POSTGRES_PORT: ${POSTGRES_PORT}
-      APP_POSTGRES_DATABASE: ${POSTGRES_DB}
+      dockerfile: test.dockerfile
+    env_file:
+      - .env.test
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
-    networks:
-      - default
-      - match-shared-network
 
   postgres:
     image: postgres:16.3
@@ -25,7 +16,6 @@ services:
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_EXPOSED_PORT: ${POSTGRES_EXPOSED_PORT}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     command:
@@ -40,11 +30,3 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
-volumes:
-  postgres_data:
-
-networks:
-  match-shared-network:
-    driver: bridge
-    name: match-shared-network

@@ -1,15 +1,10 @@
 name: check
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
-      - core-set-ci
+on: push
 
 jobs:
-  lint:
-    name: lint
+  core_lint:
+    name: core_lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -20,3 +15,47 @@ jobs:
         uses: golangci/golangci-lint-action@v8.0.0
         with:
           working-directory: core
+
+  core_build:
+    name: core_build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - run: docker buildx build . --file core/prod.dockerfile
+      - run: docker buildx build . --file core/dev.dockerfile
+
+  core_test:
+    name: core_test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-compose-action@v1
+      - run: cat .env.example >> .env.test
+      - run: docker-compose -f core/docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
+
+  bff_lint:
+    name: bff_lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v2
+      - run: uv venv --python 3.13.5
+        working-directory: bff/
+      - run: uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path .
+        working-directory: bff/
+      - run: uv run ruff check bff/lkshmatch
+        working-directory: bff/
+
+  bff_typecheck:
+    name: bff_typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v2
+      - run: uv venv --python 3.13.5
+        working-directory: bff/
+      - run: uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path .
+        working-directory: bff/
+      - run: uv run mypy -p bff.lkshmatch --cache-dir=/dev/null --config-file=pyproject.toml
+        working-directory: bff/
