@@ -4,7 +4,7 @@ mode := dev
 check: lint typecheck
 
 codegen:
-	openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path .
+	uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path lkshmatch/
 
 up:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans -d
