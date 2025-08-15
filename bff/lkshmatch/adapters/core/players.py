@@ -1,6 +1,6 @@
 import core_client
 from core_client.api.players import register_player
-from core_client.models import RegisterPlayerRequest, RegisterPlayerResponse200, RegisterPlayerResponse201
+from core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201
 from lkshmatch.adapters.base import (
     CoreID,
     Player,
@@ -10,6 +10,7 @@ from lkshmatch.adapters.base import (
     PlayerToRegister,
     UnknownError,
 )
+from lkshmatch.adapters.core.mappers.player import map_player_to_register_request
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
@@ -30,7 +31,7 @@ class CorePlayerAdapter(PlayerAdapter):
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         response = await register_player.asyncio(
             client=self.client,
-            body=RegisterPlayerRequest(tg_username=user.tg_username, name=user.name, tg_id=user.tg_id),
+            body=map_player_to_register_request(user),
         )
 
         if isinstance(response, RegisterPlayerResponse200):

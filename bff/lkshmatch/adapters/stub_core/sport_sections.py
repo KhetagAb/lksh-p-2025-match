@@ -1,5 +1,3 @@
-from typing import List
-
 from lkshmatch.adapters.base import SportAdapter, SportSection
 
 
@@ -8,7 +6,7 @@ class PlayerRegisterInfo:
 
 
 class StubSportAdapter(SportAdapter):
-    async def get_sport_list(self) -> List[SportSection]:
+    async def get_sport_list(self) -> list[SportSection]:
         return [
             SportSection(0, "Volleyball", "Волейбол"),
             SportSection(1, "Football", "Футбол"),
