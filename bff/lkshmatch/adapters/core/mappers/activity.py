@@ -17,7 +17,7 @@ def map_activity(activity: activity_api.Activity) -> domain.Activity:
         id=activity.id,
         title=activity.title,
         description=activity.description,
-        creator=map_core_player(activity.creator)
+        creator=map_core_player(activity.creator),
     )
 
 
@@ -26,8 +26,5 @@ def map_team(team: team_api.Team) -> domain.Team:
         id=team.id,
         name=team.name,
         captain=map_core_player(team.captain),
-        members=[
-            map_core_player(member)
-            for member in team.members
-        ],
+        members=[map_core_player(member) for member in team.members],
     )

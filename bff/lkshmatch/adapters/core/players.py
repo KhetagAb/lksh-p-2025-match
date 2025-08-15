@@ -11,7 +11,6 @@ from lkshmatch.adapters.base import (
     UnknownError,
 )
 from lkshmatch.adapters.core.mappers.player import map_player_to_register_request
-from lkshmatch.config import settingsv
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 

@@ -16,14 +16,12 @@ from core_client.models import (
 from lkshmatch.adapters.base import (
     Activity,
     ActivityAdapter,
-    CorePlayer,
     InvalidParameters,
     Team,
     TgID,
     UnknownError,
 )
-from lkshmatch.adapters.core.mappers.activity import map_core_player, map_team
-from lkshmatch.config import settings
+from lkshmatch.adapters.core.mappers.activity import map_team
 
 
 class CoreActivityAdapter(ActivityAdapter):
@@ -50,9 +48,7 @@ class CoreActivityAdapter(ActivityAdapter):
             raise UnknownError("get teams by activity id returns unknown response")
         teams = []
         for team in response.teams:
-            teams.append(
-                map_team(team)
-            )
+            teams.append(map_team(team))
         return teams
 
     async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:

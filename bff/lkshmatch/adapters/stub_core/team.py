@@ -10,7 +10,7 @@ class StubTeamAdapter(TeamAdapter):
             Team(
                 id=0,
                 name="Крутая тима 1",
-                capitan=CorePlayer(
+                captain=CorePlayer(
                     core_id=1,
                     tg_id=1234,
                 ),
@@ -28,7 +28,7 @@ class StubTeamAdapter(TeamAdapter):
             Team(
                 id=1,
                 name="Крутая тима 2",
-                capitan=CorePlayer(
+                captain=CorePlayer(
                     core_id=2,
                     tg_id=2234,
                 ),

@@ -1,6 +1,8 @@
 import core_client
 from core_client.api.sport_sections import get_core_sport_list
 from lkshmatch.adapters.base import SportAdapter, SportSection, UnknownError
+from lkshmatch.adapters.core.mappers.sport_section import map_sport_section
+
 
 class CoreSportAdapter(SportAdapter):
     def __init__(self, core_client: core_client.Client):
