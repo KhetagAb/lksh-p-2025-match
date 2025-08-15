@@ -1,10 +1,8 @@
-from lkshmatch.adapters.base import CorePlayer, Team
-
-from lkshmatch.adapters import base as domain
 from core_client.models import activity as activity_api
-from core_client.models import team as team_api
 from core_client.models import player as player_api
-
+from core_client.models import team as team_api
+from lkshmatch.adapters import base as domain
+from lkshmatch.adapters.base import CorePlayer
 
 
 def map_core_player(player: player_api.Player) -> CorePlayer:
@@ -23,7 +21,7 @@ def map_activity(activity: activity_api.Activity) -> domain.Activity:
     )
 
 
-def map_team(team:  team_api.Team) -> domain.Team:
+def map_team(team: team_api.Team) -> domain.Team:
     return domain.Team(
         id=team.id,
         name=team.name,
