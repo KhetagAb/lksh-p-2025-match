@@ -14,7 +14,7 @@ func NewPgxPool(
 
 	connStr := fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s",
-		db.Name,
+		db.User,
 		db.Password,
 		db.Host,
 		db.Port,
