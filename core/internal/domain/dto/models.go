@@ -5,7 +5,7 @@ import "match/internal/domain/dao"
 type Team struct {
 	team    dao.Team
 	captain dao.Player
-	members []dao.Player
+	players []dao.Player
 }
 type Teams = []Team
 
