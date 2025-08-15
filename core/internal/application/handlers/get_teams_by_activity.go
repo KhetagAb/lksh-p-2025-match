@@ -40,37 +40,32 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 
 	resultTeams := server.TeamList{}
 
-	// Mapping teams
-	{
-		for _, teamDTO := range teamsDTO {
-			// Mapping players
-			teamPlayers := teamDTO.Players
-			resultTeamPlayers := server.PlayerList{}
+	for _, teamDTO := range teamsDTO {
+		teamPlayers := teamDTO.Players
+		resultTeamPlayers := server.PlayerList{}
 
-			for _, player := range teamPlayers {
-				resultTeamPlayer := server.Player{
-					CoreId: player.ID,
-					TgId:   player.TgID,
-				}
-				resultTeamPlayers = append(resultTeamPlayers, resultTeamPlayer)
+		for _, player := range teamPlayers {
+			resultTeamPlayer := server.Player{
+				CoreId: player.ID,
+				TgId:   player.TgID,
 			}
-
-			// Mapping captain
-			teamCaptain := teamDTO.Captain
-			resultTeamCaptain := server.Player{
-				CoreId: teamCaptain.ID,
-				TgId:   teamCaptain.TgID,
-			}
-
-			resultTeam := server.Team{
-				Id:      teamDTO.Team.ID,
-				Name:    teamDTO.Team.Name,
-				Captain: resultTeamCaptain,
-				Members: resultTeamPlayers,
-			}
-
-			resultTeams = append(resultTeams, resultTeam)
+			resultTeamPlayers = append(resultTeamPlayers, resultTeamPlayer)
 		}
+
+		teamCaptain := teamDTO.Captain
+		resultTeamCaptain := server.Player{
+			CoreId: teamCaptain.ID,
+			TgId:   teamCaptain.TgID,
+		}
+
+		resultTeam := server.Team{
+			Id:      teamDTO.Team.ID,
+			Name:    teamDTO.Team.Name,
+			Captain: resultTeamCaptain,
+			Members: resultTeamPlayers,
+		}
+
+		resultTeams = append(resultTeams, resultTeam)
 	}
 
 	return ectx.JSON(200, server.ActivityTeamsResponse{
