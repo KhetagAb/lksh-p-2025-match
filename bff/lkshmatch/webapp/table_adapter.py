@@ -54,7 +54,6 @@ def get_sheet_data_from_url(sheet_url: str):
 
 
 @table_adapter_router.get("/get_sport_sections")
-@inject
 async def get_sport_sections(request: Request):
     try:
         sport_adapter = app_container.get(SportAdapter)
@@ -65,7 +64,6 @@ async def get_sport_sections(request: Request):
 
 
 @table_adapter_router.get("/get_activity_by_sport_section")
-@inject
 async def get_activity_by_sport_section(
     request: Request, sport_section_id: int
 ):
@@ -78,7 +76,6 @@ async def get_activity_by_sport_section(
 
 
 @table_adapter_router.get("/register_in_section")
-@inject
 async def register_on_section_with_table_get(request: Request):
     return templates.TemplateResponse(
         context={"request": request, "error": "", "service_account_name": SERVICE_ACCOUNT_NAME, "username": "UU"},
@@ -87,7 +84,6 @@ async def register_on_section_with_table_get(request: Request):
 
 
 @table_adapter_router.post("/register_in_section")
-@inject
 async def register_on_section_with_table_post(
     request: Request,
     activity_adapter: FromDishka[ActivityAdapter],
