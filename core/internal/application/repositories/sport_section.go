@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 	_ "embed"
-	domain "match/internal/domain/dao"
+	"match/internal/domain/dao"
 	"match/internal/domain/services"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -43,17 +43,17 @@ func (s *SportSections) CreateSportSection(
 func (s *SportSections) GetSportSectionByID(
 	ctx context.Context,
 	id int64,
-) (*domain.SportSection, error) {
+) (*dao.SportSection, error) {
 	var enName, ruName string
 	if err := s.pool.QueryRow(ctx, getSportSectionByIDQuery, id).Scan(&id, &enName, &ruName); err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
-	return &domain.SportSection{ID: id, EnName: enName, RuName: ruName}, nil
+	return &dao.SportSection{ID: id, EnName: enName, RuName: ruName}, nil
 }
 
 func (s *SportSections) GetSportsList(
 	ctx context.Context,
-) ([]domain.SportSection, error) {
+) ([]dao.SportSection, error) {
 
 	rows, err := s.pool.Query(ctx, listSportSectionsQuery)
 	if err != nil {
@@ -61,10 +61,10 @@ func (s *SportSections) GetSportsList(
 	}
 	defer rows.Close()
 
-	sections := make([]domain.SportSection, 0)
+	sections := make([]dao.SportSection, 0)
 
 	for rows.Next() {
-		var sec domain.SportSection
+		var sec dao.SportSection
 		if scanErr := rows.Scan(&sec.ID, &sec.EnName, &sec.RuName); scanErr != nil {
 			return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: scanErr.Error()}
 		}
