@@ -314,15 +314,17 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
         # TODO: id -> name
         if list_of_all_teams:
             numbered_teams = [f"{i + 1}. {team.name}" for i, team in enumerate(list_of_all_teams)]
-            teams_text = f"🏆 {activity.title}\n\n📋 Список команд:\n\n" + "\n".join(numbered_teams)
+            # todo сделать поддерждку команда/участник
+            teams_text = f"🏆 {activity.title}\n\n📋 Список участников:\n\n" + "\n".join(numbered_teams)
         else:
-            teams_text = f"🏆 {activity.title}\n\n📋 Пока нет команд."
+            teams_text = f"🏆 {activity.title}\n\n📋 Пока нет участников."
 
         # TODO вынести
         markup = types.InlineKeyboardMarkup()
-        create = types.InlineKeyboardButton("Создать команду", callback_data=f"create_{activity.id}")
-        signup = types.InlineKeyboardButton("Записаться в команду", callback_data=f"signup_{activity.id}")
-        markup.add(create, signup)
+        create = types.InlineKeyboardButton("Записаться", callback_data=f"create_{activity.id}")
+        # todo сделать поддерждку записи в команду если это командный турнир
+        # signup = types.InlineKeyboardButton("Записаться в команду", callback_data=f"signup_{activity.id}")
+        markup.add(create)
 
         await edit_with_ibuttons(call, f"{teams_text}", markup)
     except UnknownError as ue:
@@ -373,10 +375,11 @@ async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
         activity = await get_activity_by_id(activity_id)
         await select_activity(call, activity)
 
+        # todo вариант для создания команды
         await msg_without_buttons(call.message,
-                                  f"✅ Вы создали новую команду! Название: {team.name}\n\nДля изменения названия команды обратитесь к администратору.")
+                                  f"✅ Вы записались как {team.name}\n\n.")
     except PlayerAlreadyInTeam:
-        await msg_without_buttons(call.message, "⚠️ Вы уже участвуете в команде.")
+        await msg_without_buttons(call.message, "⚠️ Вы уже записаны.")
     except InsufficientRights:
         await edit_without_buttons(call, Msg.INSUFFICIENT_RIGHTS.value)
     except UnknownError:
