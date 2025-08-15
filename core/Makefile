@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := quickstart
 mode := dev
-include .env
+
 
 quickstart: check
 	make build mode=dev
@@ -25,14 +25,12 @@ test:
 build-local: codegen check
 	go build -o bin/match cmd/main.go
 
-start-local: upgrade
+start-local:
+	sh migrations/upgrade.sh
 	bin/match
 
 test-local: codegen
 	go test
-
-upgrade:
-	goose -dir migrations postgres postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:${POSTGRES_EXPOSED_PORT}/${POSTGRES_DB} up
 
 codegen:
 	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config api/config.yaml ../docs/api/openapi.yaml
