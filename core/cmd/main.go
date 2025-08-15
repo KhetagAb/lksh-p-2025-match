@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"match/internal/generated/wireset"
+	wireset "match/internal/generated"
 	"match/internal/infra"
 	"os"
 	"os/signal"
