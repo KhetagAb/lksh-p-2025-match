@@ -89,6 +89,8 @@ async def register_on_section_with_table_post(
     table_url: Annotated[str, Form()],
     activity_id: Annotated[int, Form()],
 ):
+    print("table_url:", table_url)
+    print("activity_id:", activity_id)
     activity_adapter = app_container.get(ActivityAdapter)
     user_id = get_user_id_from_token(request.cookies.get(COOKIE_NAME))
     error = ""
