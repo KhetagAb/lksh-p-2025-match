@@ -1,8 +1,8 @@
 import asyncio
-import logging
 import datetime
+import logging
 from enum import Enum
-from typing import Optional, Tuple
+from typing import Optional
 
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
@@ -21,7 +21,6 @@ from lkshmatch.adapters.base import (
 )
 from lkshmatch.config import settings
 from lkshmatch.di import app_container
-
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
@@ -150,7 +149,7 @@ async def start(mess: types.Message) -> None:
         user_name = await students_repository.validate_register_user(Player(username, int(user_id)))
         await message_with_buttons(
             mess=mess,
-            text=Msg.REGISTRATION_CONFIRM_QUESTION.value.format(user_name),
+            text=Msg.REGISTRATION_CONFIRM_QUESTION.value % user_name,
             buttons=await make_choose_registration_buttons(),
         )
     except PlayerNotFound:
@@ -177,7 +176,7 @@ async def register_on_sport(mess: types.Message) -> None:
 async def processing_of_registration(mess: types.Message) -> bool:
     if mess.text == Buttons.REGISTRATION_CONFIRM.value:
         log_info("Registration accepted.", mess)
-        user_id, username = validate_user(mess)
+        user_id, username = await validate_user(mess)
         if user_id is None:
             return True
         # TODO не вызывать второй раз
