@@ -3,14 +3,14 @@ package dto
 import "match/internal/domain/dao"
 
 type Team struct {
-	team    dao.Team
-	captain dao.Player
-	players []dao.Player
+	Team    dao.Team
+	Captain dao.Player
+	Players []dao.Player
 }
 type Teams = []Team
 
 type Activity struct {
-	activity dao.Activity
-	creator  dao.Player
+	Activity dao.Activity
+	Creator  dao.Player
 }
 type Activities = []Activity
