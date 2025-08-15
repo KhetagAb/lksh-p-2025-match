@@ -1,33 +1,35 @@
-from lkshmatch.adapters.base import CorePlayer, Activity, Team
+from lkshmatch.adapters.base import CorePlayer, Team
+
+from lkshmatch.adapters import base as domain
+from core_client.models import activity as activity_api
+from core_client.models import team as team_api
+from core_client.models import player as player_api
 
 
-def map_core_player(activity:Activity) -> CorePlayer:
+
+def map_core_player(player: player_api.Player) -> CorePlayer:
     return CorePlayer(
-        core_id=activity.creator.core_id,
-        tg_id=activity.creator.tg_id,
+        core_id=player.core_id,
+        tg_id=player.tg_id,
     )
 
 
-def map_activity(activity:Activity) -> Activity:
-    return Activity(
+def map_activity(activity: activity_api.Activity) -> domain.Activity:
+    return domain.Activity(
         id=activity.id,
         title=activity.title,
         description=activity.description,
-        creator=map_core_player(activity)
+        creator=map_core_player(activity.creator)
     )
 
-def map_team(team:Team) -> Team:
-    return Team(
+
+def map_team(team:  team_api.Team) -> domain.Team:
+    return domain.Team(
         id=team.id,
         name=team.name,
-        capitan=CorePlayer(
-            core_id=team.captain.core_id,
-            tg_id=team.captain.tg_id,
-        ),
+        captain=map_core_player(team.captain),
         members=[
             map_core_player(member)
             for member in team.members
         ],
     )
-
-

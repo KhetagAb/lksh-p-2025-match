@@ -84,7 +84,7 @@ class Activity:
 class Team:
     id: int
     name: str
-    capitan: CorePlayer
+    captain: CorePlayer
     members: list[CorePlayer]
 
 
@@ -140,7 +140,6 @@ class ActivityAdapter(ABC):
     @abstractmethod
     async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:
         raise NotImplementedError
-
 
 # class TeamAdapter(ABC):
 #     @abstractmethod

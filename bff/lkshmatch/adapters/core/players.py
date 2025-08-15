@@ -32,6 +32,7 @@ class CorePlayerAdapter(PlayerAdapter):
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         response = await register_player.asyncio(
             client=self.client,
+
             body=map_player_to_register_request(user),
         )
 
