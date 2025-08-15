@@ -1,0 +1,443 @@
+{% extends "basic_interface.html" %}
+
+{% block title %}
+Регистрация на секции через google-таблицы
+{% endblock %}
+
+{% block content %}
+
+<h2>Регистрация на секции через google-таблицы</h2>
+<p>
+    {{ error }}
+</p>
+<style>
+    input.tableurl {
+        width:  600px;
+    }
+    input.find_section {
+        width:  400px;
+    }
+    input.find_activity {
+        width:  800px;
+    }
+</style>
+<ul>
+    <li>Создайте google-таблицу</li>
+    <li>В настройках доступа добавьте {{ service_account_name }}</li>
+    <li>Заполните таблицу: в первом столбце должны быть username-ы учеников </li>
+</ul>
+<form id="gs_reg" method="post" action="/table/register_in_section">
+    <label for="table_url">Ссылка на таблицу</label><br>
+    <input type="text" id="table_url" name="table_url1" autocomplete="off" placeholder="Введите корректную доменную ссылку в формате https://example.com/" class="tableurl"><br>
+    <label for="section_name">Название секции</label><br>
+    <input type="url" id="section_name" name="section_name" autocomplete="off" placeholder="Начните вводить название секции для её поиска" class="find_section"><br>
+    <div id="sections_f" class="sections_f"></div>
+
+    <div id="chooseSection">Пока Вы не выбрали секцию</div>
+
+
+    <button type="button" value="NaN" id="view_act" style="display: none;" onclick="get_sect()">Посмотреть все активности данной секции</button>
+
+    <label for="activity_name" style="display: none;" id="activity_namel">Название активити</label>
+    <input type="text" id="activity_name" name="activity_name" autocomplete="off" placeholder="Начните вводить название активити для данной секции для её поиска" class="find_activity" style="display: none;">
+    <div id="activity_f" class="sections_f" style="display: none;"></div>
+    <div id="chooseActivity" style="display: none;">Пока Вы не выбрали активити</div>
+    <input type="text" id="r1" name="table_url" style="display: none;"></input>
+    <input type="text" id="r2" name="activity_id" style="display: none;"></input>
+    <div id="resact" style="display: none;"></div>
+    <div id="resact1" style="display: none;"></div>
+
+    <button type="submit" id="submit_form" style="display: none;" onclick="submitf()">Отправить!</button>
+    <script>        const hre = document.getElementById("table_url");
+    const but_a = document.getElementById('submit_form');
+    const chel = document.getElementById("resact1");
+    const chel_a = document.getElementById("resact");
+
+    function submitf() {
+        const hre1 = hre.value;
+
+        document.getElementById("r1").value = hre1;
+        document.getElementById("r2").value = but_a.value;
+
+    }
+    function urlis(s) {
+        try {
+            new URL(s);
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    document.getElementById('gs_reg').addEventListener('submit', function(event) {
+        var sw = document.getElementById('table_url').value;
+        var sv = document.getElementById('activityList').value;
+        if (sw === ""){
+            event.preventDefault();
+            alert("Надо ввести ссылку");
+        }
+        else {
+            if (!urlis(sw)) {
+                event.preventDefault();
+                alert("Введеное Вами значение не похоже на настоящую ссылку, напомним что ссылка должна быть в формате https://example.com/");
+            }
+            else {
+                if (sv === "NaN") {
+                    event.preventDefault();
+                    alert("Надо выбрать активити");
+                }
+                else {
+
+
+                    var qw=confirm("Вы хотите зарегистрировать участников из гугл таблицы "+document.getElementById("r1").value+" на активити "+chel_a.value+"  в секции "+chel.value+". Подтверждаете соответсвие данных, желаете отправить на  парсинг вашу таблицу? Данное действие отменить будет нельзя");
+//дизайнерское решение подсвечивать ссылку
+                    if (!qw) {
+                        event.preventDefault();
+
+                    }
+                }
+            }
+        }
+    })
+    </script>
+</form>
+
+<script>
+
+
+
+
+
+    //тоду
+    async function m3() {
+        const jst = await fetch("/table/get_sport_sections");
+        const jsts=await jst.json();
+
+
+        return JSON.stringify(jsts);
+    }
+
+    async function main_get() {
+
+
+        const response = await m3();
+
+
+        const sect = document.getElementById('sections_f');
+        const outel = document.getElementById('chooseSection');
+        const but = document.getElementById('view_act');
+        var chel;
+        var chel_a;
+        const sep = '{@#(&!&)@}';
+
+        const responseParse = JSON.parse(response);
+
+        const sectionName = document.getElementById('section_name');
+        const result = document.getElementById('res');
+        const but_a = document.getElementById('submit_form');
+        const hre = document.getElementById("table_url");
+
+
+
+
+
+        //старт
+        function get_sect() {
+            function reco(callback) {
+                const idsect = but.value;
+                var nexturl = '/table/get_activity_by_sport_section?activity_id=';
+                nexturl += idsect;
+                fetch(nexturl)
+                    .then(response => response.json())
+                    .then(data => callback(null, data))
+                    .catch(error => callback(error));
+            }
+
+            function main1(callback) {
+                reco(function (error, result) {
+                    if (error) {
+                        callback(error);
+                    } else {
+                        callback(null, result);
+                    }
+                });
+            }
+
+            main1(function (error, response_a) {
+
+                const responseParse_a = response_a;
+                //туду
+                const sect_a = document.getElementById('activity_f');
+                const outel_a = document.getElementById('chooseActivity');
+                outel_a.innerText = "Пока Вы не выбрали ни одной активити";
+
+                const activityName = document.getElementById('activity_name');
+                activityName.value = "";
+                const activityNamel = document.getElementById('activity_namel');
+
+                sect_a.style.display = "block";
+                outel_a.style.display = "block";
+                but_a.style.display = "block";
+                activityName.style.display = "block";
+                activityNamel.style.display = "block";
+
+
+                function per_a(stringen_a) {
+                    const stren_a = stringen_a.toLowerCase();
+                    var mas_a = ['`', '~', '{', '[', '}', ']', '"', "'", ';', ":", ">", ".", "<", ",", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+                    var alph_a = {
+                        '`': "ё",
+                        '~': "ё",
+                        '{': "х",
+                        '[': "х",
+                        '}': "ъ",
+                        ']': "ъ",
+                        '"': "э",
+                        "'": "э",
+                        ';': "ж",
+                        ":": "ж",
+                        ">": "ю",
+                        ".": "ю",
+                        "<": "б",
+                        ",": "б",
+                        'a': 'ф',
+                        'b': "и",
+                        'c': "с",
+                        'd': "в",
+                        'e': "у",
+                        'f': "а",
+                        'g': "п",
+                        'h': "р",
+                        'i': "ш",
+                        'j': "о",
+                        'k': "л",
+                        'l': "д", 'm': "ь",
+                        'n': "т",
+                        'o': "щ",
+                        'p': "з",
+                        'q': "й",
+                        'r': "к",
+                        's': "ы",
+                        't': "е",
+                        'u': "г",
+                        'v': "м",
+                        'w': "ц",
+                        'x': "ч",
+                        'y': "н",
+                        'z': "я"
+                    };
+                    var mas1_a = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '@', '№', '#', '$', '%', '^', '&', '?', '*', '(', ')', '-', '_', '+', '=', ' '];
+                    var chr_a = stren_a.split('');
+                    var restr_a = '';
+                    for (var i = 0; i < chr_a.length; i++) {
+                        if (mas_a.includes(chr_a[i]))
+                            restr_a += alph_a[chr_a[i]];
+                        else {
+                            if (mas1_a.includes(chr_a[i]))
+                                continue;
+                            else {
+                                restr_a += chr_a[i];
+                            }
+                        }
+                    }
+                    return restr_a;
+                }
+
+                function check_a(sa_a, sb_a) {
+                    if (sa_a.length === 0)
+                        return true;
+                    const tobr_a = 2;
+                    const s1_a = sa_a;
+                    const s2_a = sb_a;
+                    var chi_a = 0;
+                    for (var i = 0; i < s1_a.length; i++) {
+                        if (chi_a >= tobr_a)
+                            return false;
+                        if (i >= s2_a.length) {
+                            chi_a += s1_a.length - s2_a.length;
+                            break;
+                        }
+                        if (s1_a[i] !== s2_a[i])
+                            chi_a++;
+                    }
+                    return chi_a < tobr_a;
+                }
+
+                function findr_a(se_a) {
+                    const sk_a = per_a(se_a);
+                    var mas_a = [];
+                    for (var i = 0; i < responseParse_a.length; i++) {
+                        const eli_a = responseParse_a[i];
+                        const eli_a1 = eli_a["title"].toLowerCase();
+                        if (check_a(sk_a, eli_a1))
+                            mas_a.push([eli_a["id"], eli_a1]);
+                    }
+
+                    var htmlc_a = '<select id="activityList" class="activityList"><option value="NaN" selected disabled>---</option>';
+                    for (var i = 0; i < mas_a.length; i++) {
+                        htmlc_a += '<option id="' + mas_a[i][0] + '" value="' + mas_a[i][1] + '">' + mas_a[i][1] + '</option>';
+                    }
+                    htmlc_a += '</select>';
+                    sect_a.innerHTML = htmlc_a;
+
+                    chel_a = document.getElementById('activityList');
+                    if (chel_a) {
+                        chel_a.addEventListener('change', function () {
+                            const outel_a = document.getElementById('chooseActivity');
+                            const but_a = document.getElementById('submit_form');
+                            const zna = this.options[this.selectedIndex].id;
+                            const sv_a = this.value;
+
+                            document.getElementById("resact").value=sv_a;
+                            outel_a.textContent = 'Вы выбрали активность: ' + sv_a + ' в секции ' + chel.value;
+                            but_a.style.display = 'block';
+                            but_a.value = zna;
+                        });
+                    }
+                }
+
+                function main_a() {
+                    const se_a = activityName.value;
+                    findr_a(se_a);
+                }
+
+                activityName.addEventListener('input', main_a);
+                main_a();
+
+            });
+        }
+
+
+        //конец
+
+
+        function per(stringen) {
+            const stren = stringen.toLowerCase();
+            var mas = ['`', '~', '{', '[', '}', ']', '"', "'", ';', ":", ">", ".", "<", ",", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+            var alph = {
+                '`': "ё",
+                '~': "ё",
+                '{': "х",
+                '[': "х",
+                '}': "ъ",
+                ']': "ъ",
+                '"': "э",
+                "'": "э",
+                ';': "ж",
+                ":": "ж",
+                ">": "ю",
+                ".": "ю",
+                "<": "б",
+                ",": "б",
+                'a': 'ф',
+                'b': "и",
+                'c': "с",
+                'd': "в",
+                'e': "у",
+                'f': "а",
+                'g': "п",
+                'h': "р",
+                'i': "ш",
+                'j': "о",
+                'k': "л",
+                'l': "д",
+                'm': "ь",
+                'n': "т",
+                'o': "щ",
+                'p': "з",
+                'q': "й",
+                'r': "к",
+                's': "ы",
+                't': "е",
+                'u': "г",
+                'v': "м",
+                'w': "ц",
+                'x': "ч",
+                'y': "н",
+                'z': "я"
+            };
+            var mas1 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '@', '№', '#', '$', '%', '^', '&', '?', '*', '(', ')', '-', '_', '+', '=', ' '];
+            var chr = stren.split('');
+            var restr = '';
+            for (var i = 0; i < chr.length; i++) {
+                if (mas.includes(chr[i]))
+                    restr += alph[chr[i]];
+                else {
+                    if (mas1.includes(chr[i]))
+                        continue;
+                    else {
+                        restr += chr[i];
+                    }
+                }
+            }
+            return restr;
+        }
+
+        function check(sa, sb) {
+            if (sa.length === 0)
+                return true;
+            const tobr = 2;
+            const s1 = sa;
+            const s2 = sb;
+            var chi = 0;
+            for (var i = 0; i < s1.length; i++) {
+                if (chi >= tobr)
+                    return false;
+                if (i >= s2.length) {
+                    chi += s1.length - s2.length;
+                    break;
+                }
+                if (s1[i] !== s2[i])
+                    chi++;
+            }
+            return chi < tobr;
+        }
+
+        function findr(se) {
+            const sk = per(se);
+            var mas = [];
+            for (var i = 0; i < responseParse.length; i++) {
+                const eli = responseParse[i];
+                const enname = eli["name"].toLowerCase();
+                if (check(sk, enname))
+                    mas.push([eli["id"], enname]);
+            }
+
+            var htmlc = '<select id="sectionsList" class="sectionsList"><option value="NaN" selected disabled>---</option>';
+            for (var i = 0; i < mas.length; i++) {
+                htmlc += `<option id="${mas[i][0]}" value="${mas[i][1]}">${mas[i][1]}</option>`;
+            }
+            htmlc += "</select>";
+            sect.innerHTML = htmlc;
+
+            chel = document.querySelector('.sections_f .sectionsList');
+            if (chel) {
+                chel.addEventListener('change', function () {
+                    const sv = this.value;
+                    outel.textContent = 'Вы выбрали секцию: ' + sv;
+                    document.getElementById("resact1").value=sv;
+                    but.value = this.options[this.selectedIndex].id;
+                    get_sect();
+                });
+            }
+        }
+
+        function main() {
+            const se = sectionName.value;
+            findr(se);
+        }
+
+        sectionName.addEventListener('input', main);
+        main();
+
+
+
+
+    }
+    main_get();
+
+
+</script>
+<a href="/">Main page</a>
+
+{% endblock %}
