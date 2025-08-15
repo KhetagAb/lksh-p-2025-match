@@ -2,17 +2,17 @@ package teams
 
 import (
 	"context"
-	domain "match/internal/domain/dao"
+	"match/internal/domain/dao"
 )
 
 type (
 	TeamRepository interface {
-		GetTeamsByActivityID(ctx context.Context, activityID int64) ([]domain.Team, error)
-		GetTeamPlayersByID(ctx context.Context, teamID int64) ([]domain.Player, error)
+		GetTeamsByActivityID(ctx context.Context, activityID int64) ([]dao.Team, error)
+		GetTeamPlayersByID(ctx context.Context, teamID int64) ([]dao.Player, error)
 	}
 
 	PlayerRepository interface {
-		GetPlayerByID(ctx context.Context, id int64) (*domain.Player, error)
+		GetPlayerByID(ctx context.Context, id int64) (*dao.Player, error)
 	}
 
 	TeamService struct {

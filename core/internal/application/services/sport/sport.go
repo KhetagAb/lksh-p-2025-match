@@ -2,12 +2,12 @@ package sport
 
 import (
 	"context"
-	domain "match/internal/domain/dao"
+	"match/internal/domain/dao"
 )
 
 type (
 	Repository interface {
-		GetSportsList(ctx context.Context) ([]domain.SportSection, error)
+		GetSportsList(ctx context.Context) ([]dao.SportSection, error)
 	}
 
 	Service struct {
@@ -21,7 +21,7 @@ func NewSportSectionService(repository Repository) *Service {
 	}
 }
 
-func (s *Service) GetAllSportSection(ctx context.Context) ([]domain.SportSection, error) {
+func (s *Service) GetAllSportSection(ctx context.Context) ([]dao.SportSection, error) {
 	cnt, err := s.repository.GetSportsList(ctx)
 	if cnt == nil || err != nil {
 		return nil, err

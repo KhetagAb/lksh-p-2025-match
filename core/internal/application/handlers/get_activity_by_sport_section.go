@@ -2,15 +2,16 @@ package handlers
 
 import (
 	"context"
-	"github.com/labstack/echo/v4"
-	domain "match/internal/domain/dao"
+	"match/internal/domain/dto"
 	"match/internal/generated/server"
 	"match/internal/infra"
+
+	"github.com/labstack/echo/v4"
 )
 
 type (
 	GetActivitiesBySportSectionID interface {
-		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]domain.Activity, []domain.Player, error)
+		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) (dto.Activities, error)
 	}
 
 	GetActivitiesBySportSectionIDHandler struct {
@@ -29,19 +30,19 @@ func NewGetActivitiesBySportSectionIDHandler(
 func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ectx echo.Context, id int64) error {
 	ctx := context.Background()
 	infra.Infof(ctx, "Getting activities by SportSection ID (%d)", id)
-	activities, activityCreators, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
+	activitiesDTO, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
 		return InternalErrorResponse(ectx, err.Error())
 	}
 
-	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activities))
+	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activitiesDTO))
 
 	var resultActivities []server.Activity
-	for activityIndex, activity := range activities {
-		activityCreator := activityCreators[activityIndex]
+	for _, activityDTO := range activitiesDTO {
+		activityCreator := activityDTO.Creator
 		resultActivityCreator := server.Player{CoreId: activityCreator.ID, TgId: activityCreator.TgID}
-		resultActivity := server.Activity{Id: activity.ID, Title: activity.Title, Description: &activity.Description, Creator: resultActivityCreator}
+		resultActivity := server.Activity{Id: activityDTO.Activity.ID, Title: activityDTO.Activity.Title, Description: &activityDTO.Activity.Description, Creator: resultActivityCreator}
 
 		resultActivities = append(resultActivities, resultActivity)
 	}
