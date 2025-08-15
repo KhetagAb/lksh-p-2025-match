@@ -1,3 +1,6 @@
+.DEFAULT_GOAL = start
+mode := dev
+
 check: lint typecheck
 
 codegen:
@@ -10,7 +13,11 @@ start:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans
 
 stop:
-	docker-compose -f docker-compose.$(mode).yml stop -v
+	docker-compose -f docker-compose.$(mode).yml stop
+
+rm:
+	docker-compose -f docker-compose.$(mode).yml rm
+	rm -rf .venv
 
 lint:
 	uv run ruff check lkshmatch
