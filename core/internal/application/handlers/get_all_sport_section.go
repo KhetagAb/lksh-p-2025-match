@@ -3,14 +3,14 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"match/internal/domain/dao"
-	"match/internal/generated/presentation"
+	domain "match/internal/domain/dao"
+	"match/internal/generated/server"
 	"match/internal/infra"
 )
 
 type (
 	GetAllSportSectionService interface {
-		GetAllSportSection(ctx context.Context) ([]dao.SportSection, error)
+		GetAllSportSection(ctx context.Context) ([]domain.SportSection, error)
 	}
 
 	GetAllSportSectionHandler struct {
@@ -35,11 +35,11 @@ func (h *GetAllSportSectionHandler) GetAllSportSection(ectx echo.Context) error 
 		return ectx.JSON(500, err)
 	}
 	infra.Infof(ctx, "The list of all sport sections has been succesfully received")
-	var sliceOfSS []presentation.SportSection
+	var sliceOfSS []server.SportSection
 	for _, el := range allSections {
-		sliceOfSS = append(sliceOfSS, presentation.SportSection{Id: el.ID, Name: el.EnName, RuName: el.RuName})
+		sliceOfSS = append(sliceOfSS, server.SportSection{Id: el.ID, Name: el.EnName, RuName: el.RuName})
 	}
-	return ectx.JSON(200, presentation.AllSportSections{
+	return ectx.JSON(200, server.AllSportSections{
 		SportsSections: sliceOfSS,
 	})
 }

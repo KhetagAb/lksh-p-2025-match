@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"match/internal/generated/presentation"
+	"match/internal/generated/server"
 
 	"github.com/labstack/echo/v4"
 )
@@ -34,7 +34,7 @@ func (s ServerInterface) GetCoreSportList(ctx echo.Context) error {
 	return s.getSportList.GetAllSportSection(ctx)
 }
 
-var _ presentation.ServerInterface = &ServerInterface{}
+var _ server.ServerInterface = &ServerInterface{}
 
 func NewServerInterface(
 	registerPlayer *RegisterPlayerHandler,

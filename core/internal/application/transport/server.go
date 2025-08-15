@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"match/internal/generated/presentation"
+	"match/internal/generated/server"
 	"match/internal/infra"
 	"net/http"
 )
@@ -16,7 +16,7 @@ type HTTPServer struct {
 
 func CreateServer(
 	cfg *infra.Config,
-	serverInterface presentation.ServerInterface,
+	serverInterface server.ServerInterface,
 ) *HTTPServer {
 	echo := echo.New()
 
@@ -28,7 +28,8 @@ func CreateServer(
 		cfg:  cfg,
 	}
 
-	presentation.RegisterHandlers(echo, serverInterface)
+	server.RegisterHandlers(echo, serverInterface)
+	echo.GET("/ping", PingPong)
 
 	return srv
 }

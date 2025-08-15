@@ -2,22 +2,22 @@ package activities
 
 import (
 	"context"
-	"match/internal/domain/dao"
+	domain "match/internal/domain/dao"
 )
 
 type (
 	ActivityRepository interface {
-		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]dao.Activity, error)
-		GetActivityByID(ctx context.Context, id int64) (*dao.Activity, error)
+		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]domain.Activity, error)
+		GetActivityByID(ctx context.Context, id int64) (*domain.Activity, error)
 	}
 
 	PlayerRepository interface {
-		GetPlayerByID(ctx context.Context, id int64) (*dao.Player, error)
-		GetPlayerByTgID(ctx context.Context, tgID int64) (*dao.Player, error)
+		GetPlayerByID(ctx context.Context, id int64) (*domain.Player, error)
+		GetPlayerByTgID(ctx context.Context, tgID int64) (*domain.Player, error)
 	}
 
 	TeamRepository interface {
-		CreateTeam(ctx context.Context, name string, captain_id, activity_id int64) (*int64, error)
+		CreateTeam(ctx context.Context, name string, captainID, activityID int64) (*int64, error)
 		AddPlayerToTeam(ctx context.Context, teamID, playerID int64) error
 	}
 

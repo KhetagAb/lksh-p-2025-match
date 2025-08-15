@@ -1,13 +1,13 @@
 import core_client
 from core_client.api.activities import (
-    get_core_activity_by_sport_section_id,
+    get_core_activities_by_sport_section_id,
     get_core_teams_by_activity_id,
     post_core_activity_id_enroll,
 )
 from core_client.models import (
     ActivityEnrollPlayerRequest,
-    GetCoreActivityBySportSectionIdResponse200,
-    GetCoreActivityBySportSectionIdResponse400,
+    GetCoreActivitiesBySportSectionIdResponse200,
+    GetCoreActivitiesBySportSectionIdResponse400,
     GetCoreTeamsByActivityIdResponse200,
     GetCoreTeamsByActivityIdResponse400,
     PostCoreActivityIdEnrollResponse200,
@@ -29,10 +29,10 @@ class CoreActivityAdapter(ActivityAdapter):
         self.client = coreclient
 
     async def get_activities_by_sport_section(self, sport_section_id: int) -> list[Activity]:
-        response = await get_core_activity_by_sport_section_id.asyncio(client=self.client, id=sport_section_id)
-        if isinstance(response, GetCoreActivityBySportSectionIdResponse400):
+        response = await get_core_activities_by_sport_section_id.asyncio(client=self.client, id=sport_section_id)
+        if isinstance(response, GetCoreActivitiesBySportSectionIdResponse400):
             raise InvalidParameters(f"get activity by sport section id returns 400 response: {response.message}")
-        if not isinstance(response, GetCoreActivityBySportSectionIdResponse200):
+        if not isinstance(response, GetCoreActivitiesBySportSectionIdResponse200):
             raise UnknownError("get activity by sport section id returns unknown response")
         activities = []
         for activity in response.activities:

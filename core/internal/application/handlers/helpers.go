@@ -2,12 +2,12 @@ package handlers
 
 import (
 	"github.com/labstack/echo/v4"
-	"match/internal/generated/presentation"
+	"match/internal/generated/server"
 )
 
 func InternalErrorResponse(ectx echo.Context, message string) error {
 	return ectx.JSON(500,
-		&presentation.ErrorResponse{
+		&server.ErrorResponse{
 			Message: message,
 		},
 	)

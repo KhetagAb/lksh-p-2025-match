@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	g "match/internal/generated/"
+	"match/internal/generated/wireset"
 	"match/internal/infra"
 	"os"
 	"os/signal"
@@ -11,12 +11,12 @@ import (
 
 func main() {
 	infra.Init()
-	svc, err := g.app.InitializeApp()
+	svc, err := wireset.InitializeApp()
 	if err != nil {
 		panic(fmt.Sprintf("failed to initialize server: %v", err))
 	}
 
-	server := g.svc.HttpServer
+	server := svc.HttpServer
 	go func() {
 		if err := server.StartServer(); err != nil {
 			infra.Errorf(svc.Ctx, "failed to start http server: %v", err)

@@ -20,7 +20,7 @@ class CorePlayerAdapter(PlayerAdapter):
 
     async def validate_register_user(self, user: Player) -> PlayerToRegister:
         print(f"validating user to be registered with username={user.tg_username} and id={user.tg_id}")
-        students = self.lksh_config.get_players()
+        students = await self.lksh_config.get_students()
         print(f"found {len(students)} students in lksh base")
         for student in students:
             if student.tg_username == user.tg_username:

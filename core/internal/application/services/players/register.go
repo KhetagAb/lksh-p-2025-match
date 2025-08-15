@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	domain2 "match/internal/domain/dao"
+	domain "match/internal/domain/dao"
 	"match/internal/domain/services"
 )
 
 type (
 	PlayerRepository interface {
 		CreatePlayer(ctx context.Context, name, username string, telegramID int64) (*int64, error)
-		GetPlayerByTgID(ctx context.Context, telegramID int64) (*domain2.Player, error)
+		GetPlayerByTgID(ctx context.Context, telegramID int64) (*domain.Player, error)
 	}
 
 	PlayerService struct {
@@ -45,7 +45,7 @@ func (s *PlayerService) RegisterUser(ctx context.Context, name string, tgUsernam
 	return id, isRegistered, nil
 }
 
-func (s *PlayerService) getPlayer(ctx context.Context, tgId int64) (*domain2.Player, error) {
+func (s *PlayerService) getPlayer(ctx context.Context, tgId int64) (*domain.Player, error) {
 	player, err := s.repository.GetPlayerByTgID(ctx, tgId)
 	var notFoundError *services.NotFoundError
 	if errors.As(err, &notFoundError) {

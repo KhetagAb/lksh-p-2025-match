@@ -1,6 +1,7 @@
 package infra
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -9,6 +10,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
+
+func NewContextProvider() context.Context {
+	return context.Background()
+}
 
 type (
 	Config struct {
@@ -62,7 +67,7 @@ func LoadConfig(path string) (*Config, error) {
 	return &cfg, nil
 }
 
-const defaultConfigPath = "configs/config.yaml"
+const defaultConfigPath = "config/config.yaml"
 
 func NewConfig() *Config {
 	configPath := os.Getenv("CONFIG_PATH")

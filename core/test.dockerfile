@@ -3,14 +3,11 @@ FROM golang:1.24.6
 WORKDIR /app
 
 COPY core/go.mod core/go.sum ./
-
-RUN go mod download
+RUN go mod tidy
 
 COPY core/ .
 COPY docs/api/openapi.yaml ../docs/api/openapi.yaml
 
-RUN make build-local
-
-CMD ["make", "start-local"]
+CMD ["make", "test-local"]
 
 EXPOSE 8080

@@ -3,10 +3,10 @@ package activities
 import (
 	"context"
 	"fmt"
-	"match/internal/domain/dao"
+	domain "match/internal/domain/dao"
 )
 
-func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*dao.Team, error) {
+func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*domain.Team, error) {
 	// Checking existance of given Activity
 	_, err := s.activityRepository.GetActivityByID(ctx, activityID)
 	if err != nil {
@@ -25,12 +25,12 @@ func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID
 		return nil, fmt.Errorf("cannot create team using given name, captain_id and activity_id [name=%s][captain_id=%d][activity_id=%d]", captain.Name, captain.ID, activityID)
 	}
 
-	err = s.teamRepository.AddPlayerToTeam(ctx, *teamID, captain.ID)
+	err = s.teamRepository.AddPlayerToTeam(ctx, captain.ID, *teamID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot add captain to team [team_id=%d][team_name=%s][team_captain_id=%d][team_activity_id=%d]", *teamID, captain.Name, captain.ID, activityID)
+		return nil, fmt.Errorf("cannot add captain to team [team_id=%d][team_name=%s][team_captain_id=%d][team_activity_id=%d]: %v", *teamID, captain.Name, captain.ID, activityID, err)
 	}
 
-	result := dao.Team{ID: *teamID, Name: captain.Name, CaptainID: captain.ID, ActivityID: activityID}
+	result := domain.Team{ID: *teamID, Name: captain.Name, CaptainID: captain.ID, ActivityID: activityID}
 
 	return &result, nil
 }

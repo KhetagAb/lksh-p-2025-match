@@ -10,20 +10,6 @@ create table players
     constraint players_tg_id_unique unique (tg_id)
 );
 
-create table teams
-(
-    id            bigserial primary key,
-    name          varchar(64) not null,
-    captain_id    bigint      not null references players (id),
-    activity_id   bigint      not null references activities (id)
-);
-
-create table team_players
-(
-    player_id bigint primary key not null references players (id),
-    team_id   bigint primary key not null references teams (id)
-);
-
 create table sport_sections
 (
     id      bigserial primary key,
@@ -38,6 +24,21 @@ create table activities
     description      text        not null,
     sport_section_id bigint      not null references sport_sections (id),
     creator_id       bigint      not null references players (id)
+);
+
+create table teams
+(
+    id            bigserial primary key,
+    name          varchar(64) not null,
+    captain_id    bigint      not null references players (id),
+    activity_id   bigint      not null references activities (id)
+);
+
+create table team_players
+(
+    player_id bigint not null references players (id),
+    team_id   bigint not null references teams (id),
+    primary key (player_id, team_id)
 );
 
 create table meetings

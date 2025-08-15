@@ -7,11 +7,11 @@ COPY core/go.mod core/go.sum ./
 RUN go mod download
 
 COPY core/ .
-COPY docs/api/openapi.yaml ./openapi.yaml
+COPY docs/api/openapi.yaml ../docs/api/openapi.yaml
 
-RUN make migrate
-RUN make codegen
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/match cmd/main.go
+RUN make build-local
+CMD ["make", "start-local"]
+
 
 FROM alpine:latest
 

@@ -2,11 +2,6 @@ import core_client
 from core_client.api.sport_sections import get_core_sport_list
 from lkshmatch.adapters.base import SportAdapter, SportSection, UnknownError
 
-
-class PlayerRegisterInfo:
-    pass
-
-
 class CoreSportAdapter(SportAdapter):
     def __init__(self, core_client: core_client.Client):
         self.client = core_client

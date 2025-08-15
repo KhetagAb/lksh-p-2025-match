@@ -3,17 +3,17 @@ package teams
 import (
 	"context"
 	"fmt"
-	"match/internal/domain/dao"
+	domain "match/internal/domain/dao"
 )
 
-func (s *TeamService) GetTeamsByActivityID(ctx context.Context, activityID int64) ([]dao.Team, []dao.Player, [][]dao.Player, error) {
+func (s *TeamService) GetTeamsByActivityID(ctx context.Context, activityID int64) ([]domain.Team, []domain.Player, [][]domain.Player, error) {
 	teams, err := s.teamRepository.GetTeamsByActivityID(ctx, activityID)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("cannot get teams by activity_id [activity_id=%d]: %w", activityID, err)
 	}
 
-	teamCaptains := []dao.Player{}
-	teamsPlayers := [][]dao.Player{}
+	teamCaptains := []domain.Player{}
+	teamsPlayers := [][]domain.Player{}
 	for _, team := range teams {
 		// Getting team captain
 		{
