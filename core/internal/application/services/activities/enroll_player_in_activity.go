@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"match/internal/domain/dao"
+	"match/internal/domain/services"
 )
 
 func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*dao.Team, error) {
@@ -17,6 +18,14 @@ func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID
 	captain, err := s.playerRepository.GetPlayerByTgID(ctx, playerTgID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get player by tg_id [player_tg_id=%d]: %w", playerTgID, err)
+	}
+
+	existingTeam, err := s.teamRepository.GetTeamByPlayerAndActivity(ctx, captain.ID, activityID)
+	if err == nil && existingTeam != nil {
+		return nil, &services.InvalidOperationError{
+			Code:    services.InvalidOperation,
+			Message: fmt.Sprintf("player already enrolled in team for this activity [player_id=%d][activity_id=%d][team_id=%d]", captain.ID, activityID, existingTeam.ID),
+		}
 	}
 
 	// Creating team

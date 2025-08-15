@@ -12,11 +12,13 @@ from core_client.models import (
     GetCoreTeamsByActivityIdResponse400,
     PostCoreActivityIdEnrollResponse200,
     PostCoreActivityIdEnrollResponse400,
+    PostCoreActivityIdEnrollResponse409,
 )
 from lkshmatch.adapters.base import (
     Activity,
     ActivityAdapter,
     InvalidParameters,
+    PlayerAlreadyInTeam,
     Team,
     TgID,
     UnknownError,
@@ -57,6 +59,8 @@ class CoreActivityAdapter(ActivityAdapter):
         )
         if isinstance(response, PostCoreActivityIdEnrollResponse400):
             raise InvalidParameters(f"enroll player in activity returns 400 response: {response.message}")
+        if isinstance(response, PostCoreActivityIdEnrollResponse409):
+            raise PlayerAlreadyInTeam(f"Player is already enrolled in a team for this activity: {response.message}")
         if not isinstance(response, PostCoreActivityIdEnrollResponse200):
             raise UnknownError("enroll player in activity  returns unknown response")
 

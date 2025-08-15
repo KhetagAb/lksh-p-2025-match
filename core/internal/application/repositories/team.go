@@ -28,6 +28,9 @@ var getTeamPlayersByIDQuery string
 //go:embed queries/team/add-player-to-team.sql
 var addPlayerToTeamQuery string
 
+//go:embed queries/team/get-team-by-player-and-activity.sql
+var getTeamByPlayerAndActivityQuery string
+
 type Teams struct {
 	pool *pgxpool.Pool
 }
@@ -137,4 +140,25 @@ func (r *Teams) AddPlayerToTeam(ctx context.Context, playerID, teamID int64) err
 		}
 	}
 	return nil
+}
+
+func (r *Teams) GetTeamByPlayerAndActivity(ctx context.Context, playerID, activityID int64) (*dao.Team, error) {
+	var (
+		id         int64
+		name       string
+		captainID  int64
+		activityIDResult int64
+	)
+
+	err := r.pool.QueryRow(ctx, getTeamByPlayerAndActivityQuery, playerID, activityID).Scan(&id, &name, &captainID, &activityIDResult)
+	if err != nil {
+		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
+	}
+
+	return &dao.Team{
+		ID:         id,
+		Name:       name,
+		CaptainID:  captainID,
+		ActivityID: activityIDResult,
+	}, nil
 }

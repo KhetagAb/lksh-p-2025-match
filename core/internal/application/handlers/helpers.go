@@ -12,3 +12,11 @@ func InternalErrorResponse(ectx echo.Context, message string) error {
 		},
 	)
 }
+
+func ConflictErrorResponse(ectx echo.Context, message string) error {
+	return ectx.JSON(409,
+		&server.ErrorResponse{
+			Message: message,
+		},
+	)
+}

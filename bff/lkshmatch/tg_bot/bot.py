@@ -13,6 +13,7 @@ from lkshmatch.adapters.base import (
     InsufficientRights,
     Player,
     PlayerAdapter,
+    PlayerAlreadyInTeam,
     PlayerNotFound,
     PlayerToRegister,
     SportAdapter,
@@ -374,9 +375,11 @@ async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
 
         await msg_without_buttons(call.message,
                                   f"✅ Вы создали новую команду! Название: {team.name}\n\nДля изменения названия команды обратитесь к администратору.")
+    except PlayerAlreadyInTeam:
+        await msg_without_buttons(call.message, "⚠️ Вы уже участвуете в команде.")
     except InsufficientRights:
         await edit_without_buttons(call, Msg.INSUFFICIENT_RIGHTS.value)
-    except UnknownError as ue:
+    except UnknownError:
         await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
 
 
@@ -384,7 +387,7 @@ async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
 async def signup_to_activity(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
     # TODO:
-    await edit_without_buttons(call, "🚧 Функция записи в существующую команду находится в разработке.")
+    await edit_without_buttons(call, "🚧 Функция записи в существующую команду находится в разработке. ")
 
 
 @bot.message_handler(content_types=["text"])
