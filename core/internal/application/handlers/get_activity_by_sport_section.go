@@ -38,7 +38,7 @@ func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ect
 
 	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activitiesDTO))
 
-	var resultActivities []server.Activity
+	resultActivities := []server.Activity{}
 	for _, activityDTO := range activitiesDTO {
 		activityCreator := activityDTO.Creator
 		resultActivityCreator := server.Player{CoreId: activityCreator.ID, TgId: activityCreator.TgID}

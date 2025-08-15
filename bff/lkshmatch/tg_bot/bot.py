@@ -16,7 +16,6 @@ from lkshmatch.adapters.base import (
     PlayerNotFound,
     PlayerToRegister,
     SportAdapter,
-    SportSection,
     UnknownError, PlayerAlreadyRegistered,
 )
 from lkshmatch.config import settings
@@ -38,13 +37,19 @@ class Msg(Enum):
 
 
 class Buttons(Enum):
-    REGISTRATION_CONFIRM = "✅ Подтверждаю."
-    REGISTRATION_CANCEL = "❌ Отмена регистрации."
+    REGISTRATION_CONFIRM = ("✅ Подтверждаю", "reg_confirm")
+    REGISTRATION_CANCEL = ("❌ Отмена регистрации", "reg_cancel")
+    SPORTS_REGISTER_ON = ("Записаться на активность", "sports_register")
 
-    SPORT_REGISTER_ON = "Записаться на активность"
+    def __init__(self, text, callback_data):
+        self.text = text
+        self.callback_data = callback_data
 
-    def tg(self):
-        return types.KeyboardButton(self.value)
+    def inline(self) -> types.InlineKeyboardButton:
+        return types.InlineKeyboardButton(text=self.text, callback_data=self.callback_data)
+
+    def keyboard(self):
+        return types.KeyboardButton(self.text)
 
 
 logging.basicConfig(level=logging.INFO)
@@ -66,29 +71,46 @@ except Exception as e:
     exit(1)
 
 
-async def make_sports_buttons() -> types.ReplyKeyboardMarkup:
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons = []
+async def make_sports_buttons() -> types.InlineKeyboardMarkup:
+    buttons: list[types.InlineKeyboardButton] = []
     for sport in await sport_adapter.get_sport_list():
-        buttons.append(types.KeyboardButton(sport.ru_name))
-    markup.add(*buttons)
+        button = types.InlineKeyboardButton(
+            text=sport.ru_name.capitalize(),
+            callback_data=f"sport_{sport.id}"
+        )
+        buttons.append(button)
+    markup = types.InlineKeyboardMarkup()
+    return markup.add(*buttons, row_width=3)
+
+
+async def make_sports_buttons_except_one(sport_id: int, new_text: str) -> types.InlineKeyboardMarkup:
+    buttons: list[types.InlineKeyboardButton] = []
+    for sport in await sport_adapter.get_sport_list():
+        button = types.InlineKeyboardButton(
+            text=sport.ru_name.capitalize() if sport_id != sport.id else new_text,
+            callback_data=f"sport_{sport.id}"
+        )
+        buttons.append(button)
+    markup = types.InlineKeyboardMarkup()
+    return markup.add(*buttons, row_width=3)
+
+
+async def make_activity_buttons(activities: list[Activity]) -> types.InlineKeyboardMarkup:
+    markup = types.InlineKeyboardMarkup()
+    for activity in activities:
+        button = types.InlineKeyboardButton(
+            text=activity.title,
+            callback_data=f"activity_{activity.id}"
+        )
+        markup.add(button)
     return markup
 
 
-async def make_activity_buttons(sport: SportSection) -> types.ReplyKeyboardMarkup:
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    buttons = []
-    for activity in await activity_adapter.get_activities_by_sport_section(sport.id):
-        buttons.append(types.KeyboardButton(activity.title))
-    markup.add(*buttons)
-    return markup
-
-
-async def make_choose_registration_buttons() -> types.ReplyKeyboardMarkup:
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton(Buttons.REGISTRATION_CONFIRM.value)
-    button2 = types.KeyboardButton(Buttons.REGISTRATION_CANCEL.value)
-    markup.add(button1, button2)
+async def make_choose_registration_buttons() -> types.InlineKeyboardMarkup:
+    markup = types.InlineKeyboardMarkup()
+    confirm_btn = Buttons.REGISTRATION_CONFIRM.inline()
+    cancel_btn = Buttons.REGISTRATION_CANCEL.inline()
+    markup.add(confirm_btn, cancel_btn)
     return markup
 
 
@@ -106,17 +128,38 @@ async def make_choose_registration_buttons() -> types.ReplyKeyboardMarkup:
 #     markup.add(*buttons)
 #     return markup
 
-async def message_without_buttons(mess: types.Message, text: str = None) -> types.Message:
+async def msg_with_ibuttons(mess: types.Message, text: str, buttons: types.InlineKeyboardMarkup) -> types.Message:
+    return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=buttons)
+
+
+async def msg_with_buttons(mess: types.Message, text: str, buttons: types.ReplyKeyboardMarkup) -> types.Message:
+    return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=buttons)
+
+
+async def msg_without_buttons(mess: types.Message, text: str) -> types.Message:
     return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=types.ReplyKeyboardRemove())
 
 
-async def message_with_buttons(mess: types.Message, buttons: types.ReplyKeyboardMarkup, text: str) -> types.Message:
-    return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=buttons)
+async def edit_with_ibuttons(call: types.CallbackQuery, text: str, buttons: types.InlineKeyboardMarkup) -> None:
+    await bot.edit_message_text(
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        text=text,
+        reply_markup=buttons
+    )
+
+
+async def edit_without_buttons(call: types.CallbackQuery, text: str) -> None:
+    await bot.edit_message_text(
+        chat_id=call.message.chat.id,
+        message_id=call.message.message_id,
+        text=text
+    )
 
 
 async def validate_user(mess: types.Message) -> tuple[Optional[int], Optional[str]]:
     if mess.from_user.id is None or mess.from_user.username is None:
-        await message_without_buttons(mess, Msg.INTERNAL_ERROR.value)
+        await msg_without_buttons(mess, Msg.INTERNAL_ERROR.value)
         logging.warning(log_info("User hasn't got username or tg_id", mess))
         return None, None
     return mess.from_user.id, mess.from_user.username
@@ -147,94 +190,139 @@ async def start(mess: types.Message) -> None:
         return
     try:
         user_name = await students_repository.validate_register_user(Player(username, int(user_id)))
-        await message_with_buttons(
+        await msg_with_ibuttons(
             mess=mess,
             text=Msg.REGISTRATION_CONFIRM_QUESTION.value % user_name,
             buttons=await make_choose_registration_buttons(),
         )
     except PlayerNotFound:
         log_warning("User not found in lksh database. Validate failed.", mess)
-        await message_without_buttons(mess, Msg.REGISTRATION_USER_NOT_FOUND.value)
+        await msg_without_buttons(mess, Msg.REGISTRATION_USER_NOT_FOUND.value)
     except UnknownError as ue:
         log_error(f"Internal error: {ue}. Validate failed.", mess)
-        await message_without_buttons(mess, Msg.INTERNAL_ERROR.value)
+        await msg_without_buttons(mess, Msg.INTERNAL_ERROR.value)
     log_info("Finished /start successfully.", mess)
+
+
+@bot.callback_query_handler(func=lambda call: call.data in [Buttons.REGISTRATION_CONFIRM.callback_data,
+                                                            Buttons.REGISTRATION_CANCEL.callback_data])
+async def processing_of_registration(call: types.CallbackQuery) -> None:
+    await bot.answer_callback_query(call.id)
+
+    if call.data == Buttons.REGISTRATION_CONFIRM.callback_data:
+        log_info("Registration accepted.", call.message)
+        user_id, username = call.from_user.id, call.from_user.username
+        if user_id is None or username is None:
+            await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
+            return
+
+        sport_markup = types.InlineKeyboardMarkup()
+        sport_btn = Buttons.SPORTS_REGISTER_ON.inline()
+        sport_markup.add(sport_btn)
+
+        try:
+            user_name = await students_repository.validate_register_user(Player(username, int(user_id)))
+            await player_adapter.register_user(PlayerToRegister(username, user_id, user_name))
+
+            await edit_with_ibuttons(call, Msg.REGISTRATION_CONFIRMED.value, sport_markup)
+            await bot.pin_chat_message(call.message.chat.id, call.message.message_id)
+        except PlayerNotFound:
+            log_warning("User not found in lksh database. Validate failed.", call.message)
+            await edit_without_buttons(call, Msg.REGISTRATION_USER_NOT_FOUND.value)
+        except PlayerAlreadyRegistered:
+            log_warning("User already registered.", call.message)
+            await edit_with_ibuttons(call, Msg.REGISTRATION_ALREADY_REGISTERED.value, sport_markup)
+        except UnknownError as ue:
+            log_error(f"Internal error: {ue}. Validate failed.", call.message)
+            await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
+    elif call.data == Buttons.REGISTRATION_CANCEL.callback_data:
+        await edit_without_buttons(call, Msg.REGISTRATION_CANCELED.value)
 
 
 @bot.message_handler(commands=["register_on_sport"])
 async def register_on_sport(mess: types.Message) -> None:
     log_info(f"Called /register_on_sport.", mess)
-    await message_with_buttons(
-        mess,
+    await msg_with_ibuttons(
+        mess=mess,
         text="Выберите спортивную секцию.",
         buttons=await make_sports_buttons(),
     )
     log_info("Finished /register_on_sport successfully.", mess)
 
 
-# TODO перехватывать нажатия на пноки
-async def processing_of_registration(mess: types.Message) -> bool:
-    if mess.text == Buttons.REGISTRATION_CONFIRM.value:
-        log_info("Registration accepted.", mess)
-        user_id, username = await validate_user(mess)
-        if user_id is None:
-            return True
+@bot.callback_query_handler(func=lambda call: call.data == Buttons.SPORTS_REGISTER_ON.callback_data)
+async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
+    await bot.answer_callback_query(call.id)
 
-        try:
-            user_name = await students_repository.validate_register_user(Player(username, int(user_id)))
-            await player_adapter.register_user(PlayerToRegister(username, user_id, user_name))
-            to_pin = (
-                await message_with_buttons(
-                    mess=mess,
-                    text=Msg.REGISTRATION_CONFIRMED.value,
-                    buttons=types.ReplyKeyboardMarkup(resize_keyboard=True).
-                    add(Buttons.SPORT_REGISTER_ON.tg()),
-                )
-            ).message_id
-            await bot.pin_chat_message(mess.chat.id, to_pin)
-        except PlayerNotFound:
-            log_warning("User not found in lksh database. Validate failed.", mess)
-            await message_without_buttons(mess, Msg.REGISTRATION_USER_NOT_FOUND.value)
-        except PlayerAlreadyRegistered:
-            log_warning("User already registered.", mess)
-            await message_without_buttons(mess, Msg.REGISTRATION_ALREADY_REGISTERED.value)
-        except UnknownError as ue:
-            log_error(f"Internal error: {ue}. Validate failed.", mess)
-            await message_without_buttons(mess, Msg.INTERNAL_ERROR.value)
-        await register_on_sport(mess)
-        return True
-    if mess.text == Buttons.REGISTRATION_CANCEL.value:
-        await message_without_buttons(
-            mess=mess,
-            text=Msg.REGISTRATION_CANCELED.value
-        )
-        return True
-    return False
+    markup = await make_sports_buttons()
+    await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)
 
 
-async def processing_select_activity(mess: types.Message, activity: Activity) -> bool:
-    if activity.title == mess.text:
-        try:
-            list_of_all_teams = await app_container.get(ActivityAdapter).get_teams_by_activity_id(activity.id)
-            # TODO: id -> name
-            msg = [team.name for team in list_of_all_teams]
-            await bot.send_message(mess.chat.id, f"Список участников секции {activity.title}:\n" + "\n".join(msg))
-        except UnknownError as ue:
-            print(ue)
-            await bot.send_message(mess.chat.id, Msg.INTERNAL_ERROR.value)
-            return True
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        create = types.KeyboardButton(f"create {activity.title}")
-        signup = types.KeyboardButton(f"signup {activity.title}")
+@bot.callback_query_handler(func=lambda call: call.data.startswith("sport_"))
+async def select_sport(call: types.CallbackQuery) -> None:
+    await bot.answer_callback_query(call.id)
+
+    sport_id = int(call.data.split("_")[1])
+    for s in await sport_adapter.get_sport_list():
+        if s.id == sport_id:
+            activities = await activity_adapter.get_activities_by_sport_section(sport_id)
+
+            if len(activities) == 0:
+                markup = await make_sports_buttons_except_one(sport_id, "💤 ПУСТО")
+                await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)
+                return
+            if len(activities) == 1:
+                return await select_activity(call, activities[0])
+
+            markup = await make_activity_buttons(activities)
+            await edit_with_ibuttons(call, "Для выбора события, нажмите кнопку.", markup)
+            return
+    await edit_without_buttons(call, "Спортивная секция не найдена.")
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("activity_"))
+async def processing_select_activity(call: types.CallbackQuery) -> None:
+    await bot.answer_callback_query(call.id)
+
+    activity_id = int(call.data.split("_")[1])
+
+    activity = None
+    for sport in await sport_adapter.get_sport_list():
+        activities = await activity_adapter.get_activities_by_sport_section(sport.id)
+        for act in activities:
+            if act.id == activity_id:
+                activity = act
+                break
+        if activity:
+            break
+
+    if not activity:
+        await edit_without_buttons(call, "Активность не найдена.")
+        return
+
+    await select_activity(call, activity)
+
+
+async def select_activity(call: types.CallbackQuery, activity: Activity) -> None:
+    try:
+        list_of_all_teams = await activity_adapter.get_teams_by_activity_id(activity.id)
+        # TODO: id -> name
+        if list_of_all_teams:
+            numbered_teams = [f"{i + 1}. {team.name}" for i, team in enumerate(list_of_all_teams)]
+            teams_text = f"🏆 {activity.title}\n\n📋 Список команд:\n\n" + "\n".join(numbered_teams)
+        else:
+            teams_text = f"🏆 {activity.title}\n\n📋 Пока нет команд."
+
+        # TODO вынести
+        markup = types.InlineKeyboardMarkup()
+        create = types.InlineKeyboardButton("Создать команду", callback_data=f"create_{activity.id}")
+        signup = types.InlineKeyboardButton("Записаться в команду", callback_data=f"signup_{activity.id}")
         markup.add(create, signup)
-        await bot.send_message(
-            mess.chat.id,
-            f"Вы можете создать свою команду с помощью кнопки <create {activity.title}>,"
-            f" или записаться в уже существующую, нажав на кнопку <signup {activity.title}>",
-            reply_markup=markup,
-        )
-        return True
-    return False
+
+        await edit_with_ibuttons(call, f"{teams_text}", markup)
+    except UnknownError as ue:
+        print(ue)
+        await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
 
 
 # async def setname_team(mess: types.Message, activity: Activity) -> bool:
@@ -269,75 +357,33 @@ async def processing_select_activity(mess: types.Message, activity: Activity) ->
 #     return False
 
 
-async def enroll_player_in_activity(mess: types.Message, activity: Activity) -> bool:
-    if f"create {activity.title}" == mess.text:
-        team = ""
-        try:
-            team = await app_container.get(ActivityAdapter).enroll_player_in_activity(activity.id,
-                                                                                      mess.from_user.id)  # type: ignore
-        except InsufficientRights:
-            await bot.send_message(mess.chat.id, Msg.INSUFFICIENT_RIGHTS.value)
-        except UnknownError as ue:
-            print(ue)
-            await bot.send_message(mess.chat.id, Msg.INTERNAL_ERROR.value)
-            return True
-        await bot.send_message(
-            mess.chat.id,
-            f"Вы зарегистрировали новую команду. Название: {team.name}. Если захотите изменить название команды на новое_название, введите <set_name {activity.title}|{team.name}: новое_название>.",
-        )
-        return True
-    return False
+@bot.callback_query_handler(func=lambda call: call.data.startswith("create_"))
+async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
+    await bot.answer_callback_query(call.id)
+
+    activity_id = int(call.data.split("_")[1])
+
+    try:
+        team = await app_container.get(ActivityAdapter).enroll_player_in_activity(activity_id, call.from_user.id)
+        await edit_without_buttons(call,
+                                   f"✅ Вы создали новую команду! Название: {team.name}\n\nДля изменения названия команды обратитесь к администратору.")
+    except InsufficientRights:
+        await edit_without_buttons(call, Msg.INSUFFICIENT_RIGHTS.value)
+    except UnknownError as ue:
+        print(ue)
+        await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
 
 
-async def signup_to_sport(mess: types.Message, sport: SportSection) -> bool:
-    if f"{sport.ru_name}" == mess.text:
-        markup = await make_activity_buttons(sport)
-        await bot.send_message(
-            mess.chat.id,
-            "Для выбора события, нажмите кнопку.",
-            reply_markup=markup,
-        )
-        return True
-    return False
+@bot.callback_query_handler(func=lambda call: call.data.startswith("signup_"))
+async def signup_to_activity(call: types.CallbackQuery) -> None:
+    await bot.answer_callback_query(call.id)
+    # TODO:
+    await edit_without_buttons(call, "🚧 Функция записи в существующую команду находится в разработке.")
 
 
-async def signup_to_activity(mess: types.Message, activity: Activity) -> bool:
-    if mess.text == activity:  # type: ignore
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        signup_button = types.KeyboardButton(f"signup {activity.title}")
-        create_button = types.KeyboardButton(f"create {activity.title}")
-        markup.add(signup_button, create_button)
-        await bot.send_message(
-            mess.chat.id,
-            f"Для записи в уже существующую команду, нажмите <signup {activity.title}>, для создания новой команды, нажмите <create_{activity.title}>",
-            reply_markup=markup,
-        )
-    return False
-
-
-async def approve_adding_person_in_team():
-    pass
-
-
-# todo сделать более умную обработку кнопок
 @bot.message_handler(content_types=["text"])
 async def answer_to_buttons(mess: types.Message) -> None:
-    if await (
-            processing_of_registration(mess)):
-        return
-    for sport in await app_container.get(SportAdapter).get_sport_list():
-        if await signup_to_sport(mess, sport):
-            return
-        for activity in await activity_adapter.get_activities_by_sport_section(sport.id):
-            if await processing_select_activity(mess, activity):
-                return
-            if await signup_to_activity(mess, activity):
-                return
-            if await enroll_player_in_activity(mess, activity):
-                return
-            # if await setname_team(mess, activity):
-            #     return
-    await bot.send_message(mess.chat.id, "Я вас не понимаю.")
+    await bot.send_message(mess.chat.id, "Я вас не понимаю. Используйте кнопки или команды.")
 
 
 asyncio.run(bot.polling(non_stop=True, none_stop=True))

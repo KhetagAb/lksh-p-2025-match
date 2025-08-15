@@ -1,5 +1,4 @@
 -- +goose Up
--- +goose StatementBegin
 
 create table players
 (
@@ -56,16 +55,3 @@ create table meeting_participants
     player_id  bigint not null references players (id),
     meeting_id bigint not null references meetings (id)
 );
-
--- +goose StatementEnd
-
--- +goose Down
--- +goose StatementBegin
-
--- DROP TABLE IF EXISTS meeting_participants;
--- DROP TABLE IF EXISTS meetings;
--- DROP TABLE IF EXISTS activities;
--- DROP TABLE IF EXISTS sport_sections;
--- DROP TABLE IF EXISTS players;
-
--- +goose StatementEnd
