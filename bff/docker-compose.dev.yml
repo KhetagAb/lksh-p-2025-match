@@ -8,7 +8,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
     ports:
-      - "${MONGODB_EXPOSE_PORT}:27017"
+      - "${MONGODB_PORT}:27017"
     volumes:
       - mongodb_data:/data/db
       - ./mongodb/mongo-init-scripts:/docker-entrypoint-initdb.d:ro

@@ -17,7 +17,7 @@ from lkshmatch.adapters.base import (
     PlayerToRegister,
     SportAdapter,
     SportSection,
-    UnknownError,
+    UnknownError, PlayerAlreadyRegistered,
 )
 from lkshmatch.config import settings
 from lkshmatch.di import app_container
@@ -26,22 +26,22 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 
 # TODO разобраться как работает
 class Msg(Enum):
-    REGISTRATION_USER_NOT_FOUND = "Извините, но вас нет в списках. Подойдите в 4-ый комповник."
-    REGISTRATION_CONFIRM_QUESTION = "%s, мы нашли вас. Это вы?"
-    REGISTRATION_CONFIRMED = "Вы зарегистрировались в системе.\n" + \
-                             "Для регистрации в какую-либо секцию, введите /register_on_sport\n" + \
-                             "В случае возникновения проблем, обращайтесь в 4-ый комповник."
-    REGISTRATION_CANCELED = "Регистрация отменена. Если хотите зарегистрироваться, подойдите в 4-ый комповник."
+    REGISTRATION_USER_NOT_FOUND = "😔 Извините, но вас нет в списках. Подойдите в 4-ый комповник."
+    REGISTRATION_CONFIRM_QUESTION = "🎉 %s, мы нашли вас. Это вы?"
+    REGISTRATION_CONFIRMED = "🍾 Вы зарегистрировались в системе.\n\n" + \
+                             "✅ Для регистрации на активность, введите /register_on_sport."
+    REGISTRATION_ALREADY_REGISTERED = "🟢 Не переживайте, вы уже зарегистрированы."
+    REGISTRATION_CANCELED = "❌ Регистрация отменена. Если хотите зарегистрироваться, подойдите в 4-ый комповник."
 
     INSUFFICIENT_RIGHTS = "У вас недостаточно прав для этого действия."
     INTERNAL_ERROR = "Извините, что-то пошло не так. Обратитесь в 4-ый комповник к команде P."
 
 
 class Buttons(Enum):
-    REGISTRATION_CANCEL = "Нет, это не я. Отмена регистрации."
-    REGISTRATION_CONFIRM = "Это я, регистрацию подтверждаю."
+    REGISTRATION_CONFIRM = "✅ Подтверждаю."
+    REGISTRATION_CANCEL = "❌ Отмена регистрации."
 
-    SPORT_REGISTER_ON = "Записаться"
+    SPORT_REGISTER_ON = "Записаться на активность"
 
     def tg(self):
         return types.KeyboardButton(self.value)
@@ -166,7 +166,7 @@ async def register_on_sport(mess: types.Message) -> None:
     log_info(f"Called /register_on_sport.", mess)
     await message_with_buttons(
         mess,
-        text="Выберите спортивную секрцию",
+        text="Выберите спортивную секцию.",
         buttons=await make_sports_buttons(),
     )
     log_info("Finished /register_on_sport successfully.", mess)
@@ -179,19 +179,29 @@ async def processing_of_registration(mess: types.Message) -> bool:
         user_id, username = await validate_user(mess)
         if user_id is None:
             return True
-        # TODO не вызывать второй раз
-        user_name = await students_repository.validate_register_user(Player(username, int(user_id)))
 
-        await player_adapter.register_user(PlayerToRegister(username, user_id, user_name))
-        to_pin = (
-            await message_with_buttons(
-                mess=mess,
-                text=Msg.REGISTRATION_CONFIRMED.value,
-                buttons=types.ReplyKeyboardMarkup(resize_keyboard=True).
-                add(Buttons.SPORT_REGISTER_ON.tg()),
-            )
-        ).message_id
-        await bot.pin_chat_message(mess.chat.id, to_pin)
+        try:
+            user_name = await students_repository.validate_register_user(Player(username, int(user_id)))
+            await player_adapter.register_user(PlayerToRegister(username, user_id, user_name))
+            to_pin = (
+                await message_with_buttons(
+                    mess=mess,
+                    text=Msg.REGISTRATION_CONFIRMED.value,
+                    buttons=types.ReplyKeyboardMarkup(resize_keyboard=True).
+                    add(Buttons.SPORT_REGISTER_ON.tg()),
+                )
+            ).message_id
+            await bot.pin_chat_message(mess.chat.id, to_pin)
+        except PlayerNotFound:
+            log_warning("User not found in lksh database. Validate failed.", mess)
+            await message_without_buttons(mess, Msg.REGISTRATION_USER_NOT_FOUND.value)
+        except PlayerAlreadyRegistered:
+            log_warning("User already registered.", mess)
+            await message_without_buttons(mess, Msg.REGISTRATION_ALREADY_REGISTERED.value)
+        except UnknownError as ue:
+            log_error(f"Internal error: {ue}. Validate failed.", mess)
+            await message_without_buttons(mess, Msg.INTERNAL_ERROR.value)
+        await register_on_sport(mess)
         return True
     if mess.text == Buttons.REGISTRATION_CANCEL.value:
         await message_without_buttons(
@@ -312,7 +322,8 @@ async def approve_adding_person_in_team():
 # todo сделать более умную обработку кнопок
 @bot.message_handler(content_types=["text"])
 async def answer_to_buttons(mess: types.Message) -> None:
-    if await processing_of_registration(mess):
+    if await (
+            processing_of_registration(mess)):
         return
     for sport in await app_container.get(SportAdapter).get_sport_list():
         if await signup_to_sport(mess, sport):
