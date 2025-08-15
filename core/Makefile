@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := quickstart
 mode := dev
+include .env
 
 quickstart: check
 	make build mode=dev
