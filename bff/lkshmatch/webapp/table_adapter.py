@@ -86,10 +86,10 @@ async def register_on_section_with_table_get(request: Request):
 @table_adapter_router.post("/register_in_section")
 async def register_on_section_with_table_post(
     request: Request,
-    activity_adapter: FromDishka[ActivityAdapter],
     table_url: Annotated[str, Form()],
-    activity_id: Annotated[str, Form()],
+    activity_id: Annotated[int, Form()],
 ):
+    activity_adapter = app_container.get(ActivityAdapter)
     user_id = get_user_id_from_token(request.cookies.get(COOKIE_NAME))
     error = ""
     try:
