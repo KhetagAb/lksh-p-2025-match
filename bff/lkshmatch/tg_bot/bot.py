@@ -285,7 +285,16 @@ async def processing_select_activity(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
 
     activity_id = int(call.data.split("_")[1])
+    activity = await get_activity_by_id(activity_id)
+    if not activity:
+        await edit_without_buttons(call, "Активность не найдена.")
+        return
 
+    await select_activity(call, activity)
+
+
+async def get_activity_by_id(activity_id):
+    # TODO переделать на получение активности по id эффективнее
     activity = None
     for sport in await sport_adapter.get_sport_list():
         activities = await activity_adapter.get_activities_by_sport_section(sport.id)
@@ -295,12 +304,7 @@ async def processing_select_activity(call: types.CallbackQuery) -> None:
                 break
         if activity:
             break
-
-    if not activity:
-        await edit_without_buttons(call, "Активность не найдена.")
-        return
-
-    await select_activity(call, activity)
+    return activity
 
 
 async def select_activity(call: types.CallbackQuery, activity: Activity) -> None:
@@ -365,12 +369,14 @@ async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
 
     try:
         team = await app_container.get(ActivityAdapter).enroll_player_in_activity(activity_id, call.from_user.id)
-        await edit_without_buttons(call,
-                                   f"✅ Вы создали новую команду! Название: {team.name}\n\nДля изменения названия команды обратитесь к администратору.")
+        activity = await get_activity_by_id(activity_id)
+        await select_activity(call, activity)
+
+        await msg_without_buttons(call.message,
+                                  f"✅ Вы создали новую команду! Название: {team.name}\n\nДля изменения названия команды обратитесь к администратору.")
     except InsufficientRights:
         await edit_without_buttons(call, Msg.INSUFFICIENT_RIGHTS.value)
     except UnknownError as ue:
-        print(ue)
         await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
 
 
