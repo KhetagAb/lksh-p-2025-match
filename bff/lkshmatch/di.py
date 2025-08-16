@@ -8,6 +8,11 @@ from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter
 from lkshmatch.adapters.core.activity import CoreActivityAdapter
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
+
+from lkshmatch.adapters.stub_core.activity import StubActivityAdapter
+from lkshmatch.adapters.stub_core.players import StubPlayerAdapter
+from lkshmatch.adapters.stub_core.sport_sections import StubSportAdapter
+
 from lkshmatch.config import settings
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository

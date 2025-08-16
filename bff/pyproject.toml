@@ -16,6 +16,10 @@ dependencies = [
     "pymongo",
     "httpx",
     "aiohttp",
+    "python-multipart>=0.0.20",
+    "httplib2>=0.22.0",
+    "google-api-python-client>=2.179.0",
+    "oauth2client>=4.1.3",
 ]
 
 [tool.uv]

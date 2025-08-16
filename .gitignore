@@ -34,6 +34,7 @@ go.work.sum
 # environment
 .env
 .env.test
+/bff/private_keys/*.json
 
 # Editor/IDE
 .direnv
