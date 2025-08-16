@@ -269,7 +269,7 @@
                     for (var i = 0; i < responseParse_a.length; i++) {
                         const eli_a = responseParse_a[i];
                         const eli_a1 = eli_a["title"].toLowerCase();
-                        if (check_a(sk_a, eli_a1))
+                        if (check_a(sk_a, eli_a1) || check_a(se_a,eli_a1))
                             mas_a.push([eli_a["id"], eli_a1]);
                     }
 
@@ -399,7 +399,7 @@
             for (var i = 0; i < responseParse.length; i++) {
                 const eli = responseParse[i];
                 const enname = eli["name"].toLowerCase();
-                if (check(sk, enname))
+                if (check(sk, enname) || check(se,enname))
                     mas.push([eli["id"], enname]);
             }
 
