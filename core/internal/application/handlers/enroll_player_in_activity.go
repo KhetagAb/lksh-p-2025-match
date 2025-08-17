@@ -2,8 +2,10 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"github.com/labstack/echo/v4"
 	domain "match/internal/domain/dao"
+	"match/internal/domain/services"
 	"match/internal/generated/server"
 	"match/internal/infra"
 )
@@ -46,6 +48,12 @@ func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context
 	infra.Infof(ctx, "Creating Team by tgID (%d)", id)
 	domainTeam, err := h.activityService.EnrollPlayerInActivity(ctx, id, *requestBody.TgId)
 	if err != nil {
+		var invalidOpErr *services.InvalidOperationError
+		if errors.As(err, &invalidOpErr) {
+			infra.Warnf(ctx, "Player already enrolled in activity: %v", err)
+			return ConflictErrorResponse(ectx, "Player is already enrolled in a team for this activity")
+		}
+		
 		infra.Errorf(ctx, "Internal server error while trying to create team: %v", err)
 		return InternalErrorResponse(ectx, err.Error())
 	}

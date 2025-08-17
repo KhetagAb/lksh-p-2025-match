@@ -1,6 +1,8 @@
 import core_client
 from core_client.api.sport_sections import get_core_sport_list
 from lkshmatch.adapters.base import SportAdapter, SportSection, UnknownError
+from lkshmatch.adapters.core.mappers.sport_section import map_sport_section
+
 
 class CoreSportAdapter(SportAdapter):
     def __init__(self, core_client: core_client.Client):
@@ -12,5 +14,5 @@ class CoreSportAdapter(SportAdapter):
             raise UnknownError("get all sections return null response")
         sport_result = []
         for sport in response.sports_sections:
-            sport_result.append(SportSection(id=sport.id, name=sport.name, ru_name=sport.ru_name))
+            sport_result.append(map_sport_section(sport))
         return sport_result

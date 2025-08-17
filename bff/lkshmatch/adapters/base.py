@@ -84,19 +84,8 @@ class Activity:
 class Team:
     id: int
     name: str
-    capitan: CorePlayer
+    captain: CorePlayer
     members: list[CorePlayer]
-
-
-# @dataclass
-# class TournamentInterval:
-#     registration_deadline: int
-#     start: int
-#     end: int
-#
-# @dataclass
-# class Admin:
-#     tg_id: int
 
 
 class PlayerAdapter(ABC):
@@ -142,23 +131,23 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
 
-# class TeamAdapter(ABC):
-#     @abstractmethod
-#     async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     async def teams(self, section: SportSection) -> list[Team]:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     async def join_team(self, team: Team, user: Player) -> int:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     async def leave_team(self, team: Team, user: Player) -> None:
-#         raise NotImplementedError
-#
-#     @abstractmethod
-#     async def approve(self, team: Team, user: Player):
-#         raise NotImplementedError
+class TeamAdapter(ABC):
+    @abstractmethod
+    async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def teams(self, section: SportSection) -> list[Team]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def join_team(self, team: Team, user: Player) -> int:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def leave_team(self, team: Team, user: Player) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def approve(self, team: Team, user: Player):
+        raise NotImplementedError

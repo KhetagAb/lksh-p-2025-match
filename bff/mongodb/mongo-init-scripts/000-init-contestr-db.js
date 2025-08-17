@@ -8,6 +8,7 @@ const students = [
     {parallel: "P", name: "Одинцов Тимофей", sex: "male", tg_username: "timodi"},
     {parallel: "P", name: "Кокорев Вадим", sex: "male", tg_username: "VadimKokorev"},
     {parallel: "P", name: "Макаров Михаил", sex: "male", tg_username: "zog34bro"},
+    {parallel: "admin", name: "Дзестелов Хетаг", sex: "male", tg_username: "abramkht"}
 ]
 db = db.getSiblingDB("match");
 db.students.insertMany(students);

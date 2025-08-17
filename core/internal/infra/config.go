@@ -24,7 +24,7 @@ type (
 
 	PostgresConfig struct {
 		Host     string `mapstructure:"host"`
-		Name     string `mapstructure:"name"`
+		User     string `mapstructure:"user"`
 		Password string `mapstructure:"password"`
 		Database string `mapstructure:"database"`
 		Port     int    `mapstructure:"port"`

@@ -8,6 +8,6 @@ RUN go mod tidy
 COPY core/ .
 COPY docs/api/openapi.yaml ../docs/api/openapi.yaml
 
-CMD ["make", "test-local"]
+CMD ["make", "test"]
 
 EXPOSE 8080

@@ -1,5 +1,3 @@
-from typing import List
-
 from lkshmatch.adapters.base import (
     Activity,
     ActivityAdapter,
@@ -10,7 +8,7 @@ from lkshmatch.adapters.base import (
 
 
 class StubActivityAdapter(ActivityAdapter):
-    async def get_activities_by_sport_section(self, sport_section_id: int) -> List[Activity]:
+    async def get_activities_by_sport_section(self, sport_section_id: int) -> list[Activity]:
         activities = [
             Activity(
                 id=0,
@@ -33,12 +31,12 @@ class StubActivityAdapter(ActivityAdapter):
         ]
         return activities
 
-    async def get_teams_by_activity_id(self, activity_id: int) -> List[Team]:
+    async def get_teams_by_activity_id(self, activity_id: int) -> list[Team]:
         teams = [
             Team(
                 id=0,
                 name="Крутая тима 1",
-                capitan=CorePlayer(
+                captain=CorePlayer(
                     core_id=1,
                     tg_id=1234,
                 ),
@@ -56,7 +54,7 @@ class StubActivityAdapter(ActivityAdapter):
             Team(
                 id=1,
                 name="Крутая тима 2",
-                capitan=CorePlayer(
+                captain=CorePlayer(
                     core_id=2,
                     tg_id=2234,
                 ),
@@ -78,7 +76,7 @@ class StubActivityAdapter(ActivityAdapter):
         return Team(
             id=10,
             name="Тима зе бест",
-            capitan=CorePlayer(
+            captain=CorePlayer(
                 core_id=1123,
                 tg_id=2224,
             ),

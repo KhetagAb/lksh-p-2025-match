@@ -12,16 +12,18 @@ from core_client.models import (
     GetCoreTeamsByActivityIdResponse400,
     PostCoreActivityIdEnrollResponse200,
     PostCoreActivityIdEnrollResponse400,
+    PostCoreActivityIdEnrollResponse409,
 )
 from lkshmatch.adapters.base import (
     Activity,
     ActivityAdapter,
-    CorePlayer,
     InvalidParameters,
+    PlayerAlreadyInTeam,
     Team,
     TgID,
     UnknownError,
 )
+from lkshmatch.adapters.core.mappers.activity import map_team
 
 
 class CoreActivityAdapter(ActivityAdapter):
@@ -36,17 +38,7 @@ class CoreActivityAdapter(ActivityAdapter):
             raise UnknownError("get activity by sport section id returns unknown response")
         activities = []
         for activity in response.activities:
-            activities.append(
-                Activity(
-                    id=activity.id,
-                    title=activity.title,
-                    description=activity.description,
-                    creator=CorePlayer(
-                        core_id=activity.creator.core_id,
-                        tg_id=activity.creator.tg_id,
-                    ),
-                )
-            )
+            activities.append(activity)
         return activities
 
     # TODO перенести в TeamsAdapter
@@ -57,25 +49,8 @@ class CoreActivityAdapter(ActivityAdapter):
         if not isinstance(response, GetCoreTeamsByActivityIdResponse200):
             raise UnknownError("get teams by activity id returns unknown response")
         teams = []
-        # TODO:issue98
         for team in response.teams:
-            teams.append(
-                Team(
-                    id=team.id,
-                    name=team.name,
-                    capitan=CorePlayer(
-                        core_id=team.captain.core_id,
-                        tg_id=team.captain.tg_id,
-                    ),
-                    members=[
-                        CorePlayer(
-                            core_id=member.core_id,
-                            tg_id=member.tg_id,
-                        )
-                        for member in team.members
-                    ],
-                )
-            )
+            teams.append(map_team(team))
         return teams
 
     async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:
@@ -84,22 +59,10 @@ class CoreActivityAdapter(ActivityAdapter):
         )
         if isinstance(response, PostCoreActivityIdEnrollResponse400):
             raise InvalidParameters(f"enroll player in activity returns 400 response: {response.message}")
+        if isinstance(response, PostCoreActivityIdEnrollResponse409):
+            raise PlayerAlreadyInTeam(f"Player is already enrolled in a team for this activity: {response.message}")
         if not isinstance(response, PostCoreActivityIdEnrollResponse200):
             raise UnknownError("enroll player in activity  returns unknown response")
 
         team = response.team
-        return Team(
-            id=team.id,
-            name=team.name,
-            capitan=CorePlayer(
-                core_id=team.captain.core_id,
-                tg_id=team.captain.tg_id,
-            ),
-            members=[
-                CorePlayer(
-                    core_id=member.core_id,
-                    tg_id=member.tg_id,
-                )
-                for member in team.members
-            ],
-        )
+        return map_team(team)

@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 	_ "embed"
-	domain "match/internal/domain/dao"
+	"match/internal/domain/dao"
 	"match/internal/domain/services"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -49,7 +49,7 @@ func (p *Players) CreatePlayer(ctx context.Context, name, username string, tgID 
 	return &id, nil
 }
 
-func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*domain.Player, error) {
+func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*dao.Player, error) {
 	var tgID int64
 	var name string
 	var username string
@@ -59,10 +59,10 @@ func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*domain.Player, 
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
 
-	return &domain.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
+	return &dao.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
 }
 
-func (p *Players) GetPlayerByTgID(ctx context.Context, tgID int64) (*domain.Player, error) {
+func (p *Players) GetPlayerByTgID(ctx context.Context, tgID int64) (*dao.Player, error) {
 	var id int64
 	var name string
 	var username string
@@ -72,10 +72,10 @@ func (p *Players) GetPlayerByTgID(ctx context.Context, tgID int64) (*domain.Play
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
 
-	return &domain.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
+	return &dao.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
 }
 
-func (p *Players) GetPlayerByTgUsername(ctx context.Context, username string) (*domain.Player, error) {
+func (p *Players) GetPlayerByTgUsername(ctx context.Context, username string) (*dao.Player, error) {
 	var id int64
 	var name string
 	var tgID int64
@@ -85,7 +85,7 @@ func (p *Players) GetPlayerByTgUsername(ctx context.Context, username string) (*
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
 
-	return &domain.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
+	return &dao.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
 }
 
 func (p *Players) GetPlayerExistanceByTgID(

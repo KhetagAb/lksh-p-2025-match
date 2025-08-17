@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 	_ "embed"
-	domain "match/internal/domain/dao"
+	"match/internal/domain/dao"
 	"match/internal/domain/services"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -23,17 +23,17 @@ func NewActivitiesRepository(pool *pgxpool.Pool) *Activities {
 	return &Activities{pool: pool}
 }
 
-func (a *Activities) GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]domain.Activity, error) {
+func (a *Activities) GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]dao.Activity, error) {
 	rows, err := a.pool.Query(ctx, getActivitiesBySportSectionIDQuery, sportSectionID)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
 	defer rows.Close()
 
-	activities := make([]domain.Activity, 0)
+	activities := make([]dao.Activity, 0)
 
 	for rows.Next() {
-		var activity domain.Activity
+		var activity dao.Activity
 		if scanErr := rows.Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID); scanErr != nil {
 			return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: scanErr.Error()}
 		}
@@ -47,8 +47,8 @@ func (a *Activities) GetActivitiesBySportSectionID(ctx context.Context, sportSec
 	return activities, nil
 }
 
-func (a *Activities) GetActivityByID(ctx context.Context, id int64) (*domain.Activity, error) {
-	var activity domain.Activity
+func (a *Activities) GetActivityByID(ctx context.Context, id int64) (*dao.Activity, error) {
+	var activity dao.Activity
 	err := a.pool.QueryRow(ctx, getActivityByIDQuery, id).Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}

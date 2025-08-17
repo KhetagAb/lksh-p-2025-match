@@ -3,38 +3,31 @@ package teams
 import (
 	"context"
 	"fmt"
-	domain "match/internal/domain/dao"
+	"match/internal/domain/dto"
 )
 
-func (s *TeamService) GetTeamsByActivityID(ctx context.Context, activityID int64) ([]domain.Team, []domain.Player, [][]domain.Player, error) {
+func (s *TeamService) GetTeamsByActivityID(ctx context.Context, activityID int64) (dto.Teams, error) {
 	teams, err := s.teamRepository.GetTeamsByActivityID(ctx, activityID)
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("cannot get teams by activity_id [activity_id=%d]: %w", activityID, err)
+		return nil, fmt.Errorf("cannot get teams by activity_id [activity_id=%d]: %w", activityID, err)
 	}
 
-	teamCaptains := []domain.Player{}
-	teamsPlayers := [][]domain.Player{}
+	var teamsDTO dto.Teams
 	for _, team := range teams {
-		// Getting team captain
-		{
-			teamCaptain, err := s.playerRepository.GetPlayerByID(ctx, team.CaptainID)
-			if err != nil {
-				return nil, nil, nil, fmt.Errorf("cannot get captain player by player_id [player_id=%d]: %w", team.CaptainID, err)
-			}
-
-			teamCaptains = append(teamCaptains, *teamCaptain)
+		teamCaptain, err := s.playerRepository.GetPlayerByID(ctx, team.CaptainID)
+		if err != nil {
+			return nil, fmt.Errorf("cannot get captain player by player_id [player_id=%d]: %w", team.CaptainID, err)
 		}
 
-		// Getting team members
-		{
-			teamPlayers, err := s.teamRepository.GetTeamPlayersByID(ctx, team.ID)
-			if err != nil {
-				return nil, nil, nil, fmt.Errorf("cannot get members players by team_id [team_id=%d]: %w", team.ID, err)
-			}
-
-			teamsPlayers = append(teamsPlayers, teamPlayers)
+		teamPlayers, err := s.teamRepository.GetTeamPlayersByID(ctx, team.ID)
+		if err != nil {
+			return nil, fmt.Errorf("cannot get members players by team_id [team_id=%d]: %w", team.ID, err)
 		}
+
+		teamDTO := dto.Team{Team: team, Captain: *teamCaptain, Players: teamPlayers}
+
+		teamsDTO = append(teamsDTO, teamDTO)
 	}
 
-	return teams, teamCaptains, teamsPlayers, nil
+	return teamsDTO, nil
 }
