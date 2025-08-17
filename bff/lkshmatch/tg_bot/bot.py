@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import logging
 from enum import Enum
@@ -315,8 +314,7 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
         if list_of_all_teams:
             numbered_teams = [f"{i + 1}. {team.name}" for i, team in enumerate(list_of_all_teams)]
             # todo сделать поддерждку команда/участник
-            description = f"ℹ️ Описание: {activity.description}\n\n" if activity.description else ""
-            teams_text = f"🏆 {activity.title}\n\n{description}📋 Список участников:\n\n" + "\n".join(numbered_teams)
+            teams_text = f"🏆 {activity.title}\n\n📋 Список участников:\n\n" + "\n".join(numbered_teams)
         else:
             teams_text = f"🏆 {activity.title}\n\n📋 Пока нет участников."
 
@@ -398,5 +396,3 @@ async def signup_to_activity(call: types.CallbackQuery) -> None:
 async def answer_to_buttons(mess: types.Message) -> None:
     await bot.send_message(mess.chat.id, "Я вас не понимаю. Используйте кнопки или команды.")
 
-
-asyncio.run(bot.polling(non_stop=True, none_stop=True))
