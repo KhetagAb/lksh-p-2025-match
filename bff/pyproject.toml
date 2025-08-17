@@ -1,21 +1,21 @@
 [project]
 name = "lkshmatch"
 version = "0.1.0"
-description = "Backend-for-frontend of MATCH"
+description = "Backend-for-frontend service for Match"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.13.5"
 dependencies = [
-    "fastapi",
-    "uvicorn[standard]",
-    "pydantic",
-    "dynaconf",
-    "python-jose",
-    "pytelegrambotapi",
-    "dishka",
-    "pymongo",
-    "httpx",
-    "aiohttp",
+    "aiohttp >= 3.12.15",
+    "dishka >= 1.6.0",
+    "dynaconf >= 3.2.11",
+    "fastapi >= 0.116.1",
+    "pydantic >= 2.11.7",
+    "pymongo >= 4.14.0",
+    "pytelegrambotapi >= 4.28.0",
+    "python-jose >= 3.5.0",
+    "uvicorn >= 0.35.0",
+    "uvloop>=0.21.0",
 ]
 
 [tool.uv]
