@@ -7,7 +7,7 @@ services:
     env_file:
       - .env.test
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
 
   postgres:
@@ -22,8 +22,6 @@ services:
       - -p ${POSTGRES_PORT}
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: [ 'CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}' ]
       interval: 10s
