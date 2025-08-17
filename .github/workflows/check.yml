@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: docker/setup-compose-action@v1
+      - run: apt install docker-compose
       - run: cat core/.env.example >> core/.env.test
       - run: docker-compose -f core/docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
