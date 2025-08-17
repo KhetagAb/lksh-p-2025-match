@@ -32,6 +32,8 @@ class CorePlayerAdapter(PlayerAdapter):
             body=map_player_to_register_request(user),
         )
 
+        if response is None:
+            raise UnknownError("message") # todo: fixme
         if isinstance(response, RegisterPlayerResponse200):
             raise PlayerAlreadyRegistered("player already register")
         elif isinstance(response, RegisterPlayerResponse201):
