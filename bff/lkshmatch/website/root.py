@@ -24,7 +24,7 @@ async def get_sport_sections(
     except:
         return templates.TemplateResponse(name="some_error.html", context={'request': request})
     return templates.TemplateResponse(
-        name="sections.html",
+        name="list_of_sections.html",
         context={
             "request": request,
             "list_of_sections": sport_list,
@@ -43,27 +43,27 @@ async def get_activity_by_sport_section_id(
     except:
         return templates.TemplateResponse(name="some_error.html", context={'request': request})
     return templates.TemplateResponse(
-        name="activities.html",
+        name="list_of_activities.html",
         context={
             'request': request,
             'list_of_activities': list_of_activities
         }
     )
 
-# @root_router.get("/sections/activities/{activity_id}")
-# async def get_activity_by_sport_section_id(
-#     request: Request,
-#     activity_id: int
-# ):
-#     activity_adapter = app_container.get(ActivityAdapter)
-#     try:
-#         list_of_players = await activity_adapter.get_teams_by_activity_id(activity_id=activity_id)
-#     except:
-#         return templates.TemplateResponse(name="some_error.html", context={'request': request})
-#     return templates.TemplateResponse(
-#         name="activities.html",
-#         context={
-#             'request': request,
-#             'list_of_players': list_of_players
-#         }
-#     )
+@root_router.get("/sections/activities/{activity_id}")
+async def get_activity_by_sport_section_id(
+    request: Request,
+    activity_id: int
+):
+    activity_adapter = app_container.get(ActivityAdapter)
+    try:
+        list_of_teams = await activity_adapter.get_teams_by_activity_id(activity_id=activity_id)
+    except:
+        return templates.TemplateResponse(name="some_error.html", context={'request': request})
+    return templates.TemplateResponse(
+        name="list_of_teams.html",
+        context={
+            'request': request,
+            'list_of_teams': list_of_teams
+        }
+    )
