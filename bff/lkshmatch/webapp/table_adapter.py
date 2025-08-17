@@ -122,7 +122,7 @@ async def register_on_section_with_table_post(
         return_values = ["" for i in range(len(sheet_values))]
         for i in range(len(sheet_values)):
             try:
-                await activity_adapter.enroll_player_in_activity(player_tg_id=user_id, activity_id=activity_id)
+                # await activity_adapter.enroll_player_in_activity(player_tg_id=user_id, activity_id=activity_id)
                 return_values[i] = "Зарегестрирован"
             except BaseException:
                 return_values[i] = "ОШИБКА"
