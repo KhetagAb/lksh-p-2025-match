@@ -19,6 +19,10 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
 from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 
+from lkshmatch.website.vars import WEBSITE_CREDENTIALS_FILE
+import httplib2
+from googleapiclient import discovery
+from oauth2client.service_account import ServiceAccountCredentials
 
 class CoreClientProvider(Provider):
     def __init__(self, core_host: str, core_port: str):
@@ -85,3 +89,9 @@ def all_providers() -> list[Provider]:
 
 
 app_container: Container = make_container(*all_providers())
+
+credentials = ServiceAccountCredentials.from_json_keyfile_name(
+    WEBSITE_CREDENTIALS_FILE, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+)
+httpAuth = credentials.authorize(httplib2.Http())
+service = discovery.build("sheets", "v4", http=httpAuth)

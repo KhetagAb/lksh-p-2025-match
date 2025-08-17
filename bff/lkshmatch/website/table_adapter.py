@@ -1,17 +1,14 @@
 from typing import Annotated
 from urllib.parse import parse_qs, urlparse
 
-import httplib2
 from fastapi import APIRouter, Form, Request
-from googleapiclient import discovery
-from oauth2client.service_account import ServiceAccountCredentials
 
 from lkshmatch.adapters.base import ActivityAdapter, SportAdapter, PlayerAdapter
-from lkshmatch.di import app_container
+from lkshmatch.di import app_container, service
 
 from .auth import get_user_id_from_token
 from .root import templates
-from .vars import COOKIE_NAME, CREDENTIALS_FILE, SERVICE_ACCOUNT_NAME
+from .vars import COOKIE_NAME, SERVICE_ACCOUNT_NAME
 
 
 class TableIsEmptyError(Exception):
@@ -23,12 +20,6 @@ class TableIsEmptyError(Exception):
 
 
 table_adapter_router = APIRouter()
-credentials = ServiceAccountCredentials.from_json_keyfile_name(
-    CREDENTIALS_FILE, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-)
-httpAuth = credentials.authorize(httplib2.Http())
-service = discovery.build("sheets", "v4", http=httpAuth)
-
 
 def get_sheet_data_from_url(sheet_url: str):
     parse_result = urlparse(sheet_url)
