@@ -10,7 +10,8 @@ quickstart: check
 codegen:
 	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml
 	go tool github.com/google/wire/cmd/wire ./cmd/wireset
-	mv ./cmd/wireset/wire_gen.go ./internal/generated
+	mkdir ./internal/generated/app/
+	mv ./cmd/wireset/wire_gen.go ./internal/generated/app
 
 build: codegen
 	go build -o bin/match cmd/main.go
