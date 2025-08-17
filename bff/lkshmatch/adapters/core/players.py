@@ -1,6 +1,6 @@
-import core_client
-from core_client.api.players import register_player
-from core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201
+from lkshmatch import core_client
+from lkshmatch.core_client.api.players import register_player
+from lkshmatch.core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201
 from lkshmatch.adapters.base import (
     CoreID,
     Player,

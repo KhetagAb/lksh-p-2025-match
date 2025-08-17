@@ -1,9 +1,9 @@
-import asyncio
 import datetime
 import logging
 from enum import Enum
 from typing import Optional
 
+from fastapi import APIRouter
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 
@@ -22,6 +22,9 @@ from lkshmatch.adapters.base import (
 from lkshmatch.config import settings
 from lkshmatch.di import app_container
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
+
+
+router = APIRouter(include_in_schema=False)
 
 
 # TODO разобраться как работает
@@ -315,8 +318,7 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
         if list_of_all_teams:
             numbered_teams = [f"{i + 1}. {team.name}" for i, team in enumerate(list_of_all_teams)]
             # todo сделать поддерждку команда/участник
-            description = f"ℹ️ Описание: {activity.description}\n\n" if activity.description else ""
-            teams_text = f"🏆 {activity.title}\n\n{description}📋 Список участников:\n\n" + "\n".join(numbered_teams)
+            teams_text = f"🏆 {activity.title}\n\n📋 Список участников:\n\n" + "\n".join(numbered_teams)
         else:
             teams_text = f"🏆 {activity.title}\n\n📋 Пока нет участников."
 
@@ -399,4 +401,10 @@ async def answer_to_buttons(mess: types.Message) -> None:
     await bot.send_message(mess.chat.id, "Я вас не понимаю. Используйте кнопки или команды.")
 
 
-asyncio.run(bot.polling(non_stop=True, none_stop=True))
+@router.post(path=f"/{token}")
+async def telegram_webhook(update: dict):
+    if update:
+        update = types.Update.de_json(update)
+        await bot.process_new_updates([update])
+    else:
+        return
