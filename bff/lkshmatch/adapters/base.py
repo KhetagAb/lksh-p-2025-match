@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import NewType
+from typing import NewType, Optional
 
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)
@@ -76,8 +76,8 @@ class SportSection:
 class Activity:
     id: int
     title: str
-    description: str | None
     creator: CorePlayer
+    description: Optional[str]
 
 
 @dataclass
@@ -98,30 +98,37 @@ class PlayerAdapter(ABC):
         raise NotImplementedError
 
 
+# TODO спросить куда это поместить
+class PlayerAdminAdapter(ABC):
+    @abstractmethod
+    async def admin_register_user(self, user: PlayerToRegister, player_info: Player) -> CoreID:
+        raise NotImplementedError
+
+
 class SportAdapter(ABC):
     @abstractmethod
     async def get_sport_list(self) -> list[SportSection]:
         raise NotImplementedError
 
 
-# class TournamentAdminAdapter(ABC):
-#     @abstractmethod
-#     async def create_tournament(
-#         self, tournament_interval: TournamentInterval, sport_name: SportSectionName, player_info: Admin
-#     ) -> None:
-#         raise NotImplementedError
-#
-#
-#     @abstractmethod
-#     async def modify_tournament(self, activity: Activity, player_info: Admin) -> None:
-#         raise NotImplementedError
+class ActivityAdminAdapter(ABC):
+    @abstractmethod
+    async def create_activity(self, title: str, sport_section_id: int, creator_id: int, description: str) -> Activity:
+        raise NotImplementedError
+
+    # TODO спросить про айди креатора
+    @abstractmethod
+    async def delete_activity(self, core_id: CoreID) -> Activity:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_activity(self, title: str, description: str, core_id: CoreID) -> None:
+        raise NotImplementedError
 
 
 class ActivityAdapter(ABC):
     @abstractmethod
-    async def get_activities_by_sport_section(
-        self, sport_section_id: int
-    ) -> list[Activity]:
+    async def get_activities_by_sport_section(self, sport_section_id: int) -> list[Activity]:
         raise NotImplementedError
 
     @abstractmethod
@@ -129,17 +136,13 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def enroll_player_in_activity(
-        self, activity_id: int, player_tg_id: TgID
-    ) -> Team:
+    async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:
         raise NotImplementedError
 
 
 class TeamAdapter(ABC):
     @abstractmethod
-    async def create_team(
-        self, section: SportSection, user: Player, name_team: str
-    ) -> str:
+    async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
         raise NotImplementedError
 
     @abstractmethod
