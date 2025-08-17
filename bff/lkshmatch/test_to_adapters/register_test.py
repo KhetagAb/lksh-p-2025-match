@@ -68,7 +68,7 @@ async def test_register_user_already_register(player_adapter, test_server, user:
         test_server.expect_request(
             "/core/player/register", json={"tg_username": user.tg_username, "name": user.name, "tg_id": user.tg_id}
         ).respond_with_json({"id": id_reg}, status=200)
-        
+
         a = await player_adapter.register_user(user)
 
 
