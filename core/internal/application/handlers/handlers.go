@@ -14,6 +14,26 @@ type ServerInterface struct {
 	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
 }
 
+func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s ServerInterface) PostCoreActivityDeleteById(ctx echo.Context, id int64) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s ServerInterface) PostCoreActivityUpdateById(ctx echo.Context, id int64) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s ServerInterface) GetCorePlayerByTg(ctx echo.Context, params server.GetCorePlayerByTgParams) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s ServerInterface) GetCoreTeamsByActivityId(ctx echo.Context, id int64) error {
 	return s.getTeamsByIDActivity.GetTeamsByActivityID(ctx, id)
 }
