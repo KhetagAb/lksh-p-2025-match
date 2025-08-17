@@ -1,6 +1,7 @@
 package transport
 
 import (
+	"context"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -36,6 +37,14 @@ func CreateServer(
 
 func (s *HTTPServer) StartServer() error {
 	return s.echo.Start(fmt.Sprintf(":%v", s.cfg.HTTP.Port))
+}
+
+func (s *HTTPServer) StopServer(ctx context.Context) error {
+	return s.echo.Shutdown(ctx)
+}
+
+func (s *HTTPServer) RegisterHealthCheck(healthcheck func(c echo.Context) error) {
+	s.echo.GET("/health", healthcheck)
 }
 
 func PingPong(c echo.Context) error {
