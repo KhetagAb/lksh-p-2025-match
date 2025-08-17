@@ -20,7 +20,7 @@ services:
       dockerfile: bff/webapp.dev.dockerfile
     container_name: match-web
     ports:
-      - "80:80"
+      - "8000:8000"
     depends_on:
       - mongodb
     networks:
