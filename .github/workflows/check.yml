@@ -12,10 +12,12 @@ jobs:
         with:
           go-version: stable
       - run: |
+          go mod tidy
           go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml && \
           go tool github.com/google/wire/cmd/wire ./cmd/wireset && \
           mkdir ./internal/generated/app/ && \
           mv ./cmd/wireset/wire_gen.go ./internal/generated/app
+        working-directory: core/
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8.0.0
         with:
