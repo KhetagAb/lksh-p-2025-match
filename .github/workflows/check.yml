@@ -37,9 +37,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: apt install docker-compose
+      - uses: docker/setup-compose-action@v1
       - run: cat core/.env.example >> core/.env.test
-      - run: docker-compose -f core/docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
+      - run: docker compose -f core/docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
 
   bff_lint:
     name: bff_lint
