@@ -15,7 +15,7 @@ core/internal/generated/
 coverage.*
 *.coverprofile
 profile.cov
-pytest_cache/
+.pytest_cache/
 
 # database backup
 core/db/
@@ -36,3 +36,10 @@ bff/.venv/
 
 # UV
 bff/uv.lock
+.python-version
+
+# mypy
+.mypy_cache/
+
+# ruff
+.ruff_cache/
