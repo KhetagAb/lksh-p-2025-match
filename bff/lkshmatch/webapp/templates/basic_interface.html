@@ -10,24 +10,12 @@
         top: 20px;
         right: 3%;
     }
-    a.login {
-        position: absolute;
-        text-align: right;
-        top: 20px;
-        right: 3%;
-    }
     </style>
 </head>
 <body>
-    {% if username == "UU" %}
-    <a class="login" href="/login">
-        Log in
-    </a>
-    {% else %}
     <div class="username">
     {{ username }}
     </div>
-    {% endif %}
 
     {% block content %}
     {% endblock %}
