@@ -1,0 +1,19 @@
+{% extends "basic_interface.html" %}
+
+{% block content %}
+
+<h2>Активности</h2>
+<ol>
+<div>
+    {% for activity in list_of_activities %}
+    <div>
+        <li>
+            <a href="activities/{{ activity.id }}">{{ activity.title }}</a><br>
+            <p>{{ activity.description }}</p>
+        </li>
+    </div>
+    {% endfor %}
+</div>
+</ol>
+
+{% endblock %}

@@ -26,7 +26,7 @@ services:
     networks:
       - default
       - match-shared-network
-    command: [ "python", "-m",  "lkshmatch.webapp.mainWebapp" ]
+    command: [ "python", "-m",  "lkshmatch.website.mainWebapp" ]
 
   # Telegram бот (опционально, можно запускать отдельно)
   match-bot:

@@ -3,10 +3,10 @@ from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
 
 from lkshmatch.di import app_container
-from lkshmatch.webapp.auth import auth_router
-from lkshmatch.webapp.login_wall import LoginWallMiddleware
-from lkshmatch.webapp.root import root_router
-from lkshmatch.webapp.table_adapter import table_adapter_router
+from lkshmatch.website.auth import auth_router
+from lkshmatch.website.login_wall import LoginWallMiddleware
+from lkshmatch.website.root import root_router
+from lkshmatch.website.table_adapter import table_adapter_router
 
 app = FastAPI()
 

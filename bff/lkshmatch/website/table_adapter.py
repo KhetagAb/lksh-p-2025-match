@@ -2,13 +2,11 @@ from typing import Annotated
 from urllib.parse import parse_qs, urlparse
 
 import httplib2
-from dishka.integrations.fastapi import FromDishka, inject
 from fastapi import APIRouter, Form, Request
 from googleapiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
-from pydantic import BaseModel
 
-from lkshmatch.adapters.base import ActivityAdapter, SportAdapter
+from lkshmatch.adapters.base import ActivityAdapter, SportAdapter, PlayerAdapter
 from lkshmatch.di import app_container
 
 from .auth import get_user_id_from_token
@@ -22,11 +20,6 @@ class TableIsEmptyError(Exception):
 
     def __str__(self):
         return "Table is empty"
-
-
-class RegisterInSectionInfo(BaseModel):
-    table_url: str
-    section_name: str
 
 
 table_adapter_router = APIRouter()
@@ -54,7 +47,7 @@ def get_sheet_data_from_url(sheet_url: str):
 
 
 @table_adapter_router.get("/get_sport_sections")
-async def get_sport_sections(request: Request):
+async def get_sport_sections_json(request: Request):
     try:
         sport_adapter = app_container.get(SportAdapter)
         sport_sections = await sport_adapter.get_sport_list()
@@ -64,7 +57,7 @@ async def get_sport_sections(request: Request):
 
 
 @table_adapter_router.get("/get_activity_by_sport_section")
-async def get_activity_by_sport_section(
+async def get_activity_by_sport_section_json(
     request: Request, sport_section_id: int
 ):
     try:
@@ -92,6 +85,7 @@ async def register_on_section_with_table_post(
     print("table_url:", table_url)
     print("activity_id:", activity_id)
     activity_adapter = app_container.get(ActivityAdapter)
+    player_adapter = app_container.get(PlayerAdapter)
     user_id = get_user_id_from_token(request.cookies.get(COOKIE_NAME))
     error = ""
     try:
