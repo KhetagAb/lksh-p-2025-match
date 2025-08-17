@@ -28,10 +28,7 @@ class CoreClientProvider(Provider):
     @provide(scope=Scope.APP)
     def core_client(self) -> Iterable[core_client.Client]:
         client = core_client.Client(base_url=self.url)
-        try:
-            yield client
-        finally:
-            client.close()
+        yield client
 
 
 class MongoProvider(Provider):
