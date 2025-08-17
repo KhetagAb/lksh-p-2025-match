@@ -104,6 +104,13 @@ class PlayerAdapter(ABC):
         raise NotImplementedError
 
 
+# TODO спросить куда это поместить
+class PlayerAdminAdapter(ABC):
+    @abstractmethod
+    async def admin_register_user(self, user: PlayerToRegister, player_info: Player) -> CoreID:
+        raise NotImplementedError
+
+
 class SportAdapter(ABC):
     @abstractmethod
     async def get_sport_list(self) -> list[SportSection]:
