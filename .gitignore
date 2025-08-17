@@ -29,6 +29,7 @@ go.work.sum
 bff/.venv/
 .env
 .env.test
+/bff/private_keys/*.json
 
 # Editor/IDE
 .idea/
