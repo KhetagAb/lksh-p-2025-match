@@ -11,7 +11,7 @@ codegen:
 	rm -rf ./tmp
 
 up:
-	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans -d
+	docker compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans -d
 
 start:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans

@@ -16,8 +16,8 @@ services:
   # Веб-приложение lkshmatch
   match-web:
     build:
-      context: .
-      dockerfile: lkshmatch/webapp/Dockerfile
+      context: ..
+      dockerfile: bff/webapp.dev.dockerfile
     container_name: match-web
     ports:
       - "80:80"
