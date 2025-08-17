@@ -19,4 +19,4 @@ RUN make codegen
 
 ENTRYPOINT []
 
-CMD ["uv", "run", "python", "-m", "lkshmatch.website.mainWebapp"]
+CMD ["uv", "run", "python", "-m", "lkshmatch.webapp.mainWebapp"]
