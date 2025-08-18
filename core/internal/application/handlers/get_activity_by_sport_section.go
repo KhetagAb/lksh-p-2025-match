@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"match/internal/application/handlers/mappers"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
 	"match/internal/infra"
@@ -38,13 +39,10 @@ func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ect
 
 	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activitiesDTO))
 
-	resultActivities := []server.Activity{}
+	var resultActivities []server.Activity
 	for _, activityDTO := range activitiesDTO {
-		activityCreator := activityDTO.Creator
-		resultActivityCreator := server.Player{CoreId: activityCreator.ID, TgId: activityCreator.TgID}
-		resultActivity := server.Activity{Id: activityDTO.Activity.ID, Title: activityDTO.Activity.Title, Description: &activityDTO.Activity.Description, Creator: resultActivityCreator}
 
-		resultActivities = append(resultActivities, resultActivity)
+		resultActivities = append(resultActivities, mappers.MapActivityToAPI(activityDTO))
 	}
 
 	return ectx.JSON(200, server.ActivityListResponse{

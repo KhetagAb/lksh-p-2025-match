@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"github.com/labstack/echo/v4"
+	"match/internal/application/handlers/mappers"
 	domain "match/internal/domain/dao"
 	"match/internal/generated/server"
 	"match/internal/infra"
@@ -37,7 +38,7 @@ func (h *GetAllSportSectionHandler) GetAllSportSection(ectx echo.Context) error 
 	infra.Infof(ctx, "The list of all sport sections has been succesfully received")
 	var sliceOfSS []server.SportSection
 	for _, el := range allSections {
-		sliceOfSS = append(sliceOfSS, server.SportSection{Id: el.ID, Name: el.EnName, RuName: el.RuName})
+		sliceOfSS = append(sliceOfSS, mappers.MapSportToAPI(el))
 	}
 	return ectx.JSON(200, server.AllSportSections{
 		SportsSections: sliceOfSS,

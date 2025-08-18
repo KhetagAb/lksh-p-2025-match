@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"match/internal/application/handlers/mappers"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
 	"match/internal/infra"
@@ -41,30 +42,24 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 	resultTeams := server.TeamList{}
 
 	for _, teamDTO := range teamsDTO {
-		teamPlayers := teamDTO.Players
-		resultTeamPlayers := server.PlayerList{}
+		//teamPlayers := teamDTO.Players
+		//resultTeamPlayers := server.PlayerList{}
+		//
+		//for _, player := range teamPlayers {
+		//	resultTeamPlayer := server.Player{
+		//		CoreId: player.ID,
+		//		TgId:   player.TgID,
+		//	}
+		//	resultTeamPlayers = append(resultTeamPlayers, resultTeamPlayer)
+		//}
+		//
+		//teamCaptain := teamDTO.Captain
+		//resultTeamCaptain := server.Player{
+		//	CoreId: teamCaptain.ID,
+		//	TgId:   teamCaptain.TgID,
+		//}
 
-		for _, player := range teamPlayers {
-			resultTeamPlayer := server.Player{
-				CoreId: player.ID,
-				TgId:   player.TgID,
-			}
-			resultTeamPlayers = append(resultTeamPlayers, resultTeamPlayer)
-		}
-
-		teamCaptain := teamDTO.Captain
-		resultTeamCaptain := server.Player{
-			CoreId: teamCaptain.ID,
-			TgId:   teamCaptain.TgID,
-		}
-
-		resultTeam := server.Team{
-			Id:      teamDTO.Team.ID,
-			Name:    teamDTO.Team.Name,
-			Captain: resultTeamCaptain,
-			Members: resultTeamPlayers,
-		}
-
+		resultTeam := mappers.MapTeamToAPI(teamDTO)
 		resultTeams = append(resultTeams, resultTeam)
 	}
 
