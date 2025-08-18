@@ -36,11 +36,14 @@ class Msg(Enum):
     INSUFFICIENT_RIGHTS = "У вас недостаточно прав для этого действия."
     INTERNAL_ERROR = "Извините, что-то пошло не так. Обратитесь в 4-ый комповник к команде P."
 
+    TECHNICAL_SUPPORT = "Для написания в техподдержку, в ответном сообщении напишите свою проблему."
+
 
 class Buttons(Enum):
     REGISTRATION_CONFIRM = ("✅ Подтверждаю", "reg_confirm")
     REGISTRATION_CANCEL = ("❌ Отмена регистрации", "reg_cancel")
     SPORTS_REGISTER_ON = ("Записаться на активность", "sports_register")
+    TECHNICAL_SUPPORT = ("Написать в техподдержку.", "")
 
     def __init__(self, text, callback_data):
         self.text = text
@@ -69,6 +72,14 @@ try:
     logging.info(f"Telegram bot started, token: {token}")
 except Exception as e:
     logging.error(f"Ошибка создания Telegram бота: {e}")
+    exit(1)
+
+try:
+    support_chat_id = settings.get("SUPPORT_CHAT_ID")
+    if support_chat_id is None:
+        raise ValueError("SUPPORT_CHAT_ID required!")
+except Exception as e:
+    logging.error(f"Error {e}")
     exit(1)
 
 
@@ -191,6 +202,9 @@ async def start(mess: types.Message) -> None:
         return
     try:
         user_name = await students_repository.validate_register_user(Player(username, int(user_id)))
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+        markup.add(types.KeyboardButton(Buttons.TECHNICAL_SUPPORT.value[0]))
+        await msg_with_buttons(mess, "Здравствуйте!", markup)
         await msg_with_ibuttons(
             mess=mess,
             text=Msg.REGISTRATION_CONFIRM_QUESTION.value % user_name,
@@ -226,7 +240,7 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
             await player_adapter.register_user(PlayerToRegister(username, user_id, user_name))
 
             await edit_with_ibuttons(call, Msg.REGISTRATION_CONFIRMED.value, sport_markup)
-            await bot.pin_chat_message(call.message.chat.id, call.message.message_id)
+            # await bot.pin_chat_message(call.message.chat.id, call.message.message_id)
         except PlayerNotFound:
             log_warning("User not found in lksh database. Validate failed.", call.message)
             await edit_without_buttons(call, Msg.REGISTRATION_USER_NOT_FOUND.value)
@@ -243,11 +257,13 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
 @bot.message_handler(commands=["register_on_sport"])
 async def register_on_sport(mess: types.Message) -> None:
     log_info(f"Called /register_on_sport.", mess)
-    await msg_with_ibuttons(
+    to_pin = (await msg_with_ibuttons(
         mess=mess,
         text="Выберите спортивную секцию.",
         buttons=await make_sports_buttons(),
-    )
+    )).message_id
+    log_warning(str(to_pin), mess)
+    await bot.pin_chat_message(mess.chat.id, to_pin)
     log_info("Finished /register_on_sport successfully.", mess)
 
 
@@ -256,7 +272,7 @@ async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
 
     markup = await make_sports_buttons()
-    await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)
+    await msg_with_ibuttons(call.message, "Выберите спортивную секцию:", markup)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("sport_"))
@@ -273,7 +289,8 @@ async def select_sport(call: types.CallbackQuery) -> None:
                 await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)
                 return
             if len(activities) == 1:
-                return await select_activity(call, activities[0])
+                await select_activity(call, activities[0])
+                return
 
             markup = await make_activity_buttons(activities)
             await edit_with_ibuttons(call, "Для выбора события, нажмите кнопку.", markup)
@@ -311,11 +328,11 @@ async def get_activity_by_id(activity_id):
 async def select_activity(call: types.CallbackQuery, activity: Activity) -> None:
     try:
         list_of_all_teams = await activity_adapter.get_teams_by_activity_id(activity.id)
+        description = f"ℹ️ Описание: {activity.description}\n\n" if activity.description else ""
         # TODO: id -> name
         if list_of_all_teams:
             numbered_teams = [f"{i + 1}. {team.name}" for i, team in enumerate(list_of_all_teams)]
             # todo сделать поддерждку команда/участник
-            description = f"ℹ️ Описание: {activity.description}\n\n" if activity.description else ""
             teams_text = f"🏆 {activity.title}\n\n{description}📋 Список участников:\n\n" + "\n".join(numbered_teams)
         else:
             teams_text = f"🏆 {activity.title}\n\n📋 Пока нет участников."
@@ -396,7 +413,12 @@ async def signup_to_activity(call: types.CallbackQuery) -> None:
 
 @bot.message_handler(content_types=["text"])
 async def answer_to_buttons(mess: types.Message) -> None:
-    await bot.send_message(mess.chat.id, "Я вас не понимаю. Используйте кнопки или команды.")
+    if mess.text == Buttons.TECHNICAL_SUPPORT.value[0]:
+        await msg_without_buttons(mess, Msg.TECHNICAL_SUPPORT.value)
+    if mess.reply_to_message is not None and  mess.reply_to_message.text == Msg.TECHNICAL_SUPPORT.value:
+        await bot.send_message(support_chat_id, f"[username: @{mess.from_user.username}, id: {mess.from_user.id}]"
+                                                f"\n{mess.text}")
+    await msg_without_buttons(mess, "Я вас не понимаю. Используйте кнопки или команды.")
 
 
 asyncio.run(bot.polling(non_stop=True, none_stop=True))
