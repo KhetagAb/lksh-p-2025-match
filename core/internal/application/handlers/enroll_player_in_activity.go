@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 	"github.com/labstack/echo/v4"
-	domain "match/internal/domain/dao"
+	"match/internal/application/handlers/mappers"
+	"match/internal/domain/dto"
 	"match/internal/domain/services"
 	"match/internal/generated/server"
 	"match/internal/infra"
@@ -12,7 +13,7 @@ import (
 
 type (
 	EnrollPlayerInActivity interface {
-		EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*domain.Team, error)
+		EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*dto.Team, error)
 	}
 
 	EnrollPlayerInActivityHandler struct {
@@ -53,25 +54,15 @@ func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context
 			infra.Warnf(ctx, "Player already enrolled in activity: %v", err)
 			return ConflictErrorResponse(ectx, "Player is already enrolled in a team for this activity")
 		}
-		
+
 		infra.Errorf(ctx, "Internal server error while trying to create team: %v", err)
 		return InternalErrorResponse(ectx, err.Error())
 	}
 
-	infra.Infof(ctx, "Team created successfully [team_id=%d][team_name=%s][team_captain_id=%d][activity_id=%d]",
-		domainTeam.ID, domainTeam.Name, domainTeam.CaptainID, domainTeam.ActivityID)
+	infra.Infof(ctx, "Team created successfully [team_id=%d][team_name=%s][team_captain_id=%d]",
+		domainTeam.Team.ID, domainTeam.Team.Name, domainTeam.Captain.ID)
 
-	player := server.Player{
-		CoreId: domainTeam.CaptainID,
-		TgId:   *requestBody.TgId,
-	}
-
-	resultTeam := server.Team{
-		Id:      domainTeam.ID,
-		Name:    domainTeam.Name,
-		Members: []server.Player{player},
-		Captain: player,
-	}
+	resultTeam := mappers.MapTeamToAPI(*domainTeam)
 
 	return ectx.JSON(200, server.CreatedTeamResponse{
 		Team: resultTeam,
