@@ -15,7 +15,6 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
 from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 
-from lkshmatch.website.vars import WEBSITE_CREDENTIALS_FILE
 import httplib2
 from googleapiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
@@ -82,6 +81,12 @@ def all_providers() -> list[Provider]:
 
 
 app_container: Container = make_container(*all_providers())
+
+# Google sheets
+WEBSITE_CREDENTIALS_FILE = settings.get("WEBSITE_CREDENTIALS_FILE")  # имя файла с закрытым ключом для google-таблиц
+WEBSITE_SERVICE_ACCOUNT_NAME = settings.get("WEBSITE_SERVICE_ACCOUNT_NAME")  # почта сервисного аккаунта
+WEBSITE_IP = settings.get("WEBSITE_IP")
+WEBSITE_PORT = settings.get("WEBSITE_PORT")
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name(
     WEBSITE_CREDENTIALS_FILE, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
