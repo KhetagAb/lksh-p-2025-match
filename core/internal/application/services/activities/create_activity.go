@@ -8,14 +8,6 @@ import (
 )
 
 func (s *ActivityService) CreateActivity(ctx context.Context, creatorID, sportSectionId int64, title, description string) (*dto.Activity, error) {
-	//
-	//existingTeam, err := s.teamRepository.GetTeamByPlayerAndActivity(ctx, captain.ID, activityID)
-	//if err == nil && existingTeam != nil {
-	//	return nil, &services.InvalidOperationError{
-	//		Code:    services.InvalidOperation,
-	//		Message: fmt.Sprintf("player already enrolled in team for this activity [player_id=%d][activity_id=%d][team_id=%d]", captain.ID, activityID, existingTeam.ID),
-	//	}
-	//}
 
 	//checking creator by tg_id
 	creator, err := s.playerRepository.GetPlayerByTgID(ctx, creatorID)
