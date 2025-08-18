@@ -54,6 +54,7 @@ func (h *CreateActivityHandler) CreateActivity(ectx echo.Context, id int64) erro
 	}
 
 	resultActivity := mappers.MapActivityToAPI(*activity)
+	infra.Infof(ctx, "Activity succesfully created: %v", resultActivity)
 
 	return ectx.JSON(200, server.ActivityResponse{
 		Activity: resultActivity,
