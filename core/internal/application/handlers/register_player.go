@@ -1,9 +1,8 @@
-package players
+package handlers
 
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"match/internal/application/handlers"
 	"match/internal/generated/server"
 	"match/internal/infra"
 	"net/http"
@@ -39,7 +38,7 @@ func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context) error {
 	playerId, isRegistered, err := h.registerPlayerService.RegisterUser(ctx, request.Name, request.TgUsername, request.TgId)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find %v: %v", request.TgUsername, err)
-		return handlers.InternalErrorResponse(ectx, err.Error())
+		return InternalErrorResponse(ectx, err.Error())
 	}
 	if isRegistered {
 		infra.Infof(ctx, "Player %v registered", request.TgUsername)
