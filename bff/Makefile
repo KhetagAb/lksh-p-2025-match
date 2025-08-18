@@ -31,3 +31,6 @@ typecheck:
 venv:
 	uv venv --python 3.13.5
 	uv sync
+
+test:
+	uv run pytest -v

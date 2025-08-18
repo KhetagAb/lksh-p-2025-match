@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "lkshmatch"
 version = "0.1.0"
@@ -55,13 +59,17 @@ no_implicit_optional = true
 strict_optional = true
 ignore_missing_imports = true
 
-
 [tool.pytest.ini_options]
-pythonpath = [ "." ]
-asyncio_mode="auto"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = []
 
 [pytest]
 markers = []
 
+[tool.setuptools]
+package-dir = {"" = "."}
+
 [tool.setuptools.packages.find]
-include = ["lkshmatch*"]        # only include package(s)
+include = ["lkshmatch*"]
+exclude = ["tests*"]

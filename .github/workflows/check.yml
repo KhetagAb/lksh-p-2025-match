@@ -75,3 +75,19 @@ jobs:
         working-directory: bff/
       - run: uv run mypy -p lkshmatch --cache-dir=/dev/null --config-file=pyproject.toml
         working-directory: bff/
+  bff_test:
+    name: bff_test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v2
+      - run: uv venv --python 3.13.5
+        working-directory: bff/
+      - run: |
+          uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path ./tmp
+          rm -rf core_client
+          mv tmp/core_client lkshmatch/
+          rm -rf ./tmp
+        working-directory: bff/
+      - run: uv run pytest -v
+        working-directory: bff/
