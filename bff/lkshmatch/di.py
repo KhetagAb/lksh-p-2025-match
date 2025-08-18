@@ -1,28 +1,19 @@
 from collections.abc import Iterable
+from types import TracebackType
 
 from dishka import Container, Provider, Scope, make_container, provide
+from lkshmatch.core_client import Client
 from pymongo import MongoClient
 
-import core_client
 from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter
 from lkshmatch.adapters.core.activity import CoreActivityAdapter
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
-
-from lkshmatch.adapters.stub_core.activity import StubActivityAdapter
-from lkshmatch.adapters.stub_core.players import StubPlayerAdapter
-from lkshmatch.adapters.stub_core.sport_sections import StubSportAdapter
-
 from lkshmatch.config import settings
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
 from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
-
-from lkshmatch.website.vars import WEBSITE_CREDENTIALS_FILE
-import httplib2
-from googleapiclient import discovery
-from oauth2client.service_account import ServiceAccountCredentials
 
 class CoreClientProvider(Provider):
     def __init__(self, core_host: str, core_port: str):
@@ -30,8 +21,8 @@ class CoreClientProvider(Provider):
         self.url = f"http://{core_host}:{core_port}"
 
     @provide(scope=Scope.APP)
-    def core_client(self) -> Iterable[core_client.Client]:
-        client = core_client.Client(base_url=self.url)
+    def core_client(self) -> Iterable[Client]:
+        client = Client(base_url=self.url)
         yield client
 
 
@@ -46,10 +37,7 @@ class MongoProvider(Provider):
         client = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
         if self._ping:
             client.admin.command("ping")
-        try:
-            yield client
-        finally:
-            client.close()
+        yield client
 
 
 class MongoRepositoryProvider(Provider):
@@ -78,7 +66,7 @@ def all_providers() -> list[Provider]:
         raise ValueError("MongoDB credentials are not properly set in environment variables")
 
     mongo_uri = (
-        f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_database}?authSource=admin"
+        f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/?retryWrites=true&w=majority"
     )
     return [
         MongoProvider(mongo_uri),
@@ -89,9 +77,3 @@ def all_providers() -> list[Provider]:
 
 
 app_container: Container = make_container(*all_providers())
-
-credentials = ServiceAccountCredentials.from_json_keyfile_name(
-    WEBSITE_CREDENTIALS_FILE, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-)
-httpAuth = credentials.authorize(httplib2.Http())
-service = discovery.build("sheets", "v4", http=httpAuth)

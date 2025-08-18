@@ -9,8 +9,8 @@ RUN go mod download
 COPY core/ .
 COPY docs/api/openapi.yaml ../docs/api/openapi.yaml
 
-RUN make build
+RUN make build-local
 
-CMD ["make", "start-migrate"]
+CMD ["make", "start-local"]
 
 EXPOSE 8080

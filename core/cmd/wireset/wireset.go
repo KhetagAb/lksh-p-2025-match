@@ -42,14 +42,21 @@ var All = wire.NewSet(
 
 	wire.Bind(new(handlers.RegisterPlayerService), new(*players.PlayerService)),
 	handlers.NewRegisterPlayerHandler,
+
 	wire.Bind(new(handlers.GetAllSportSectionService), new(*sport.Service)),
 	handlers.NewGetAllSportSectionHandler,
+
 	wire.Bind(new(handlers.GetTeamsByActivityID), new(*teams.TeamService)),
 	handlers.NewGetTeamsByActivityIDHandler,
+
 	wire.Bind(new(handlers.GetActivitiesBySportSectionID), new(*activities.ActivityService)),
 	handlers.NewGetActivitiesBySportSectionIDHandler,
+
 	wire.Bind(new(handlers.EnrollPlayerInActivity), new(*activities.ActivityService)),
 	handlers.NewEnrollPlayerInActivityHandler,
+
+	wire.Bind(new(handlers.CreateActivityService), new(*activities.ActivityService)),
+	handlers.NewCreateActivityHandler,
 	handlers.NewServerInterface,
 
 	wire.Bind(new(server.ServerInterface), new(*handlers.ServerInterface)),

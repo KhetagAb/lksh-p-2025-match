@@ -1,7 +1,7 @@
 services:
   mongodb:
     image: mongo:7.0
-    container_name: match-mongodb
+    container_name: mongodb
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
@@ -10,44 +10,25 @@ services:
     ports:
       - "${MONGODB_PORT}:27017"
     volumes:
-      - mongodb_data:/data/db
+      - ./mongodb_data:/data/db
       - ./mongodb/mongo-init-scripts:/docker-entrypoint-initdb.d:ro
 
-  # Веб-приложение lkshmatch
-  match-web:
-    build:
-      context: ..
-      dockerfile: bff/webapp.dev.dockerfile
-    container_name: match-web
-    ports:
-      - "8000:8000"
-    depends_on:
-      - mongodb
-    networks:
-      - default
-      - match-shared-network
-    command: [ "python", "-m",  "lkshmatch.website.mainWebapp" ]
-
-  # Telegram бот (опционально, можно запускать отдельно)
-  match-bot:
+  app:
     build:
       context: ..
       dockerfile: bff/dev.dockerfile
-    container_name: match-bot
-    environment:
-# FIXME:issue
-      - MATCH_CORE_HOST=match-core
-      - MATCH_CORE_PORT=8080
+    container_name: app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
     depends_on:
       - mongodb
     networks:
       - default
       - match-shared-network
-    command: [ "python", "lkshmatch/main.py" ]
-
-volumes:
-  mongodb_data:
-    driver: local
+    volumes:
+      - ./config.toml:/app/bff/config.toml:ro
 
 networks:
   match-shared-network:

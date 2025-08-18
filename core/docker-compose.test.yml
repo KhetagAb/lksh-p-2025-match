@@ -3,11 +3,11 @@ services:
     container_name: tests
     build:
       context: ..
-      dockerfile: test.dockerfile
+      dockerfile: core/test.dockerfile
     env_file:
       - .env.test
     depends_on:
-      db:
+      postgres:
         condition: service_healthy
 
   postgres:
@@ -18,12 +18,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
+    env_file:
+      - .env.test
     command:
       - -p ${POSTGRES_PORT}
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: [ 'CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}' ]
       interval: 10s

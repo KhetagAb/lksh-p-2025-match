@@ -1,14 +1,17 @@
 from typing import Annotated
-from urllib.parse import parse_qs, urlparse
 
 from fastapi import APIRouter, Form, Request
 
 from lkshmatch.adapters.base import ActivityAdapter, SportAdapter, PlayerAdapter
-from lkshmatch.di import app_container, service
+from lkshmatch.adapters.gheets.gsheets import (
+    get_data_gsheet, change_data_gsheet,
+    WEBSITE_SERVICE_ACCOUNT_NAME, get_sheet_data_from_url
+)
 
-from .auth import get_user_id_from_token
-from .root import templates
-from .vars import COOKIE_NAME, SERVICE_ACCOUNT_NAME
+from lkshmatch.di import app_container
+
+from lkshmatch.website.templating import templates
+from lkshmatch.website.auth.auth import get_user_id_from_token, COOKIE_NAME
 
 
 class TableIsEmptyError(Exception):
@@ -20,22 +23,6 @@ class TableIsEmptyError(Exception):
 
 
 table_adapter_router = APIRouter()
-
-def get_sheet_data_from_url(sheet_url: str):
-    parse_result = urlparse(sheet_url)
-    sheetId = int(parse_qs(parse_result.query)["gid"][0])
-    spreadsheetId = parse_result.path.split("/")[3]
-    spreadsheet = service.spreadsheets().get(spreadsheetId=spreadsheetId).execute()
-    sheetList = spreadsheet.get("sheets")
-    sheetName = None
-    for d in sheetList:
-        if d["properties"]["sheetId"] == sheetId:
-            sheetName = d["properties"]["title"]
-            break
-    if sheetName is None:
-        raise
-    return {"spreadsheetId": spreadsheetId, "sheetName": sheetName}
-
 
 @table_adapter_router.get("/get_sport_sections")
 async def get_sport_sections_json(request: Request):
@@ -49,7 +36,8 @@ async def get_sport_sections_json(request: Request):
 
 @table_adapter_router.get("/get_activity_by_sport_section")
 async def get_activity_by_sport_section_json(
-    request: Request, sport_section_id: int
+    request: Request,
+    sport_section_id: int
 ):
     try:
         activity_adapter = app_container.get(ActivityAdapter)
@@ -62,7 +50,7 @@ async def get_activity_by_sport_section_json(
 @table_adapter_router.get("/register_in_section")
 async def register_on_section_with_table_get(request: Request):
     return templates.TemplateResponse(
-        context={"request": request, "error": "", "service_account_name": SERVICE_ACCOUNT_NAME, "username": "UU"},
+        context={"request": request, "error": "", "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME},
         name="table/register_in_section.html",
     )
 
@@ -81,20 +69,13 @@ async def register_on_section_with_table_post(
     error = ""
     try:
         sheet_data = get_sheet_data_from_url(table_url)
-        spreadsheetId = sheet_data["spreadsheetId"]
-        sheetName = sheet_data["sheetName"]
     except BaseException:
         error = "Неправильная ссылка на таблицу"
 
     if error == "":
         sheet_values = [[]]
         try:
-            results = (
-                service.spreadsheets()
-                .values()
-                .get(spreadsheetId=spreadsheetId, range=sheetName + "!A1:A1000", majorDimension="COLUMNS")
-                .execute()
-            )
+            results = get_data_gsheet(sheet_data, "A1:A1000")
             if "values" not in results:
                 raise TableIsEmptyError
             sheet_values = results["values"][0]
@@ -112,27 +93,10 @@ async def register_on_section_with_table_post(
             except BaseException:
                 return_values[i] = "ОШИБКА"
                 error = "Возникли ошибки при регистрации"
-
-        results = (
-            service.spreadsheets()
-            .values()
-            .batchUpdate(
-                spreadsheetId=spreadsheetId,
-                body={
-                    "valueInputOption": "USER_ENTERED",
-                    "data": [
-                        {
-                            "range": sheetName + "!A1:B1000",
-                            "majorDimension": "COLUMNS",
-                            "values": [sheet_values, return_values],
-                        }
-                    ],
-                },
-            )
-            .execute()
-        )
+    
+        change_data_gsheet(sheet_data, "B1:B1000", [return_values])
 
     return templates.TemplateResponse(
-        context={"request": request, "error": error, "service_account_name": SERVICE_ACCOUNT_NAME, "username": "UU"},
+        context={"request": request, "error": error, "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME, "username": "UU"},
         name="table/register_in_section.html",
     )
