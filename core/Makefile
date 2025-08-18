@@ -1,11 +1,5 @@
-.DEFAULT_GOAL := quickstart
+.DEFAULT_GOAL := start
 mode := dev
-
-
-quickstart: check
-	make build mode=dev
-	make start mode=dev
-	make clean mode=dev
 
 codegen:
 	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml
@@ -24,6 +18,9 @@ test:
 
 stop:
 	docker-compose -f docker-compose.$(mode).yml stop
+
+down:
+	docker-compose -f docker-compose.$(mode).yml down -v
 
 rm:
 	docker-compose -f docker-compose.$(mode).yml rm
