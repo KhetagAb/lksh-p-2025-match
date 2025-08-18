@@ -1,33 +1,33 @@
-name: push to registry
+# name: push to registry
 
-on:
-  push:
-    branches:
-      - master
+# on:
+#   push:
+#     branches:
+#       - master
 
-jobs:
-  push:
-    name: push
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - id: vars
-        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-      - id: login-cr
-        uses: yc-actions/yc-cr-login@v3
-        with:
-          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-      - uses: docker/setup-buildx-action@v3
-      - run: |
-          docker buildx build -f core/prod.dockerfile -t match/core:latest -t match/core:$TAG -o match/bin/ core
-        env:
-          REGISTRY: ${{ vars.REGISTRY }}  # REGISTRY identificator(without any prefixes)
-          REPOSITORY: match/core
-          TAG: ${{ steps.vars.outputs.sha_short }}
-      - run: |
-          docker push cr.yandex/$REGISTRY/match$TAG
-          docker push cr.yandex/$REGISTRY/match:latest
-        env:
-          REGISTRY: ${{ vars.REGISTRY }}  # REGISTRY identificator(without any prefixes)
-          REPOSITORY: match/core
-          TAG: ${{ steps.vars.outputs.sha_short }}
+# jobs:
+#   push:
+#     name: push
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v5
+#       - id: vars
+#         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+#       - id: login-cr
+#         uses: yc-actions/yc-cr-login@v3
+#         with:
+#           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+#       - uses: docker/setup-buildx-action@v3
+#       - run: |
+#           docker buildx build -f core/prod.dockerfile -t match/core:latest -t match/core:$TAG -o match/bin/ core
+#         env:
+#           REGISTRY: ${{ vars.REGISTRY }}  # REGISTRY identificator(without any prefixes)
+#           REPOSITORY: match/core
+#           TAG: ${{ steps.vars.outputs.sha_short }}
+#       - run: |
+#           docker push cr.yandex/$REGISTRY/match$TAG
+#           docker push cr.yandex/$REGISTRY/match:latest
+#         env:
+#           REGISTRY: ${{ vars.REGISTRY }}  # REGISTRY identificator(without any prefixes)
+#           REPOSITORY: match/core
+#           TAG: ${{ steps.vars.outputs.sha_short }}
