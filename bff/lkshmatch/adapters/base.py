@@ -119,7 +119,9 @@ class SportAdapter(ABC):
 
 class ActivityAdapter(ABC):
     @abstractmethod
-    async def get_activities_by_sport_section(self, sport_section_id: int) -> list[Activity]:
+    async def get_activities_by_sport_section(
+        self, sport_section_id: int
+    ) -> list[Activity]:
         raise NotImplementedError
 
     @abstractmethod
@@ -127,13 +129,17 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:
+    async def enroll_player_in_activity(
+        self, activity_id: int, player_tg_id: TgID
+    ) -> Team:
         raise NotImplementedError
 
 
 class TeamAdapter(ABC):
     @abstractmethod
-    async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
+    async def create_team(
+        self, section: SportSection, user: Player, name_team: str
+    ) -> str:
         raise NotImplementedError
 
     @abstractmethod
@@ -149,5 +155,5 @@ class TeamAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def approve(self, team: Team, user: Player):
+    async def approve(self, team: Team, user: Player) -> None:
         raise NotImplementedError

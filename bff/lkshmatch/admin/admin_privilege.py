@@ -1,7 +1,6 @@
 import hashlib
 
-from lkshmatch.adapters.core import Admin
-from lkshmatch.domain.repositories.admin_repository import AdminRepository
+from lkshmatch.domain.repositories.admin_repository import Admin, AdminRepository
 
 
 class PrivilegeChecker:

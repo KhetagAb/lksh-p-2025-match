@@ -40,14 +40,8 @@ func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context
 		})
 	}
 
-	if requestBody.TgId == nil {
-		return ectx.JSON(400, &server.ErrorResponse{
-			Message: "TgId is required",
-		})
-	}
-
 	infra.Infof(ctx, "Creating Team by tgID (%d)", id)
-	team, err := h.activityService.EnrollPlayerInActivity(ctx, id, *requestBody.TgId)
+	team, err := h.activityService.EnrollPlayerInActivity(ctx, id, requestBody.TgId)
 	if err != nil {
 		var invalidOpErr *services.InvalidOperationError
 		if errors.As(err, &invalidOpErr) {
