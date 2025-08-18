@@ -50,7 +50,7 @@ func (s ServerInterface) RegisterPlayer(ctx echo.Context) error {
 	return s.registerPlayer.RegisterUser(ctx)
 }
 
-func (s ServerInterface) GetCoreSportList(ctx echo.Context) error {
+func (s ServerInterface) GetCoreSportList(ctx echo.Context, params server.GetCoreSportListParams) error {
 	return s.getSportList.GetAllSportSection(ctx)
 }
 

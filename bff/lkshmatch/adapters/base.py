@@ -56,8 +56,10 @@ class CorePlayer:
 
 @dataclass
 class Player:
-    tg_username: str
+    core_id: CoreID
+    name: str
     tg_id: TgID
+    tg_username: str
 
 
 @dataclass
@@ -97,11 +99,8 @@ class PlayerAdapter(ABC):
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         raise NotImplementedError
 
-
-# TODO спросить куда это поместить
-class PlayerAdminAdapter(ABC):
     @abstractmethod
-    async def admin_register_user(self, user: PlayerToRegister, player_info: Player) -> CoreID:
+    async def get_player_by_tg(self, tg_id: TgID, tg_username: str) -> Player:
         raise NotImplementedError
 
 

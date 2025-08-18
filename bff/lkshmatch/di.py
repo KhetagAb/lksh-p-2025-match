@@ -24,8 +24,13 @@ class CoreClientProvider(Provider):
         client = Client(base_url=self.url)
         yield client
 
+class CorePrivilegeChecker():
+    def __init__(self):
+        pass
+
 
 class MongoProvider(Provider):
+
     def __init__(self, uri: str, ping: bool = True):
         super().__init__()
         self._uri = uri

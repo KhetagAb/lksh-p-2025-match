@@ -1,6 +1,8 @@
-from lkshmatch import core_client
-from lkshmatch.core_client.api.players import register_player
-from lkshmatch.core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201
+from typing import Optional
+
+import core_client
+from core_client.api.players import register_player, get_core_player_by_tg
+from core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201
 from lkshmatch.adapters.base import (
     CoreID,
     Player,
@@ -8,9 +10,9 @@ from lkshmatch.adapters.base import (
     PlayerAlreadyRegistered,
     PlayerNotFound,
     PlayerToRegister,
-    UnknownError,
+    UnknownError, TgID,
 )
-from lkshmatch.adapters.core.mappers.player import map_player_to_register_request
+from lkshmatch.adapters.core.mappers.player import map_player_to_register_request, map_player
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
@@ -39,3 +41,19 @@ class CorePlayerAdapter(PlayerAdapter):
         elif isinstance(response, RegisterPlayerResponse201):
             return response.id
         raise UnknownError("None response")
+
+    async def get_player_by_tg(self, tg_id: Optional[TgID], tg_username: Optional[str]) -> Player:
+        response = await get_core_player_by_tg.asyncio(
+            client=self.client,
+            tg_id=tg_id,
+            tg_username=tg_username
+        )
+        #TODO что делать с ошибками
+        # if isinstance(response, RegisterPlayerResponse200):
+        #     raise PlayerAlreadyRegistered("player already register")
+        # elif isinstance(response, RegisterPlayerResponse201):
+        #     return response.id
+        # raise UnknownError("None response")
+
+        player = response.player
+        return map_player(player)
