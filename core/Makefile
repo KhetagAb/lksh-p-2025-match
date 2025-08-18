@@ -2,9 +2,7 @@
 mode := dev
 
 codegen:
-	go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml
-	go tool github.com/google/wire/cmd/wire ./cmd/wireset
-	mv ./cmd/wireset/wire_gen.go ./internal/generated/wire_gen.go
+	go generate ./cmd
 
 start:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans

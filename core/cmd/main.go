@@ -1,12 +1,15 @@
 package main
 
+//go:generate go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config ../config/openapi.yaml -o ../internal/generated/server/api.gen.go ../../docs/api/openapi.yaml
+//go:generate go run github.com/google/wire/cmd/wire ./wireset
+
 import (
 	"context"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"log"
+	"match/cmd/wireset"
 	"match/internal/application/transport"
-	wireset "match/internal/generated"
 	"match/internal/infra"
 	"net/http"
 	"os/signal"
