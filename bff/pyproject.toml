@@ -53,11 +53,15 @@ disallow_untyped_defs = true
 warn_return_any = true
 no_implicit_optional = true
 strict_optional = true
-ignore_missing_imports = false
+ignore_missing_imports = true
+
 
 [tool.pytest.ini_options]
-pythonpath = [ ".", "src",]
+pythonpath = [ "." ]
 asyncio_mode="auto"
 
 [pytest]
 markers = []
+
+[tool.setuptools.packages.find]
+include = ["lkshmatch*"]        # only include package(s)

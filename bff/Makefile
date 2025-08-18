@@ -5,7 +5,7 @@ check: lint typecheck
 
 codegen:
 	uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path ./tmp
-	rm -rf core_client
+	rm -rf lkshmatch/core_client
 	mv tmp/core_client lkshmatch/
 	rm -rf ./tmp
 

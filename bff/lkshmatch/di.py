@@ -1,5 +1,4 @@
 from collections.abc import Iterable
-from types import TracebackType
 
 from dishka import Container, Provider, Scope, make_container, provide
 from lkshmatch.core_client import Client
@@ -14,6 +13,7 @@ from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
 from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
+
 
 class CoreClientProvider(Provider):
     def __init__(self, core_host: str, core_port: str):
@@ -34,7 +34,7 @@ class MongoProvider(Provider):
 
     @provide(scope=Scope.APP)
     def mongo_client(self) -> Iterable[MongoClient]:
-        client = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
+        client: MongoClient = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
         if self._ping:
             client.admin.command("ping")
         yield client
@@ -43,7 +43,9 @@ class MongoProvider(Provider):
 class MongoRepositoryProvider(Provider):
     scope = Scope.APP
     mongo_admin_repository = provide(MongoAdminRepository, provides=AdminRepository)
-    mongo_player_repository = provide(MongoLKSHStudentsRepository, provides=LKSHStudentsRepository)
+    mongo_player_repository = provide(
+        MongoLKSHStudentsRepository, provides=LKSHStudentsRepository
+    )
 
 
 class RestAllAdapterProvider(Provider):
@@ -63,11 +65,11 @@ def all_providers() -> list[Provider]:
     core_port = settings.get("CORE_PORT")
 
     if not all([mongo_username, mongo_password, mongo_database]):
-        raise ValueError("MongoDB credentials are not properly set in environment variables")
+        raise ValueError(
+            "MongoDB credentials are not properly set in environment variables"
+        )
 
-    mongo_uri = (
-        f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/?retryWrites=true&w=majority"
-    )
+    mongo_uri = f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/?retryWrites=true&w=majority"
     return [
         MongoProvider(mongo_uri),
         MongoRepositoryProvider(),
