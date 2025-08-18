@@ -37,7 +37,8 @@ start-local:
 	bin/match
 
 test-local: codegen
-	go test
+	sh migrations/upgrade.sh
+	go test ./...
 
 check:
 	golangci-lint run
