@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"log"
 	"match/internal/application/transport"
-	"match/internal/generated/app"
+	"match/internal/generated"
 	"match/internal/infra"
 	"net/http"
 	"os/signal"

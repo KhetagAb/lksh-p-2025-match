@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: docker/setup-compose-action@v1
-      - run: cat core/.env.example >> core/.env.test && docker compose -f core/docker-compose.test.yml up --build --force-recreate --remove-orphans --abort-on-container-exit
+      - run: cat core/.env.example > core/.env.test && docker compose -f core/docker-compose.test.yml up --build --force-recreate --remove-orphans --abort-on-container-exit
         env:
           POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
           POSTGRES_USER: ${{ vars.POSTGRES_USER }}
