@@ -1,7 +1,8 @@
-package handlers
+package teams
 
 import (
 	"context"
+	"match/internal/application/handlers"
 	"match/internal/application/handlers/mappers"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
@@ -35,7 +36,7 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 	teams, err := h.teamService.GetTeamsByActivityID(ctx, activityID)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
-		return InternalErrorResponse(ectx, err.Error())
+		return handlers.InternalErrorResponse(ectx, err.Error())
 	}
 	infra.Infof(ctx, "%d teams have been found and extracted succesfully", 1)
 
