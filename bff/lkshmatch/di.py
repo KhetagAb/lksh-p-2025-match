@@ -1,20 +1,28 @@
 from collections.abc import Iterable
 
 from dishka import Container, Provider, Scope, make_container, provide
-
-from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
-from lkshmatch.core_client import Client
 from pymongo import MongoClient
 
-from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter, ActivityAdminAdapter
-from lkshmatch.adapters.core.activity import CoreActivityAdapter, CoreActivityAdminAdapter
+import core_client
+from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter
+from lkshmatch.adapters.core.activity import CoreActivityAdapter
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
+
+from lkshmatch.adapters.stub_core.activity import StubActivityAdapter
+from lkshmatch.adapters.stub_core.players import StubPlayerAdapter
+from lkshmatch.adapters.stub_core.sport_sections import StubSportAdapter
+
 from lkshmatch.config import settings
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
 from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
+
+from lkshmatch.website.vars import WEBSITE_CREDENTIALS_FILE
+import httplib2
+from googleapiclient import discovery
+from oauth2client.service_account import ServiceAccountCredentials
 
 class CoreClientProvider(Provider):
     def __init__(self, core_host: str, core_port: str):
@@ -22,11 +30,17 @@ class CoreClientProvider(Provider):
         self.url = f"http://{core_host}:{core_port}"
 
     @provide(scope=Scope.APP)
-    def core_client(self) -> Iterable[Client]:
-        client = Client(base_url=self.url)
+    def core_client(self) -> Iterable[core_client.Client]:
+        client = core_client.Client(base_url=self.url)
         yield client
 
+class CorePrivilegeChecker():
+    def __init__(self):
+        pass
+
+
 class MongoProvider(Provider):
+
     def __init__(self, uri: str, ping: bool = True):
         super().__init__()
         self._uri = uri
@@ -34,27 +48,25 @@ class MongoProvider(Provider):
 
     @provide(scope=Scope.APP)
     def mongo_client(self) -> Iterable[MongoClient]:
-        client: MongoClient = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
+        client = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
         if self._ping:
             client.admin.command("ping")
-        yield client
+        try:
+            yield client
+        finally:
+            client.close()
 
 
 class MongoRepositoryProvider(Provider):
     scope = Scope.APP
     mongo_admin_repository = provide(MongoAdminRepository, provides=AdminRepository)
-    mongo_player_repository = provide(
-        MongoLKSHStudentsRepository, provides=LKSHStudentsRepository
-    )
+    mongo_player_repository = provide(MongoLKSHStudentsRepository, provides=LKSHStudentsRepository)
 
 
 class RestAllAdapterProvider(Provider):
     scope = Scope.APP
-    admin_privilege_checker = provide(PrivilegeChecker, provides=PrivilegeChecker)
-
     core_player_adapter = provide(CorePlayerAdapter, provides=PlayerAdapter)
     core_activity_adapter = provide(CoreActivityAdapter, provides=ActivityAdapter)
-    core_admin_activity_adapter = provide(CoreActivityAdminAdapter, provides=ActivityAdminAdapter)
     core_sport_adapter = provide(CoreSportAdapter, provides=SportAdapter)
 
 
@@ -68,11 +80,11 @@ def all_providers() -> list[Provider]:
     core_port = settings.get("CORE_PORT")
 
     if not all([mongo_username, mongo_password, mongo_database]):
-        raise ValueError(
-            "MongoDB credentials are not properly set in environment variables"
-        )
+        raise ValueError("MongoDB credentials are not properly set in environment variables")
 
-    mongo_uri = f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/?retryWrites=true&w=majority"
+    mongo_uri = (
+        f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_database}?authSource=admin"
+    )
     return [
         MongoProvider(mongo_uri),
         MongoRepositoryProvider(),
@@ -82,3 +94,9 @@ def all_providers() -> list[Provider]:
 
 
 app_container: Container = make_container(*all_providers())
+
+credentials = ServiceAccountCredentials.from_json_keyfile_name(
+    WEBSITE_CREDENTIALS_FILE, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
+)
+httpAuth = credentials.authorize(httplib2.Http())
+service = discovery.build("sheets", "v4", http=httpAuth)
