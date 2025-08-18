@@ -1,21 +1,18 @@
 package handlers
 
 import (
-	"match/internal/application/handlers/activities"
-	"match/internal/application/handlers/players"
-	"match/internal/application/handlers/sports"
-	"match/internal/application/handlers/teams"
 	"match/internal/generated/server"
 
 	"github.com/labstack/echo/v4"
 )
 
 type ServerInterface struct {
-	registerPlayer              *players.RegisterPlayerHandler
-	getSportList                *sports.GetAllSportSectionHandler
-	getTeamsByIDActivity        *teams.GetTeamsByActivityIDHandler
-	getActivityBySportSectionID *activities.GetActivitiesBySportSectionIDHandler
-	enrollPlayerInActivity      *activities.EnrollPlayerInActivityHandler
+	registerPlayer              *RegisterPlayerHandler
+	getSportList                *GetAllSportSectionHandler
+	getTeamsByIDActivity        *GetTeamsByActivityIDHandler
+	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler
+	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
+	createPlayer                *CreateActivityHandler
 }
 
 func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context) error {
@@ -61,11 +58,11 @@ func (s ServerInterface) GetCoreSportList(ctx echo.Context) error {
 var _ server.ServerInterface = &ServerInterface{}
 
 func NewServerInterface(
-	registerPlayer *players.RegisterPlayerHandler,
-	getSportList *sports.GetAllSportSectionHandler,
-	getTeamsByIDActivity *teams.GetTeamsByActivityIDHandler,
-	getActivityBySportSectionID *activities.GetActivitiesBySportSectionIDHandler,
-	enrollPlayerInActivity *activities.EnrollPlayerInActivityHandler,
+	registerPlayer *RegisterPlayerHandler,
+	getSportList *GetAllSportSectionHandler,
+	getTeamsByIDActivity *GetTeamsByActivityIDHandler,
+	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler,
+	enrollPlayerInActivity *EnrollPlayerInActivityHandler,
 ) *ServerInterface {
 	return &ServerInterface{
 		getSportList:                getSportList,
