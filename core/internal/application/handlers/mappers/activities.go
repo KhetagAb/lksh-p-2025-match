@@ -6,10 +6,23 @@ import (
 )
 
 func MapActivityToAPI(activity dto.Activity) server.Activity {
+	description := &activity.Activity.Description
+	if *description == "" {
+		description = nil
+	}
 	return server.Activity{
 		Id:          activity.Activity.ID,
 		Creator:     MapPlayerToAPI(activity.Creator),
 		Title:       activity.Activity.Title,
-		Description: &activity.Activity.Description,
+		Description: description,
 	}
+}
+
+func MapActivitiesToAPI(activities dto.Activities) []server.Activity {
+	var resultActivities []server.Activity
+	for _, activity := range activities {
+
+		resultActivities = append(resultActivities, MapActivityToAPI(activity))
+	}
+	return resultActivities
 }

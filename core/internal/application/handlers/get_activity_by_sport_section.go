@@ -31,19 +31,15 @@ func NewGetActivitiesBySportSectionIDHandler(
 func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ectx echo.Context, id int64) error {
 	ctx := context.Background()
 	infra.Infof(ctx, "Getting activities by SportSection ID (%d)", id)
-	activitiesDTO, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
+	activities, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
 		return InternalErrorResponse(ectx, err.Error())
 	}
 
-	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activitiesDTO))
+	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activities))
 
-	var resultActivities []server.Activity
-	for _, activityDTO := range activitiesDTO {
-
-		resultActivities = append(resultActivities, mappers.MapActivityToAPI(activityDTO))
-	}
+	resultActivities := mappers.MapActivitiesToAPI(activities)
 
 	return ectx.JSON(200, server.ActivityListResponse{
 		Activities: resultActivities,

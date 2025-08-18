@@ -13,12 +13,3 @@ func MapPlayerToAPI(player dao.Player) server.Player {
 		TgId:       player.TgID,
 	}
 }
-
-func MapDAOPlayerListToServerPlayerList(players []dao.Player) []server.Player {
-	var serverPlayers []server.Player
-	for _, p := range players {
-		serverPlayers = append(serverPlayers, MapPlayerToAPI(p))
-
-	}
-	return serverPlayers
-}

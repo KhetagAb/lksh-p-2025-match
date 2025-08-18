@@ -47,7 +47,7 @@ func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context
 	}
 
 	infra.Infof(ctx, "Creating Team by tgID (%d)", id)
-	domainTeam, err := h.activityService.EnrollPlayerInActivity(ctx, id, *requestBody.TgId)
+	team, err := h.activityService.EnrollPlayerInActivity(ctx, id, *requestBody.TgId)
 	if err != nil {
 		var invalidOpErr *services.InvalidOperationError
 		if errors.As(err, &invalidOpErr) {
@@ -60,9 +60,9 @@ func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context
 	}
 
 	infra.Infof(ctx, "Team created successfully [team_id=%d][team_name=%s][team_captain_id=%d]",
-		domainTeam.Team.ID, domainTeam.Team.Name, domainTeam.Captain.ID)
+		team.Team.ID, team.Team.Name, team.Captain.ID)
 
-	resultTeam := mappers.MapTeamToAPI(*domainTeam)
+	resultTeam := mappers.MapTeamToAPI(*team)
 
 	return ectx.JSON(200, server.CreatedTeamResponse{
 		Team: resultTeam,

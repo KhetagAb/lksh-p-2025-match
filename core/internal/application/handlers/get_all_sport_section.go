@@ -36,11 +36,8 @@ func (h *GetAllSportSectionHandler) GetAllSportSection(ectx echo.Context) error 
 		return ectx.JSON(500, err)
 	}
 	infra.Infof(ctx, "The list of all sport sections has been succesfully received")
-	var sliceOfSS []server.SportSection
-	for _, el := range allSections {
-		sliceOfSS = append(sliceOfSS, mappers.MapSportToAPI(el))
-	}
+	sportSections := mappers.MapSportSectionsToAPI(allSections)
 	return ectx.JSON(200, server.AllSportSections{
-		SportsSections: sliceOfSS,
+		SportsSections: sportSections,
 	})
 }

@@ -13,3 +13,12 @@ func MapTeamToAPI(team dto.Team) server.Team {
 		Members: server.PlayerList{MapPlayerToAPI(team.Captain)},
 	}
 }
+
+func MapTeamsToAPI(teams dto.Teams) server.TeamList {
+	var resultTeams server.TeamList
+	for _, team := range teams {
+		resultTeam := MapTeamToAPI(team)
+		resultTeams = append(resultTeams, resultTeam)
+	}
+	return resultTeams
+}
