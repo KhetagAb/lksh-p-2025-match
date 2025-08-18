@@ -2,6 +2,10 @@ package wireset
 
 import (
 	"match/internal/application/handlers"
+	activities2 "match/internal/application/handlers/activities"
+	players2 "match/internal/application/handlers/players"
+	"match/internal/application/handlers/sports"
+	teams2 "match/internal/application/handlers/teams"
 	"match/internal/application/repositories"
 	"match/internal/application/services/activities"
 	"match/internal/application/services/players"
@@ -40,16 +44,16 @@ var All = wire.NewSet(
 	wire.Bind(new(activities.TeamRepository), new(*repositories.Teams)),
 	activities.NewActivityService,
 
-	wire.Bind(new(handlers.RegisterPlayerService), new(*players.PlayerService)),
-	handlers.NewRegisterPlayerHandler,
-	wire.Bind(new(handlers.GetAllSportSectionService), new(*sport.Service)),
-	handlers.NewGetAllSportSectionHandler,
-	wire.Bind(new(handlers.GetTeamsByActivityID), new(*teams.TeamService)),
-	handlers.NewGetTeamsByActivityIDHandler,
-	wire.Bind(new(handlers.GetActivitiesBySportSectionID), new(*activities.ActivityService)),
-	handlers.NewGetActivitiesBySportSectionIDHandler,
-	wire.Bind(new(handlers.EnrollPlayerInActivity), new(*activities.ActivityService)),
-	handlers.NewEnrollPlayerInActivityHandler,
+	wire.Bind(new(players2.RegisterPlayerService), new(*players.PlayerService)),
+	players2.NewRegisterPlayerHandler,
+	wire.Bind(new(sports.GetAllSportSectionService), new(*sport.Service)),
+	sports.NewGetAllSportSectionHandler,
+	wire.Bind(new(teams2.GetTeamsByActivityID), new(*teams.TeamService)),
+	teams2.NewGetTeamsByActivityIDHandler,
+	wire.Bind(new(activities2.GetActivitiesBySportSectionID), new(*activities.ActivityService)),
+	activities2.NewGetActivitiesBySportSectionIDHandler,
+	wire.Bind(new(activities2.EnrollPlayerInActivity), new(*activities.ActivityService)),
+	activities2.NewEnrollPlayerInActivityHandler,
 	handlers.NewServerInterface,
 
 	wire.Bind(new(server.ServerInterface), new(*handlers.ServerInterface)),
