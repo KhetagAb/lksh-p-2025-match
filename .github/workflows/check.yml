@@ -24,10 +24,6 @@ jobs:
           cache: true
           cache-dependency-path: core/go.sum
 
-      - name: Install oapi-codegen
-        run: go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-        working-directory: core/
-
       - name: Generate code
         run: make codegen
         working-directory: core/
