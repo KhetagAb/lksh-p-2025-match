@@ -12,7 +12,7 @@ type ServerInterface struct {
 	getTeamsByIDActivity        *GetTeamsByActivityIDHandler
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler
 	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
-	createPlayer                *CreateActivityHandler
+	createActivity              *CreateActivityHandler
 }
 
 func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context) error {
