@@ -1,8 +1,7 @@
-package activities
+package handlers
 
 import (
 	"context"
-	"match/internal/application/handlers"
 	"match/internal/application/handlers/mappers"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
@@ -35,7 +34,7 @@ func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ect
 	activities, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
-		return handlers.InternalErrorResponse(ectx, err.Error())
+		return InternalErrorResponse(ectx, err.Error())
 	}
 
 	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activities))
