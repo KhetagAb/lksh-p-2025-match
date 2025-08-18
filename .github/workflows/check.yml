@@ -37,7 +37,7 @@ jobs:
         working-directory: core/
 
       - name: Build
-        run: make build-local
+        run: make build
         working-directory: core/
 
   core_test:
@@ -110,10 +110,6 @@ jobs:
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Generate code
-        run: make codegen
-        working-directory: ${{ matrix.service }}/
 
       - name: Build Docker image
         run: docker buildx build . --file ${{ matrix.service }}/dev.dockerfile

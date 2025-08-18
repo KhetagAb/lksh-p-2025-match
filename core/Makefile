@@ -25,7 +25,7 @@ rm:
 	docker-compose -f docker-compose.$(mode).yml rm
 	rm -rf internal/generated/* db/
 
-build-local:
+build: codegen
 	go build -o bin/match cmd/main.go
 
 start-local:
