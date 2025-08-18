@@ -14,24 +14,19 @@ services:
       - ./mongodb/mongo-init-scripts:/docker-entrypoint-initdb.d:ro
 
   # Веб-приложение lkshmatch
-#    lkshmatch-web:
-#      build: .
-#      container_name: lkshmatch-web
-#      restart: unless-stopped
-#      ports:
-#        - "8000:8000"
-#      environment:
-#        - MATCH_ENV=prod
-#        - MATCH_CORE_HOST=127.0.0.1
-#        - MATCH_CORE_PORT=32442
-#        - MATCH_TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
-#        - MONGODB_URL=mongodb://admin:password123@mongodb:27017/lkshmatch?authSource=admin
-#      depends_on:
-#        - mongodb
-#      networks:
-#        - lkshmatch-network
-#      volumes:
-#        - ./config.toml:/app/bff/config.toml:ro
+  match-web:
+    build:
+      context: ..
+      dockerfile: bff/webapp.dev.dockerfile
+    container_name: match-web
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    networks:
+      - default
+      - match-shared-network
+    command: [ "python", "-m",  "lkshmatch.website.mainWebapp" ]
 
   # Telegram бот (опционально, можно запускать отдельно)
   match-bot:
