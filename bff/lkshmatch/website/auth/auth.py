@@ -1,20 +1,26 @@
 import hmac
+import hashlib
 from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import PlainTextResponse, RedirectResponse
 from jose import jwt
 
-from .vars import ALGORITHM, BOT_TOKEN_HASH, COOKIE_NAME, JWT_SECRET_KEY
+from lkshmatch.di import settings
+
+JWT_SECRET_KEY = settings.get("WEBSITE_JWT_SECRET_KEY")
+BOT_TOKEN_HASH = hashlib.sha256(settings.get("TELEGRAM_TOKEN").encode())
+COOKIE_NAME = "auth-token"
+ALGORITHM = "HS256"
 
 auth_router = APIRouter()
-
 
 def get_user_id_from_token(token: str):
     token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
     return token_parts["user_id"]
 
 
+# Код взят из https://github.com/tm-a-t/telegram-auth-wall
 @auth_router.get("/telegram-callback")
 async def telegram_callback(
     request: Request,
