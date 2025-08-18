@@ -14,7 +14,7 @@ from lkshmatch.config import settings
 
 async def lifespan(app: FastAPI) -> AsyncGenerator[FastAPI]:
     bot.remove_webhook()
-    bot.set_webhook(url=os.path.join(settings.get("BASE_URL"), f"bot/{token}")
+    bot.set_webhook(url=os.path.join(settings.get("BASE_URL"), f"bot/{token}"))
     yield app
     bot.remove_webhook()
 
