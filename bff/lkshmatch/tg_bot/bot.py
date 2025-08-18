@@ -24,7 +24,6 @@ from lkshmatch.di import app_container
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
-# TODO разобраться как работает
 class Msg(Enum):
     REGISTRATION_USER_NOT_FOUND = "😔 Извините, но вас нет в списках. Подойдите в 4-ый комповник."
     REGISTRATION_CONFIRM_QUESTION = "🎉 %s, мы нашли вас. Это вы?"
@@ -64,6 +63,24 @@ player_adapter = app_container.get(PlayerAdapter)
 
 students_repository = app_container.get(LKSHStudentsRepository)
 
+
+def log_text(text: str, mess: types.Message) -> str:
+    return text + (f" [username: @{mess.from_user.username}, tg_id: {mess.from_user.id},"
+                   f" time: {datetime.datetime.fromtimestamp(mess.date)}]")
+
+
+def log_info(text: str, mess: types.Message) -> None:
+    logging.info(log_text(text, mess))
+
+
+def log_warning(text: str, mess: types.Message) -> None:
+    logging.warning(log_text(text, mess))
+
+
+def log_error(text: str, mess: types.Message) -> None:
+    logging.error(log_text(text, mess))
+
+
 try:
     token = settings.get("TELEGRAM_TOKEN")
     if token is None:
@@ -78,6 +95,16 @@ try:
     support_chat_id = settings.get("SUPPORT_CHAT_ID")
     if support_chat_id is None:
         raise ValueError("SUPPORT_CHAT_ID required!")
+    logging.info(f"Support chat ID: {support_chat_id}")
+except Exception as e:
+    logging.error(f"Error {e}")
+    exit(1)
+
+try:
+    support_chat_thread_id = settings.get("SUPPORT_CHAT_THREAD_ID")
+    if support_chat_thread_id is None:
+        raise ValueError("SUPPORT_CHAT_THREAD_ID required!")
+    logging.info(f"Support chat thread ID: {support_chat_thread_id}")
 except Exception as e:
     logging.error(f"Error {e}")
     exit(1)
@@ -175,23 +202,6 @@ async def validate_user(mess: types.Message) -> tuple[Optional[int], Optional[st
         logging.warning(log_info("User hasn't got username or tg_id", mess))
         return None, None
     return mess.from_user.id, mess.from_user.username
-
-
-def log_text(text: str, mess: types.Message) -> str:
-    return text + (f" [username: @{mess.from_user.username}, tg_id: {mess.from_user.id},"
-                   f" time: {datetime.datetime.fromtimestamp(mess.date)}]")
-
-
-def log_info(text: str, mess: types.Message) -> None:
-    logging.info(log_text(text, mess))
-
-
-def log_warning(text: str, mess: types.Message) -> None:
-    logging.warning(log_text(text, mess))
-
-
-def log_error(text: str, mess: types.Message) -> None:
-    logging.error(log_text(text, mess))
 
 
 @bot.message_handler(commands=["start"])
@@ -415,9 +425,15 @@ async def signup_to_activity(call: types.CallbackQuery) -> None:
 async def answer_to_buttons(mess: types.Message) -> None:
     if mess.text == Buttons.TECHNICAL_SUPPORT.value[0]:
         await msg_without_buttons(mess, Msg.TECHNICAL_SUPPORT.value)
+        log_info("User need help", mess)
+        return
     if mess.reply_to_message is not None and  mess.reply_to_message.text == Msg.TECHNICAL_SUPPORT.value:
+        log_info(f"support_chat_id: {support_chat_id}, message_thread_id: {support_chat_thread_id}", mess)
         await bot.send_message(support_chat_id, f"[username: @{mess.from_user.username}, id: {mess.from_user.id}]"
-                                                f"\n{mess.text}")
+                                                f"\n{mess.text}", message_thread_id=support_chat_thread_id)
+        log_info("Message has been sent to support", mess)
+        await bot.send_message(mess.chat.id, f"Сообщение отправлено в техподдержку. Через некоторое время с Вами свяжутся.")
+        return
     await msg_without_buttons(mess, "Я вас не понимаю. Используйте кнопки или команды.")
 
 
