@@ -4,7 +4,7 @@ import uvicorn
 import uvloop
 from fastapi import FastAPI
 
-from lkshmatch.tg_bot.bot import token, router as bot_router
+from lkshmatch.tg_bot.bot import token, bot, router as bot_router
 from lkshmatch.webapp.auth import auth_router
 from lkshmatch.webapp.login_wall import LoginWallMiddleware
 from lkshmatch.webapp.root import root_router
@@ -14,7 +14,7 @@ from lkshmatch.config import settings
 
 async def lifespan(app: FastAPI) -> AsyncGenerator[FastAPI]:
     bot.remove_webhook()
-    bot.set_webhook(url=os.path.join(settings.get("BASE_URL"), f"bot/{token}")
+    bot.set_webhook(url=os.path.join(settings.get("BASE_URL"), f"bot/{token}"))
     yield app
     bot.remove_webhook()
 
