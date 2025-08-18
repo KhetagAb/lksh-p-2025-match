@@ -1,0 +1,14 @@
+{% extends "basic_interface.html" %}
+
+{% block content %}
+
+<h2>Команды</h2>
+<ol>
+<div>
+    {% for team in list_of_teams %}
+    <li>{{ team.name }}</li>
+    {% endfor %}
+</div>
+</ol>
+
+{% endblock %}
