@@ -1,5 +1,5 @@
-from core_client.models import SportSection
-from core_client.models import sport_section as api
+from lkshmatch.core_client.models import SportSection
+from lkshmatch.core_client.models import sport_section as api
 from lkshmatch.adapters import base as domain
 
 

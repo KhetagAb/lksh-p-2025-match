@@ -4,6 +4,7 @@ import logging
 from enum import Enum
 from typing import Optional
 
+from fastapi import APIRouter
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 
@@ -58,7 +59,7 @@ logging.basicConfig(level=logging.INFO)
 activity_adapter = app_container.get(ActivityAdapter)
 sport_adapter = app_container.get(SportAdapter)
 player_adapter = app_container.get(PlayerAdapter)
-
+router = APIRouter(prefix="/bot")
 students_repository = app_container.get(LKSHStudentsRepository)
 
 try:
@@ -399,4 +400,10 @@ async def answer_to_buttons(mess: types.Message) -> None:
     await bot.send_message(mess.chat.id, "Я вас не понимаю. Используйте кнопки или команды.")
 
 
-asyncio.run(bot.polling(non_stop=True, none_stop=True))
+@router.post(f'/{token}')
+async def telegram_webhook(update: dict):
+    if update:
+        update = telebot.types.Update.de_json(update)
+        bot.process_new_updates([update])
+    else:
+        return
