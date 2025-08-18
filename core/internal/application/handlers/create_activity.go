@@ -29,7 +29,7 @@ func NewCreateActivityHandler(
 	}
 }
 
-func (h *CreateActivityHandler) CreateActivity(ectx echo.Context, id int64) error {
+func (h *CreateActivityHandler) CreateActivity(ectx echo.Context) error {
 	ctx := context.Background()
 
 	var requestBody server.PostCoreActivityCreateJSONRequestBody
