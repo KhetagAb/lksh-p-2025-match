@@ -4,14 +4,22 @@ import uvicorn
 import uvloop
 from fastapi import FastAPI
 
-from lkshmatch.tg_bot.bot import router as bot_router
+from lkshmatch.tg_bot.bot import token, router as bot_router
 from lkshmatch.webapp.auth import auth_router
 from lkshmatch.webapp.login_wall import LoginWallMiddleware
 from lkshmatch.webapp.root import root_router
 from lkshmatch.webapp.table_adapter import table_adapter_router
+from lkshmatch.config import settings
 
 
-async def start() -> ...:
+async def lifespan(app: FastAPI) -> AsyncGenerator[FastAPI]:
+    bot.remove_webhook()
+    bot.set_webhook(url=os.path.join(settings.get("BASE_URL"), f"bot/{token}")
+    yield app
+    bot.remove_webhook()
+
+
+async def start() -> None:
     uvloop.install()
 
     app = FastAPI(
@@ -19,6 +27,7 @@ async def start() -> ...:
         summary="REST API documentation for Match",
         version="0.1.0",
         redoc_url="/",
+        lifespan=lifespan,
     )
     app.include_router(auth_router, prefix="/auth")
     app.include_router(table_adapter_router, prefix="/table")
