@@ -1,10 +1,9 @@
-package activities
+package handlers
 
 import (
 	"context"
 	"errors"
 	"github.com/labstack/echo/v4"
-	"match/internal/application/handlers"
 	"match/internal/application/handlers/mappers"
 	"match/internal/domain/dto"
 	"match/internal/domain/services"
@@ -13,27 +12,27 @@ import (
 )
 
 type (
-	CreateActivity interface {
-		CreateActivity(ctx context.Context, activityID, playerTgID int64) (*dto.Team, error)
+	EnrollPlayerInActivity interface {
+		EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*dto.Team, error)
 	}
 
-	CreateActivityHandler struct {
-		activityService CreateActivity
+	EnrollPlayerInActivityHandler struct {
+		activityService EnrollPlayerInActivity
 	}
 )
 
-func NewCreateActivityHandler(
-	activityService CreateActivity,
-) *CreateActivityHandler {
-	return &CreateActivityHandler{
+func NewEnrollPlayerInActivityHandler(
+	activityService EnrollPlayerInActivity,
+) *EnrollPlayerInActivityHandler {
+	return &EnrollPlayerInActivityHandler{
 		activityService: activityService,
 	}
 }
 
-func (h *CreateActivityHandler) CreateActivity(ectx echo.Context, id int64) error {
+func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context, id int64) error {
 	ctx := context.Background()
 
-	var requestBody server.PostCoreActivityCreateJSONRequestBody
+	var requestBody server.PostCoreActivityIdEnrollJSONRequestBody
 
 	if err := ectx.Bind(&requestBody); err != nil {
 		return ectx.JSON(400, &server.ErrorResponse{
@@ -41,17 +40,17 @@ func (h *CreateActivityHandler) CreateActivity(ectx echo.Context, id int64) erro
 		})
 	}
 
-	//infra.Infof(ctx, "Creating Team by tgID (%d)", id)
-	team, err := h.activityService.CreateActivity(ctx, id, *requestBody.TgId)
+	infra.Infof(ctx, "Creating Team by tgID (%d)", id)
+	team, err := h.activityService.EnrollPlayerInActivity(ctx, id, requestBody.TgId)
 	if err != nil {
 		var invalidOpErr *services.InvalidOperationError
 		if errors.As(err, &invalidOpErr) {
 			infra.Warnf(ctx, "Player already enrolled in activity: %v", err)
-			return handlers.ConflictErrorResponse(ectx, "Player is already enrolled in a team for this activity")
+			return ConflictErrorResponse(ectx, "Player is already enrolled in a team for this activity")
 		}
 
 		infra.Errorf(ctx, "Internal server error while trying to create team: %v", err)
-		return handlers.InternalErrorResponse(ectx, err.Error())
+		return InternalErrorResponse(ectx, err.Error())
 	}
 
 	infra.Infof(ctx, "Team created successfully [team_id=%d][team_name=%s][team_captain_id=%d]",
