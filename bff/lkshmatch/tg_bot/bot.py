@@ -252,7 +252,7 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
 async def register_on_sport(mess: types.Message) -> None:
     if await shono_fuse(mess):
         return
-    log_info(f"Called /register_on_sport.", mess)
+    log_info("Called /register_on_sport.", mess)
     to_pin = (await msg_with_ibuttons(mess=mess, text="Выберите спортивную секцию.",
         buttons=await make_sports_buttons(), )).message_id
     log_warning(str(to_pin), mess)
@@ -430,7 +430,7 @@ async def answer_to_buttons(mess: types.Message) -> None:
         await bot.send_message(support_chat_id, f"[username: @{mess.from_user.username}, id: {mess.from_user.id}]"
                                                 f"\n\n{mess.text}", message_thread_id=support_chat_thread_id)
         log_info("Message has been sent to support", mess)
-        await msg_without_buttons(mess, f"Сообщение отправлено в техподдержку. Через некоторое время с Вами свяжутся.")
+        await msg_without_buttons(mess, "Сообщение отправлено в техподдержку. Через некоторое время с Вами свяжутся.")
         return
     if mess.message_thread_id is not None and mess.message_thread_id == support_chat_thread_id:
         if mess.reply_to_message is not None:
