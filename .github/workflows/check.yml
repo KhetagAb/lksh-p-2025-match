@@ -28,6 +28,10 @@ jobs:
         run: make codegen
         working-directory: core/
 
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+        working-directory: core/
+
       - name: Lint
         run: make check
         working-directory: core/
@@ -64,11 +68,6 @@ jobs:
       - name: Run tests
         run: make test
         working-directory: core/
-        env:
-          POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
-          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
 
   bff:
     name: BFF CI

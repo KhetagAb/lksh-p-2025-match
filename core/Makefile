@@ -25,15 +25,14 @@ rm:
 	docker-compose -f docker-compose.$(mode).yml rm
 	rm -rf internal/generated/* db/
 
-build-local: codegen
+build-local:
 	go build -o bin/match cmd/main.go
 
 start-local:
 	sh migrations/upgrade.sh
 	bin/match
 
-# TODO распилить этапы кодгена/миграции
-test-local: codegen
+test-local:
 	sh migrations/upgrade.sh
 	go test ./...
 
