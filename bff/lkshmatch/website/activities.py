@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from lkshmatch.adapters.base import SportAdapter, ActivityAdapter
 from lkshmatch.di import app_container
 
-from lkshmatch.website.main import templates
+from lkshmatch.website.templating import templates
 
 activities_router = APIRouter()
 

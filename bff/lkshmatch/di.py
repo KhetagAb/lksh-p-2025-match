@@ -19,10 +19,6 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
 from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 
-import httplib2
-from googleapiclient import discovery
-from oauth2client.service_account import ServiceAccountCredentials
-
 class CoreClientProvider(Provider):
     def __init__(self, core_host: str, core_port: str):
         super().__init__()
@@ -89,14 +85,5 @@ def all_providers() -> list[Provider]:
 
 app_container: Container = make_container(*all_providers())
 
-# Google sheets
-WEBSITE_CREDENTIALS_FILE = settings.get("WEBSITE_CREDENTIALS_FILE")  # имя файла с закрытым ключом для google-таблиц
-WEBSITE_SERVICE_ACCOUNT_NAME = settings.get("WEBSITE_SERVICE_ACCOUNT_NAME")  # почта сервисного аккаунта
 WEBSITE_IP = settings.get("WEBSITE_IP")
 WEBSITE_PORT = settings.get("WEBSITE_PORT")
-
-credentials = ServiceAccountCredentials.from_json_keyfile_name(
-    WEBSITE_CREDENTIALS_FILE, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-)
-httpAuth = credentials.authorize(httplib2.Http())
-service = discovery.build("sheets", "v4", http=httpAuth)

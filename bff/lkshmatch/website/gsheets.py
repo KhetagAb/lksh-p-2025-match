@@ -1,14 +1,17 @@
 from typing import Annotated
-from urllib.parse import parse_qs, urlparse
 
 from fastapi import APIRouter, Form, Request
 
 from lkshmatch.adapters.base import ActivityAdapter, SportAdapter, PlayerAdapter
-from lkshmatch.di import app_container, service
-from lkshmatch.website.main import templates
+from lkshmatch.adapters.gheets.gsheets import (
+    get_data_gsheet, change_data_gsheet,
+    WEBSITE_SERVICE_ACCOUNT_NAME, get_sheet_data_from_url
+)
 
+from lkshmatch.di import app_container
+
+from lkshmatch.website.templating import templates
 from lkshmatch.website.auth.auth import get_user_id_from_token, COOKIE_NAME
-from lkshmatch.di import WEBSITE_SERVICE_ACCOUNT_NAME
 
 
 class TableIsEmptyError(Exception):
@@ -17,22 +20,6 @@ class TableIsEmptyError(Exception):
 
     def __str__(self):
         return "Table is empty"
-
-
-def get_sheet_data_from_url(sheet_url: str):
-    parse_result = urlparse(sheet_url)
-    sheetId = int(parse_qs(parse_result.query)["gid"][0])
-    spreadsheetId = parse_result.path.split("/")[3]
-    spreadsheet = service.spreadsheets().get(spreadsheetId=spreadsheetId).execute()
-    sheetList = spreadsheet.get("sheets")
-    sheetName = None
-    for d in sheetList:
-        if d["properties"]["sheetId"] == sheetId:
-            sheetName = d["properties"]["title"]
-            break
-    if sheetName is None:
-        raise
-    return {"spreadsheetId": spreadsheetId, "sheetName": sheetName}
 
 
 table_adapter_router = APIRouter()
@@ -82,20 +69,13 @@ async def register_on_section_with_table_post(
     error = ""
     try:
         sheet_data = get_sheet_data_from_url(table_url)
-        spreadsheetId = sheet_data["spreadsheetId"]
-        sheetName = sheet_data["sheetName"]
     except BaseException:
         error = "Неправильная ссылка на таблицу"
 
     if error == "":
         sheet_values = [[]]
         try:
-            results = (
-                service.spreadsheets()
-                .values()
-                .get(spreadsheetId=spreadsheetId, range=sheetName + "!A1:A1000", majorDimension="COLUMNS")
-                .execute()
-            )
+            results = get_data_gsheet(sheet_data, "A1:A1000")
             if "values" not in results:
                 raise TableIsEmptyError
             sheet_values = results["values"][0]
@@ -113,25 +93,8 @@ async def register_on_section_with_table_post(
             except BaseException:
                 return_values[i] = "ОШИБКА"
                 error = "Возникли ошибки при регистрации"
-
-        results = (
-            service.spreadsheets()
-            .values()
-            .batchUpdate(
-                spreadsheetId=spreadsheetId,
-                body={
-                    "valueInputOption": "USER_ENTERED",
-                    "data": [
-                        {
-                            "range": sheetName + "!A1:B1000",
-                            "majorDimension": "COLUMNS",
-                            "values": [sheet_values, return_values],
-                        }
-                    ],
-                },
-            )
-            .execute()
-        )
+    
+        change_data_gsheet(sheet_data, "B1:B1000", [return_values])
 
     return templates.TemplateResponse(
         context={"request": request, "error": error, "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME, "username": "UU"},

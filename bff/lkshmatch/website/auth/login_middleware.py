@@ -2,7 +2,7 @@ from fastapi import Request, Response
 from jose import JWTError, jwt
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from lkshmatch.website.activities import templates
+from lkshmatch.website.templating import templates
 from lkshmatch.website.auth.auth import ALGORITHM, COOKIE_NAME, JWT_SECRET_KEY
 
 
