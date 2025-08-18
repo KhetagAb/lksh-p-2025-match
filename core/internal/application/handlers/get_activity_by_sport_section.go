@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"match/internal/application/handlers/mappers"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
 	"match/internal/infra"
@@ -30,22 +31,15 @@ func NewGetActivitiesBySportSectionIDHandler(
 func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ectx echo.Context, id int64) error {
 	ctx := context.Background()
 	infra.Infof(ctx, "Getting activities by SportSection ID (%d)", id)
-	activitiesDTO, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
+	activities, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
 		return InternalErrorResponse(ectx, err.Error())
 	}
 
-	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activitiesDTO))
+	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activities))
 
-	resultActivities := []server.Activity{}
-	for _, activityDTO := range activitiesDTO {
-		activityCreator := activityDTO.Creator
-		resultActivityCreator := server.Player{CoreId: activityCreator.ID, TgId: activityCreator.TgID}
-		resultActivity := server.Activity{Id: activityDTO.Activity.ID, Title: activityDTO.Activity.Title, Description: &activityDTO.Activity.Description, Creator: resultActivityCreator}
-
-		resultActivities = append(resultActivities, resultActivity)
-	}
+	resultActivities := mappers.MapActivitiesToAPI(activities)
 
 	return ectx.JSON(200, server.ActivityListResponse{
 		Activities: resultActivities,
