@@ -32,6 +32,7 @@ start-local:
 	sh migrations/upgrade.sh
 	bin/match
 
+# TODO распилить этапы кодгена/миграции
 test-local: codegen
 	sh migrations/upgrade.sh
 	go test ./...
