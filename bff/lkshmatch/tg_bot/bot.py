@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import logging
 from enum import Enum
@@ -7,18 +6,9 @@ from typing import Optional
 from telebot import types
 from telebot.async_telebot import AsyncTeleBot
 
-from lkshmatch.adapters.base import (
-    Activity,
-    ActivityAdapter,
-    InsufficientRights,
-    Player,
-    PlayerAdapter,
-    PlayerAlreadyInTeam,
-    PlayerNotFound,
-    PlayerToRegister,
-    SportAdapter,
-    UnknownError, PlayerAlreadyRegistered,
-)
+from lkshmatch.adapters.base import (Activity, ActivityAdapter, InsufficientRights, Player, PlayerAdapter,
+                                     PlayerAlreadyInTeam, PlayerNotFound, PlayerToRegister, SportAdapter, UnknownError,
+                                     PlayerAlreadyRegistered, )
 from lkshmatch.config import settings
 from lkshmatch.di import app_container
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
@@ -27,15 +17,14 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 class Msg(Enum):
     REGISTRATION_USER_NOT_FOUND = "😔 Извините, но вас нет в списках. Подойдите в 4-ый комповник."
     REGISTRATION_CONFIRM_QUESTION = "🎉 %s, мы нашли вас. Это вы?"
-    REGISTRATION_CONFIRMED = "🍾 Вы зарегистрировались в системе.\n\n" + \
-                             "✅ Для регистрации на активность, введите /register_on_sport."
+    REGISTRATION_CONFIRMED = "🍾 Вы зарегистрировались в системе.\n\n" + "✅ Для регистрации на активность, введите /register_on_sport."
     REGISTRATION_ALREADY_REGISTERED = "🟢 Не переживайте, вы уже зарегистрированы."
     REGISTRATION_CANCELED = "❌ Регистрация отменена. Если хотите зарегистрироваться, подойдите в 4-ый комповник."
 
     INSUFFICIENT_RIGHTS = "У вас недостаточно прав для этого действия."
     INTERNAL_ERROR = "Извините, что-то пошло не так. Обратитесь в 4-ый комповник к команде P."
 
-    TECHNICAL_SUPPORT = "Для написания в техподдержку, в ответном сообщении напишите свою проблему."
+    TECHNICAL_SUPPORT = "Опишите свою проблему в ответном сообщении, мы постараемся оперативно ответить."
 
 
 class Buttons(Enum):
@@ -62,6 +51,14 @@ sport_adapter = app_container.get(SportAdapter)
 player_adapter = app_container.get(PlayerAdapter)
 
 students_repository = app_container.get(LKSHStudentsRepository)
+
+
+# Защита от Шоно
+async def shono_fuse(mess: types.Message):
+    if mess.from_user.id == 1026324598:
+        await bot.send_message(mess.chat.id, "Шоно перестань, займись делом.", message_thread_id=mess.message_thread_id)
+        return True
+    return False
 
 
 def log_text(text: str, mess: types.Message) -> str:
@@ -113,10 +110,7 @@ except Exception as e:
 async def make_sports_buttons() -> types.InlineKeyboardMarkup:
     buttons: list[types.InlineKeyboardButton] = []
     for sport in await sport_adapter.get_sport_list():
-        button = types.InlineKeyboardButton(
-            text=sport.ru_name.capitalize(),
-            callback_data=f"sport_{sport.id}"
-        )
+        button = types.InlineKeyboardButton(text=sport.ru_name.capitalize(), callback_data=f"sport_{sport.id}")
         buttons.append(button)
     markup = types.InlineKeyboardMarkup()
     return markup.add(*buttons, row_width=3)
@@ -125,10 +119,8 @@ async def make_sports_buttons() -> types.InlineKeyboardMarkup:
 async def make_sports_buttons_except_one(sport_id: int, new_text: str) -> types.InlineKeyboardMarkup:
     buttons: list[types.InlineKeyboardButton] = []
     for sport in await sport_adapter.get_sport_list():
-        button = types.InlineKeyboardButton(
-            text=sport.ru_name.capitalize() if sport_id != sport.id else new_text,
-            callback_data=f"sport_{sport.id}"
-        )
+        button = types.InlineKeyboardButton(text=sport.ru_name.capitalize() if sport_id != sport.id else new_text,
+            callback_data=f"sport_{sport.id}")
         buttons.append(button)
     markup = types.InlineKeyboardMarkup()
     return markup.add(*buttons, row_width=3)
@@ -137,10 +129,7 @@ async def make_sports_buttons_except_one(sport_id: int, new_text: str) -> types.
 async def make_activity_buttons(activities: list[Activity]) -> types.InlineKeyboardMarkup:
     markup = types.InlineKeyboardMarkup()
     for activity in activities:
-        button = types.InlineKeyboardButton(
-            text=activity.title,
-            callback_data=f"activity_{activity.id}"
-        )
+        button = types.InlineKeyboardButton(text=activity.title, callback_data=f"activity_{activity.id}")
         markup.add(button)
     return markup
 
@@ -168,32 +157,27 @@ async def make_choose_registration_buttons() -> types.InlineKeyboardMarkup:
 #     return markup
 
 async def msg_with_ibuttons(mess: types.Message, text: str, buttons: types.InlineKeyboardMarkup) -> types.Message:
-    return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=buttons)
+    return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=buttons,
+                                  message_thread_id=mess.message_thread_id)
 
 
 async def msg_with_buttons(mess: types.Message, text: str, buttons: types.ReplyKeyboardMarkup) -> types.Message:
-    return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=buttons)
+    return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=buttons,
+                                  message_thread_id=mess.message_thread_id)
 
 
 async def msg_without_buttons(mess: types.Message, text: str) -> types.Message:
-    return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=types.ReplyKeyboardRemove())
+    return await bot.send_message(chat_id=mess.chat.id, text=text, reply_markup=types.ReplyKeyboardRemove(),
+                                  message_thread_id=mess.message_thread_id)
 
 
 async def edit_with_ibuttons(call: types.CallbackQuery, text: str, buttons: types.InlineKeyboardMarkup) -> None:
-    await bot.edit_message_text(
-        chat_id=call.message.chat.id,
-        message_id=call.message.message_id,
-        text=text,
-        reply_markup=buttons
-    )
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text,
+        reply_markup=buttons)
 
 
 async def edit_without_buttons(call: types.CallbackQuery, text: str) -> None:
-    await bot.edit_message_text(
-        chat_id=call.message.chat.id,
-        message_id=call.message.message_id,
-        text=text
-    )
+    await bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text=text)
 
 
 async def validate_user(mess: types.Message) -> tuple[Optional[int], Optional[str]]:
@@ -206,6 +190,8 @@ async def validate_user(mess: types.Message) -> tuple[Optional[int], Optional[st
 
 @bot.message_handler(commands=["start"])
 async def start(mess: types.Message) -> None:
+    if await shono_fuse(mess):
+        return
     log_info("Called /start.", mess)
     user_id, username = await validate_user(mess)
     if user_id is None:
@@ -215,11 +201,8 @@ async def start(mess: types.Message) -> None:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         markup.add(types.KeyboardButton(Buttons.TECHNICAL_SUPPORT.value[0]))
         await msg_with_buttons(mess, "Здравствуйте!", markup)
-        await msg_with_ibuttons(
-            mess=mess,
-            text=Msg.REGISTRATION_CONFIRM_QUESTION.value % user_name,
-            buttons=await make_choose_registration_buttons(),
-        )
+        await msg_with_ibuttons(mess=mess, text=Msg.REGISTRATION_CONFIRM_QUESTION.value % user_name,
+            buttons=await make_choose_registration_buttons(), )
     except PlayerNotFound:
         log_warning("User not found in lksh database. Validate failed.", mess)
         await msg_without_buttons(mess, Msg.REGISTRATION_USER_NOT_FOUND.value)
@@ -233,7 +216,8 @@ async def start(mess: types.Message) -> None:
                                                             Buttons.REGISTRATION_CANCEL.callback_data])
 async def processing_of_registration(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-
+    if await shono_fuse(call.message):
+        return
     if call.data == Buttons.REGISTRATION_CONFIRM.callback_data:
         log_info("Registration accepted.", call.message)
         user_id, username = call.from_user.id, call.from_user.username
@@ -249,8 +233,8 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
             user_name = await students_repository.validate_register_user(Player(username, int(user_id)))
             await player_adapter.register_user(PlayerToRegister(username, user_id, user_name))
 
-            await edit_with_ibuttons(call, Msg.REGISTRATION_CONFIRMED.value, sport_markup)
-            # await bot.pin_chat_message(call.message.chat.id, call.message.message_id)
+            await edit_with_ibuttons(call, Msg.REGISTRATION_CONFIRMED.value,
+                                     sport_markup)  # await bot.pin_chat_message(call.message.chat.id, call.message.message_id)
         except PlayerNotFound:
             log_warning("User not found in lksh database. Validate failed.", call.message)
             await edit_without_buttons(call, Msg.REGISTRATION_USER_NOT_FOUND.value)
@@ -266,12 +250,11 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
 
 @bot.message_handler(commands=["register_on_sport"])
 async def register_on_sport(mess: types.Message) -> None:
+    if await shono_fuse(mess):
+        return
     log_info(f"Called /register_on_sport.", mess)
-    to_pin = (await msg_with_ibuttons(
-        mess=mess,
-        text="Выберите спортивную секцию.",
-        buttons=await make_sports_buttons(),
-    )).message_id
+    to_pin = (await msg_with_ibuttons(mess=mess, text="Выберите спортивную секцию.",
+        buttons=await make_sports_buttons(), )).message_id
     log_warning(str(to_pin), mess)
     await bot.pin_chat_message(mess.chat.id, to_pin)
     log_info("Finished /register_on_sport successfully.", mess)
@@ -280,7 +263,8 @@ async def register_on_sport(mess: types.Message) -> None:
 @bot.callback_query_handler(func=lambda call: call.data == Buttons.SPORTS_REGISTER_ON.callback_data)
 async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-
+    if await shono_fuse(call.message):
+        return
     markup = await make_sports_buttons()
     await msg_with_ibuttons(call.message, "Выберите спортивную секцию:", markup)
 
@@ -288,7 +272,8 @@ async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
 @bot.callback_query_handler(func=lambda call: call.data.startswith("sport_"))
 async def select_sport(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-
+    if await shono_fuse(call.message):
+        return
     sport_id = int(call.data.split("_")[1])
     for s in await sport_adapter.get_sport_list():
         if s.id == sport_id:
@@ -311,7 +296,8 @@ async def select_sport(call: types.CallbackQuery) -> None:
 @bot.callback_query_handler(func=lambda call: call.data.startswith("activity_"))
 async def processing_select_activity(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-
+    if await shono_fuse(call.message):
+        return
     activity_id = int(call.data.split("_")[1])
     activity = await get_activity_by_id(activity_id)
     if not activity:
@@ -395,17 +381,17 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
 @bot.callback_query_handler(func=lambda call: call.data.startswith("create_"))
 async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-
+    if await shono_fuse(call.message):
+        return
     activity_id = int(call.data.split("_")[1])
 
     try:
-        team = await app_container.get(ActivityAdapter).enroll_player_in_activity(activity_id, call.from_user.id)
+        team = await activity_adapter.enroll_player_in_activity(activity_id, call.from_user.id)
         activity = await get_activity_by_id(activity_id)
         await select_activity(call, activity)
 
         # todo вариант для создания команды
-        await msg_without_buttons(call.message,
-                                  f"✅ Вы записались как {team.name}\n\n.")
+        await msg_without_buttons(call.message, f"✅ Вы записались как {team.name}\n\n.")
     except PlayerAlreadyInTeam:
         await msg_without_buttons(call.message, "⚠️ Вы уже записаны.")
     except InsufficientRights:
@@ -421,20 +407,38 @@ async def signup_to_activity(call: types.CallbackQuery) -> None:
     await edit_without_buttons(call, "🚧 Функция записи в существующую команду находится в разработке. ")
 
 
+def parse_message(msg: str) -> int:
+    str1 = msg.split(", id: ")[1]
+    return int(str1[:str1.find("]")])
+
+
+async def change_message(mess: types.Message, answer: types.Message) -> None:
+    await bot.edit_message_text(f"{mess.text}\n\nОтвечено: [username: {answer.from_user.username}, "
+                                f"id: {answer.from_user.id}]", mess.chat.id, mess.id)
+
+
 @bot.message_handler(content_types=["text"])
 async def answer_to_buttons(mess: types.Message) -> None:
+    if await shono_fuse(mess):
+        return
     if mess.text == Buttons.TECHNICAL_SUPPORT.value[0]:
         await msg_without_buttons(mess, Msg.TECHNICAL_SUPPORT.value)
         log_info("User need help", mess)
         return
-    if mess.reply_to_message is not None and  mess.reply_to_message.text == Msg.TECHNICAL_SUPPORT.value:
+    if mess.reply_to_message is not None and mess.reply_to_message.text == Msg.TECHNICAL_SUPPORT.value:
         log_info(f"support_chat_id: {support_chat_id}, message_thread_id: {support_chat_thread_id}", mess)
         await bot.send_message(support_chat_id, f"[username: @{mess.from_user.username}, id: {mess.from_user.id}]"
-                                                f"\n{mess.text}", message_thread_id=support_chat_thread_id)
+                                                f"\n\n{mess.text}", message_thread_id=support_chat_thread_id)
         log_info("Message has been sent to support", mess)
-        await bot.send_message(mess.chat.id, f"Сообщение отправлено в техподдержку. Через некоторое время с Вами свяжутся.")
+        await msg_without_buttons(mess, f"Сообщение отправлено в техподдержку. Через некоторое время с Вами свяжутся.")
+        return
+    if mess.message_thread_id is not None and mess.message_thread_id == support_chat_thread_id:
+        if mess.reply_to_message is not None:
+            await bot.send_message(parse_message(mess.reply_to_message.text), mess.text)
+            log_info("Message has been sent to user", mess)
+            await change_message(mess.reply_to_message, mess)
+            return
         return
     await msg_without_buttons(mess, "Я вас не понимаю. Используйте кнопки или команды.")
 
-
-asyncio.run(bot.polling(non_stop=True, none_stop=True))
+# asyncio.run(bot.polling(non_stop=True, none_stop=True))
