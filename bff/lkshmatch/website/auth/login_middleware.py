@@ -2,13 +2,11 @@ from fastapi import Request, Response
 from jose import JWTError, jwt
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from .root import templates
-from .vars import ALGORITHM, COOKIE_NAME, JWT_SECRET_KEY
+from lkshmatch.website.activities import templates
+from lkshmatch.website.auth.auth import ALGORITHM, COOKIE_NAME, JWT_SECRET_KEY
 
 
 class LoginWallMiddleware(BaseHTTPMiddleware):
-    # Rate limiting configurations
-
     def __init__(self, app):
         super().__init__(app)
 

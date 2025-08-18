@@ -5,10 +5,10 @@ from fastapi import APIRouter, Form, Request
 
 from lkshmatch.adapters.base import ActivityAdapter, SportAdapter, PlayerAdapter
 from lkshmatch.di import app_container, service
+from lkshmatch.website.main import templates
 
-from .auth import get_user_id_from_token
-from .root import templates
-from .vars import COOKIE_NAME, SERVICE_ACCOUNT_NAME
+from lkshmatch.website.auth.auth import get_user_id_from_token, COOKIE_NAME
+from lkshmatch.di import WEBSITE_SERVICE_ACCOUNT_NAME
 
 
 class TableIsEmptyError(Exception):
@@ -18,8 +18,6 @@ class TableIsEmptyError(Exception):
     def __str__(self):
         return "Table is empty"
 
-
-table_adapter_router = APIRouter()
 
 def get_sheet_data_from_url(sheet_url: str):
     parse_result = urlparse(sheet_url)
@@ -37,6 +35,8 @@ def get_sheet_data_from_url(sheet_url: str):
     return {"spreadsheetId": spreadsheetId, "sheetName": sheetName}
 
 
+table_adapter_router = APIRouter()
+
 @table_adapter_router.get("/get_sport_sections")
 async def get_sport_sections_json(request: Request):
     try:
@@ -49,7 +49,8 @@ async def get_sport_sections_json(request: Request):
 
 @table_adapter_router.get("/get_activity_by_sport_section")
 async def get_activity_by_sport_section_json(
-    request: Request, sport_section_id: int
+    request: Request,
+    sport_section_id: int
 ):
     try:
         activity_adapter = app_container.get(ActivityAdapter)
@@ -62,7 +63,7 @@ async def get_activity_by_sport_section_json(
 @table_adapter_router.get("/register_in_section")
 async def register_on_section_with_table_get(request: Request):
     return templates.TemplateResponse(
-        context={"request": request, "error": "", "service_account_name": SERVICE_ACCOUNT_NAME, "username": "UU"},
+        context={"request": request, "error": "", "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME},
         name="table/register_in_section.html",
     )
 
@@ -133,6 +134,6 @@ async def register_on_section_with_table_post(
         )
 
     return templates.TemplateResponse(
-        context={"request": request, "error": error, "service_account_name": SERVICE_ACCOUNT_NAME, "username": "UU"},
+        context={"request": request, "error": error, "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME, "username": "UU"},
         name="table/register_in_section.html",
     )
