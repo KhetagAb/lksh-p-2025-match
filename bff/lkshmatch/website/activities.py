@@ -6,15 +6,16 @@ from fastapi.templating import Jinja2Templates
 from lkshmatch.adapters.base import SportAdapter, ActivityAdapter
 from lkshmatch.di import app_container
 
-root_router = APIRouter()
-templates = Jinja2Templates("./lkshmatch/website/templates")
+from lkshmatch.website.templating import templates
 
-@root_router.get("/")
+activities_router = APIRouter()
+
+@activities_router.get("/")
 async def root(request: Request, username: str = "UU"):
     return templates.TemplateResponse(name="index.html", context={"request": request, "username": username})
 
 
-@root_router.get("/sections")
+@activities_router.get("/sections")
 async def get_sport_sections(
     request: Request,
 ):
@@ -32,7 +33,7 @@ async def get_sport_sections(
     )
 
 
-@root_router.get("/sections/{sport_section_id}")
+@activities_router.get("/sections/{sport_section_id}")
 async def get_activity_by_sport_section_id(
     request: Request,
     sport_section_id: int
@@ -50,7 +51,7 @@ async def get_activity_by_sport_section_id(
         }
     )
 
-@root_router.get("/sections/activities/{activity_id}")
+@activities_router.get("/sections/activities/{activity_id}")
 async def get_activity_by_sport_section_id(
     request: Request,
     activity_id: int
