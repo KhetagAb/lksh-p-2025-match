@@ -4,7 +4,7 @@ import uvicorn
 import uvloop
 from fastapi import FastAPI
 
-from lkshmatch.tg_bot.bot import token, router as bot_router
+from lkshmatch.tg_bot.bot import token, bot, router as bot_router
 from lkshmatch.webapp.auth import auth_router
 from lkshmatch.webapp.login_wall import LoginWallMiddleware
 from lkshmatch.webapp.root import root_router
