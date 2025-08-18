@@ -77,6 +77,3 @@ def all_providers() -> list[Provider]:
 
 
 app_container: Container = make_container(*all_providers())
-
-WEBSITE_IP = settings.get("WEBSITE_IP")
-WEBSITE_PORT = settings.get("WEBSITE_PORT")
