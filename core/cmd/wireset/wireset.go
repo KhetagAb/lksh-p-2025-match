@@ -63,6 +63,7 @@ var All = wire.NewSet(
 
 	wire.Bind(new(handlers.CreateActivityService), new(*activities.ActivityService)),
 	handlers.NewCreateActivityHandler,
+
 	handlers.NewServerInterface,
 
 	// ---

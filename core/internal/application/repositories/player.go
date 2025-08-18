@@ -88,7 +88,7 @@ func (p *Players) GetPlayerByTgUsername(ctx context.Context, username string) (*
 	return &dao.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
 }
 
-func (p *Players) GetPlayerExistanceByTgID(
+func (p *Players) GetPlayerExistenceByTgID(
 	ctx context.Context,
 	tgID int64,
 ) (bool, error) {

@@ -13,6 +13,7 @@ type ServerInterface struct {
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler
 	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
 	createActivity              *CreateActivityHandler
+	getPlayerByTg               *GetPlayerByIdHandler
 }
 
 func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context, params server.PostCoreActivityCreateParams) error {
@@ -30,8 +31,7 @@ func (s ServerInterface) PostCoreActivityUpdateById(ctx echo.Context, id int64, 
 }
 
 func (s ServerInterface) GetCorePlayerByTg(ctx echo.Context, params server.GetCorePlayerByTgParams) error {
-	//TODO implement me
-	panic("implement me")
+	return s.getPlayerByTg.GetPlayerByTg(ctx)
 }
 
 func (s ServerInterface) GetCoreTeamsByActivityId(ctx echo.Context, id int64) error {
