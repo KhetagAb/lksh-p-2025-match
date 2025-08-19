@@ -90,3 +90,6 @@ async def create_activity(
         request.cookies.get(COOKIE_NAME)
     )
     # admin function 
+    return templates.TemplateResponse(
+        name="some_error.html", context={"request": request}
+    )
