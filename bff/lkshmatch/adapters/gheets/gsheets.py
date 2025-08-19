@@ -60,7 +60,7 @@ def get_sheet_data_from_url(sheet_url: str) -> GSheetData:
     return GSheetData(spreadsheetId, sheetName)
 
 
-def get_data_gsheet(sheet_data: GSheetData, range: str, mod: str = "COLUMNS") -> list[list[str]]:
+def get_data_gsheet(sheet_data: GSheetData, range: str, mod: str = "COLUMNS") -> dict:
     # mod shoud be "ROWS" or "COLUMNS"
     if service is None:
         raise GSheetDoesNotResponseError
