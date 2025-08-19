@@ -22,10 +22,9 @@ type (
 		AddPlayerToTeam(ctx context.Context, teamID, playerID int64) error
 		GetTeamByPlayerAndActivity(ctx context.Context, playerID, activityID int64) (*dao.Team, error)
 	}
+
 	SportRepository interface {
-		GetSportsList(
-			ctx context.Context,
-		) ([]dao.SportSection, error)
+		GetSportSectionByID(ctx context.Context, sportSectionID int64) (*dao.SportSection, error)
 	}
 
 	ActivityService struct {

@@ -4,16 +4,18 @@ import (
 	"context"
 	"fmt"
 	"match/internal/domain/dto"
+	"match/internal/infra"
 )
 
 func (s *ActivityService) GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) (dto.Activities, error) {
+	infra.Infof(ctx, "Getting activities by sport section id [sport_section_id=%d]", sportSectionID)
+
 	activities, err := s.activityRepository.GetActivitiesBySportSectionID(ctx, sportSectionID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get list activities by sports section id [sport_section_id=%d]: %w", sportSectionID, err)
 	}
 
 	var activitiesDTO dto.Activities
-
 	for _, activity := range activities {
 		creator, err := s.playerRepository.GetPlayerByID(ctx, activity.CreatorID)
 		if err != nil {
@@ -21,9 +23,9 @@ func (s *ActivityService) GetActivitiesBySportSectionID(ctx context.Context, spo
 		}
 
 		activityDTO := dto.Activity{Activity: activity, Creator: *creator}
-
 		activitiesDTO = append(activitiesDTO, activityDTO)
 	}
 
+	infra.Infof(ctx, "Activities by sport section id [sport_section_id=%d] [activities=%v]", sportSectionID, activitiesDTO)
 	return activitiesDTO, nil
 }
