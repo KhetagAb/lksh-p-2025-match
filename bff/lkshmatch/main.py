@@ -37,9 +37,6 @@ def start() -> None:
     app.include_router(bot_router, prefix="/bot")
 
     app.add_middleware(LoginWallMiddleware)
-
-
-
     uvicorn.run(
         app=app,
         host="0.0.0.0",
