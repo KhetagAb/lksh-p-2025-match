@@ -183,20 +183,20 @@ components:
       description: "Структура описывающая пользователя"
       type: object
       required:
-        - coreId
+        - core_id
         - name
-        - tgUsername
-        - tgId
+        - tg_username
+        - tg_id
       properties:
-        coreId:
+        core_id:
           type: integer
           format: int64
         name:
           type: string
-        tgId:
+        tg_id:
           type: integer
           format: int64
-        tgUsername:
+        tg_username:
           type: string
     PlayerList:
       type: array
@@ -319,7 +319,7 @@ components:
       required:
         - tg_id
       properties:
-        tgId:
+        tg_id:
           type: integer
           format: int64
 

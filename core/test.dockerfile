@@ -8,6 +8,6 @@ RUN go mod download
 COPY core/ .
 COPY docs/api/openapi.yaml ../docs/api/openapi.yaml
 
-CMD ["cd core", "make test-local"]
+CMD ["make", "test-local"]
 
 EXPOSE 8080

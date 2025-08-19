@@ -1,9 +1,9 @@
 import hmac
 import hashlib
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Query, Request
-from fastapi.responses import PlainTextResponse, RedirectResponse
+from fastapi.responses import PlainTextResponse, RedirectResponse, Response
 from jose import jwt
 
 from lkshmatch.di import settings
@@ -15,7 +15,7 @@ ALGORITHM = "HS256"
 
 auth_router = APIRouter()
 
-def get_user_id_from_token(token: str):
+def get_user_id_from_token(token: str) -> Any:
     token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
     return token_parts["user_id"]
 
@@ -26,7 +26,7 @@ async def telegram_callback(
     request: Request,
     user_id: Annotated[int, Query(alias="id")],
     query_hash: Annotated[str, Query(alias="hash")],
-):
+) -> Response:
     params = request.query_params.items()
     data_check_string = "\n".join(sorted(f"{x}={y}" for x, y in params if x not in ("hash", "next")))
     computed_hash = hmac.new(BOT_TOKEN_HASH.digest(), data_check_string.encode(), "sha256").hexdigest()
@@ -41,7 +41,7 @@ async def telegram_callback(
 
 
 @auth_router.get("/logout")
-async def logout():
+async def logout() -> Response:
     response = RedirectResponse("/")
     response.delete_cookie(key=COOKIE_NAME)
     return response
