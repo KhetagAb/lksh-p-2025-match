@@ -67,6 +67,8 @@ player_adapter = app_container.get(PlayerAdapter)
 router = APIRouter()
 students_repository = app_container.get(LKSHStudentsRepository)
 
+logging.basicConfig(level=logging.INFO)
+
 try:
     token = settings.get("TELEGRAM_TOKEN")
     if token is None:

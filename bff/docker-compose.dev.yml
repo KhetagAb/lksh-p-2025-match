@@ -13,13 +13,28 @@ services:
       - mongodb_data:/data/db
       - ./mongodb/mongo-init-scripts:/docker-entrypoint-initdb.d:ro
 
-  app:
+  website-app:
     build:
       context: ..
-      dockerfile: bff/dev.dockerfile
-    container_name: app
+      dockerfile: bff/website.dev.dockerfile
+    container_name: website-app
     ports:
       - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - mongodb
+    networks:
+      - default
+      - match-shared-network
+    volumes:
+      - ./config.toml:/app/bff/config.toml:ro
+
+  telegrambot-app:
+    build:
+      context: ..
+      dockerfile: bff/telegrambot.dev.dockerfile
+    container_name: telegrambot-app
     env_file:
       - .env
     depends_on:
