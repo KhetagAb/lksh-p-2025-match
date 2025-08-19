@@ -10,13 +10,16 @@ codegen:
 	rm -rf ./tmp
 
 up:
-	docker compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans -d
+	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans -d
 
 start:
-	docker compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans
+	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans
 
 stop:
 	docker-compose -f docker-compose.$(mode).yml stop
+
+down:
+	docker-compose -f docker-compose.$(mode).yml down -v
 
 rm:
 	docker-compose -f docker-compose.$(mode).yml rm

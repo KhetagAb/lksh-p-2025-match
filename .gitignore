@@ -41,3 +41,4 @@ bff/.venv/
 # Editor/IDE
 .idea/
 .vscode/
+/core/cmd/wireset/wire_gen.go
