@@ -497,7 +497,7 @@ def parse_message(msg: str) -> int:
 
 
 async def change_message(mess: types.Message, answer: types.Message) -> None:
-    await bot.edit_message_text(f"{mess.text}\n\nОтвечено: [username: {answer.from_user.username}, "
+    await bot.edit_message_text(f"{mess.text}\n\nОтвечено: [username: {answer.from_user.username}, " # type: ignore
                                 f"id: {answer.from_user.id}]", mess.chat.id, mess.id) # type: ignore
 
 
@@ -513,8 +513,8 @@ async def answer_to_buttons(mess: types.Message) -> None:
         return
     if mess.reply_to_message is not None and mess.reply_to_message.text == Msg.TECHNICAL_SUPPORT.value:
         log_info(f"support_chat_id: {support_chat_id}, message_thread_id: {support_chat_thread_id}", mess)
-        await bot.send_message(support_chat_id, f"[username: @{mess.from_user.username}, id: {mess.from_user.id}]"
-                                                f"\n\n{mess.text}", message_thread_id=support_chat_thread_id) # type: ignore
+        await bot.send_message(support_chat_id, f"[username: @{mess.from_user.username}, id: {mess.from_user.id}]" # type: ignore
+                                                f"\n\n{mess.text}", message_thread_id=support_chat_thread_id)
         log_info("Message has been sent to support", mess)
         await msg_without_buttons(mess, "Сообщение отправлено в техподдержку. Через некоторое время с Вами свяжутся.")
         return
