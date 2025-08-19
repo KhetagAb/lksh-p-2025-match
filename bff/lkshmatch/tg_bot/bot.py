@@ -417,6 +417,10 @@ async def change_message(mess: types.Message, answer: types.Message) -> None:
                                 f"id: {answer.from_user.id}]", mess.chat.id, mess.id)
 
 
+async def notify_person(tg_id: int, text: str) -> None:
+    await bot.send_message(tg_id, text)
+
+
 @bot.message_handler(content_types=["text"])
 async def answer_to_buttons(mess: types.Message) -> None:
     if await shono_fuse(mess):
