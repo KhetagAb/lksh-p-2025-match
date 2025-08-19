@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import Response
 
-from lkshmatch.adapters.base import ActivityAdapter, SportAdapter, PlayerAdapter
+from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter
 from lkshmatch.adapters.gheets.gsheets import (
     get_data_gsheet, change_data_gsheet,
     WEBSITE_SERVICE_ACCOUNT_NAME, get_sheet_data_from_url,
