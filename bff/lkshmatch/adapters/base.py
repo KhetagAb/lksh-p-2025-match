@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import NewType, Optional
+from typing import NewType
 
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)
