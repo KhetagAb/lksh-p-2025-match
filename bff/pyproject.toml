@@ -1,22 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "lkshmatch"
 version = "0.1.0"
-description = "Backend-for-frontend of MATCH"
+description = "Backend-for-frontend service for Match"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.13.5"
 dependencies = [
-    "fastapi",
-    "uvicorn[standard]",
-    "pydantic",
-    "dynaconf",
-    "python-jose",
-    "pytelegrambotapi",
-    "dishka",
-    "pymongo",
-    "httpx",
-    "aiohttp",
+    "aiohttp >= 3.12.15",
+    "dishka >= 1.6.0",
+    "dynaconf >= 3.2.11",
+    "fastapi >= 0.116.1",
+    "pydantic >= 2.11.7",
+    "pymongo >= 4.14.0",
+    "pytelegrambotapi >= 4.28.0",
+    "python-jose >= 3.5.0",
     "python-multipart>=0.0.20",
+    "uvicorn >= 0.35.0",
+    "uvloop>=0.21.0",
     "httplib2>=0.22.0",
     "google-api-python-client>=2.179.0",
     "oauth2client>=4.1.3",
@@ -38,6 +42,7 @@ dev-dependencies = [
 
 [tool.ruff.lint]
 ignore = []
+extend-select = ["UP006", "UP007", "UP019", "UP026", "UP035", "UP044", "UP045"]
 
 [tool.mypy]
 python_version = 3.12
@@ -53,11 +58,19 @@ disallow_untyped_defs = true
 warn_return_any = true
 no_implicit_optional = true
 strict_optional = true
-ignore_missing_imports = false
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
-pythonpath = [ ".", "src",]
-asyncio_mode="auto"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = []
 
 [pytest]
 markers = []
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+include = ["lkshmatch*"]
+exclude = ["tests*"]

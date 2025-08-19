@@ -12,11 +12,11 @@ type ServerInterface struct {
 	getTeamsByIDActivity        *GetTeamsByActivityIDHandler
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler
 	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
+	createActivity              *CreateActivityHandler
 }
 
 func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context) error {
-	//TODO implement me
-	panic("implement me")
+	return s.createActivity.CreateActivity(ctx)
 }
 
 func (s ServerInterface) PostCoreActivityDeleteById(ctx echo.Context, id int64) error {
@@ -62,6 +62,7 @@ func NewServerInterface(
 	getTeamsByIDActivity *GetTeamsByActivityIDHandler,
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler,
 	enrollPlayerInActivity *EnrollPlayerInActivityHandler,
+	createActivity *CreateActivityHandler,
 ) *ServerInterface {
 	return &ServerInterface{
 		getSportList:                getSportList,
@@ -69,5 +70,6 @@ func NewServerInterface(
 		getTeamsByIDActivity:        getTeamsByIDActivity,
 		getActivityBySportSectionID: getActivityBySportSectionID,
 		enrollPlayerInActivity:      enrollPlayerInActivity,
+		createActivity:              createActivity,
 	}
 }

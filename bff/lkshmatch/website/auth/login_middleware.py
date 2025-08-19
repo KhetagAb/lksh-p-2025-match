@@ -1,16 +1,18 @@
 from fastapi import Request, Response
 from jose import JWTError, jwt
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.types import ASGIApp
+from collections.abc import Callable
 
 from lkshmatch.website.templating import templates
 from lkshmatch.website.auth.auth import ALGORITHM, COOKIE_NAME, JWT_SECRET_KEY
 
 
 class LoginWallMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app):
+    def __init__(self, app: ASGIApp):
         super().__init__(app)
 
-    async def dispatch(self, request: Request, call_next) -> Response:
+    async def dispatch(self, request: Request, call_next: Callable) -> Response:
         if request.url.path.startswith("/auth/"):
             return await call_next(request)
 

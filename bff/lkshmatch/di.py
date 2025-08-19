@@ -1,18 +1,13 @@
 from collections.abc import Iterable
 
 from dishka import Container, Provider, Scope, make_container, provide
+from lkshmatch.core_client import Client
 from pymongo import MongoClient
 
-import core_client
 from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter
 from lkshmatch.adapters.core.activity import CoreActivityAdapter
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
-
-from lkshmatch.adapters.stub_core.activity import StubActivityAdapter
-from lkshmatch.adapters.stub_core.players import StubPlayerAdapter
-from lkshmatch.adapters.stub_core.sport_sections import StubSportAdapter
-
 from lkshmatch.config import settings
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
@@ -25,8 +20,8 @@ class CoreClientProvider(Provider):
         self.url = f"http://{core_host}:{core_port}"
 
     @provide(scope=Scope.APP)
-    def core_client(self) -> Iterable[core_client.Client]:
-        client = core_client.Client(base_url=self.url)
+    def core_client(self) -> Iterable[Client]:
+        client = Client(base_url=self.url)
         yield client
 
 
@@ -38,19 +33,18 @@ class MongoProvider(Provider):
 
     @provide(scope=Scope.APP)
     def mongo_client(self) -> Iterable[MongoClient]:
-        client = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
+        client: MongoClient = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
         if self._ping:
             client.admin.command("ping")
-        try:
-            yield client
-        finally:
-            client.close()
+        yield client
 
 
 class MongoRepositoryProvider(Provider):
     scope = Scope.APP
     mongo_admin_repository = provide(MongoAdminRepository, provides=AdminRepository)
-    mongo_player_repository = provide(MongoLKSHStudentsRepository, provides=LKSHStudentsRepository)
+    mongo_player_repository = provide(
+        MongoLKSHStudentsRepository, provides=LKSHStudentsRepository
+    )
 
 
 class RestAllAdapterProvider(Provider):
@@ -70,11 +64,11 @@ def all_providers() -> list[Provider]:
     core_port = settings.get("CORE_PORT")
 
     if not all([mongo_username, mongo_password, mongo_database]):
-        raise ValueError("MongoDB credentials are not properly set in environment variables")
+        raise ValueError(
+            "MongoDB credentials are not properly set in environment variables"
+        )
 
-    mongo_uri = (
-        f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_database}?authSource=admin"
-    )
+    mongo_uri = f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/?retryWrites=true&w=majority"
     return [
         MongoProvider(mongo_uri),
         MongoRepositoryProvider(),

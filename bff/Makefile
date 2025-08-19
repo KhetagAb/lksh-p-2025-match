@@ -3,11 +3,10 @@ mode := dev
 
 check: lint typecheck
 
-# FIXME переработат, учесть dev.dockefile
 codegen:
 	uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path ./tmp
-	rm -rf core_client
-	mv tmp/core_client core_client
+	rm -rf lkshmatch/core_client
+	mv tmp/core_client lkshmatch/
 	rm -rf ./tmp
 
 up:
@@ -19,12 +18,9 @@ start:
 stop:
 	docker-compose -f docker-compose.$(mode).yml stop
 
-down:
-	docker-compose -f docker-compose.$(mode).yml down -v
-
 rm:
 	docker-compose -f docker-compose.$(mode).yml rm
-	rm -rf .venv
+	rm -rf .venv mongodb_data/ lkshmatch/core_client
 
 lint:
 	uv run ruff check lkshmatch
@@ -35,3 +31,6 @@ typecheck:
 venv:
 	uv venv --python 3.13.5
 	uv sync
+
+test:
+	uv run pytest -v

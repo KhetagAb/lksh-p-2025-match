@@ -9,6 +9,7 @@ type (
 	ActivityRepository interface {
 		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]dao.Activity, error)
 		GetActivityByID(ctx context.Context, id int64) (*dao.Activity, error)
+		CreateActivity(ctx context.Context, creatorID, sportSectionId int64, title, description string) (*dao.Activity, error)
 	}
 
 	PlayerRepository interface {

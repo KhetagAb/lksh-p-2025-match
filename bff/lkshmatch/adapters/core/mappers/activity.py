@@ -1,6 +1,6 @@
-from core_client.models import activity as activity_api
-from core_client.models import player as player_api
-from core_client.models import team as team_api
+from lkshmatch.core_client.models import activity as activity_api
+from lkshmatch.core_client.models import player as player_api
+from lkshmatch.core_client.models import team as team_api
 from lkshmatch.adapters import base as domain
 from lkshmatch.adapters.base import CorePlayer
 
@@ -16,7 +16,7 @@ def map_activity(activity: activity_api.Activity) -> domain.Activity:
     return domain.Activity(
         id=activity.id,
         title=activity.title,
-        description=activity.description,
+        description= activity.description if activity.description else None,
         creator=map_core_player(activity.creator),
     )
 

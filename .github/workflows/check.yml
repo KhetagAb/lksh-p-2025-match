@@ -11,6 +11,12 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
+      - run: |
+          go tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config config/openapi.yaml ../docs/api/openapi.yaml
+          go tool github.com/google/wire/cmd/wire ./cmd/wireset
+          mkdir ./internal/generated/app/
+          mv ./cmd/wireset/wire_gen.go ./internal/generated/app
+        working-directory: core/
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v8.0.0
         with:
@@ -22,7 +28,6 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: docker/setup-buildx-action@v3
-      - run: docker buildx build . --file core/prod.dockerfile
       - run: docker buildx build . --file core/dev.dockerfile
 
   core_test:
@@ -31,9 +36,12 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: docker/setup-compose-action@v1
-      - run: cat core/.env.example >> core/.env.test
-      - run: docker-compose -f core/docker-compose.test.yml --build --force-recreate --remove-orphans --abort-on-container-exit
-
+      - run: cat core/.env.example >> core/.env.test && docker compose -f core/docker-compose.test.yml up --build --force-recreate --remove-orphans --abort-on-container-exit
+        env:
+          POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+          POSTGRES_USER: ${{ vars.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ vars.POSTGRES_DB }}
   bff_lint:
     name: bff_lint
     runs-on: ubuntu-latest
@@ -42,9 +50,13 @@ jobs:
       - uses: astral-sh/setup-uv@v2
       - run: uv venv --python 3.13.5
         working-directory: bff/
-      - run: uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path .
+      - run: |
+          uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path ./tmp
+          rm -rf core_client
+          mv tmp/core_client lkshmatch/
+          rm -rf ./tmp
         working-directory: bff/
-      - run: uv run ruff check bff/lkshmatch
+      - run: uv run ruff check lkshmatch
         working-directory: bff/
 
   bff_typecheck:
@@ -55,7 +67,27 @@ jobs:
       - uses: astral-sh/setup-uv@v2
       - run: uv venv --python 3.13.5
         working-directory: bff/
-      - run: uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path .
+      - run: |
+          uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path ./tmp
+          rm -rf core_client
+          mv tmp/core_client lkshmatch/
+          rm -rf ./tmp
         working-directory: bff/
-      - run: uv run mypy -p bff.lkshmatch --cache-dir=/dev/null --config-file=pyproject.toml
+      - run: uv run mypy -p lkshmatch --cache-dir=/dev/null --config-file=pyproject.toml
+        working-directory: bff/
+  bff_test:
+    name: bff_test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v2
+      - run: uv venv --python 3.13.5
+        working-directory: bff/
+      - run: |
+          uv run openapi-python-client generate --path ../docs/api/openapi.yaml --overwrite --output-path ./tmp
+          rm -rf core_client
+          mv tmp/core_client lkshmatch/
+          rm -rf ./tmp
+        working-directory: bff/
+      - run: uv run pytest -v
         working-directory: bff/

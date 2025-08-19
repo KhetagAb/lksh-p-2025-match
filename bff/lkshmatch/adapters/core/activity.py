@@ -1,10 +1,10 @@
-import core_client
-from core_client.api.activities import (
+from lkshmatch import core_client
+from lkshmatch.core_client.api.activities import (
     get_core_activities_by_sport_section_id,
     get_core_teams_by_activity_id,
     post_core_activity_id_enroll,
 )
-from core_client.models import (
+from lkshmatch.core_client.models import (
     ActivityEnrollPlayerRequest,
     GetCoreActivitiesBySportSectionIdResponse200,
     GetCoreActivitiesBySportSectionIdResponse400,
@@ -23,7 +23,7 @@ from lkshmatch.adapters.base import (
     TgID,
     UnknownError,
 )
-from lkshmatch.adapters.core.mappers.activity import map_team
+from lkshmatch.adapters.core.mappers.activity import map_core_player, map_team
 
 
 class CoreActivityAdapter(ActivityAdapter):
@@ -36,9 +36,10 @@ class CoreActivityAdapter(ActivityAdapter):
             raise InvalidParameters(f"get activity by sport section id returns 400 response: {response.message}")
         if not isinstance(response, GetCoreActivitiesBySportSectionIdResponse200):
             raise UnknownError("get activity by sport section id returns unknown response")
-        activities = []
+        activities: list[Activity] = []
         for activity in response.activities:
-            activities.append(activity)
+            desc: str = activity.description if activity.description else ""
+            activities.append(Activity(activity.id, activity.title, desc, map_core_player(activity.creator)))
         return activities
 
     # TODO перенести в TeamsAdapter
