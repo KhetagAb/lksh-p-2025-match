@@ -7,18 +7,12 @@ import os
 from fastapi import FastAPI
 
 from lkshmatch.tg_bot.bot import token, bot, router as bot_router
+from lkshmatch.website.api_requests import api_requests_router
 from lkshmatch.website.auth.auth import auth_router
 from lkshmatch.website.activities import activities_router
 from lkshmatch.website.auth.login_middleware import LoginWallMiddleware
 from lkshmatch.website.activities_gsheets import table_adapter_router
 from lkshmatch.config import settings
-
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[FastAPI]:
-    _remove_webhook = await bot.remove_webhook()
-    _set_webhook = await bot.set_webhook(url=os.path.join(settings.get("BASE_URL"), f"bot/{token}")) 
-    yield app
-    _remove_webhook = await bot.remove_webhook()
 
 
 def start() -> None:
@@ -29,11 +23,11 @@ def start() -> None:
         summary="REST API documentation for Match",
         version="0.1.0",
         redoc_url="/docs2",
-        # lifespan=lifespan, # type: ignore
     )
     app.include_router(activities_router)
-    app.include_router(auth_router, prefix="/auth")
-    app.include_router(table_adapter_router, prefix="/table")
+    app.include_router(auth_router)
+    app.include_router(table_adapter_router)
+    app.include_router(api_requests_router)
     app.include_router(bot_router, prefix="/bot")
 
     app.add_middleware(LoginWallMiddleware)
