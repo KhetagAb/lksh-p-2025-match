@@ -1,13 +1,9 @@
 import logging
 
 from fastapi import APIRouter, Request
-from fastapi.responses import Response
 
 from lkshmatch.adapters.base import SportAdapter, ActivityAdapter, Team, Activity
 from lkshmatch.di import app_container
-
-from lkshmatch.website.auth.auth import get_user_id_from_token, COOKIE_NAME
-from lkshmatch.website.templating import templates
 
 api_requests_router = APIRouter(prefix="/api")
 

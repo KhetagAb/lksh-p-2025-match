@@ -1,6 +1,6 @@
 import hmac
 import hashlib
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import PlainTextResponse, RedirectResponse, Response
