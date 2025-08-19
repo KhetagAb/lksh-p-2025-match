@@ -3,5 +3,5 @@
 # only call from core
 go tool github.com/pressly/goose/v3/cmd/goose \
   -dir migrations \
-  postgres "host=${APP_POSTGRES_HOST} port=${APP_POSTGRES_PORT} user=${APP_POSTGRES_USER} password=${APP_POSTGRES_PASSWORD} dbname=${APP_POSTGRES_DATABASE} sslmode=disable" \
+  postgres "host=${POSTGRES_HOST} port=${POSTGRES_PORT} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} sslmode=disable" \
   up

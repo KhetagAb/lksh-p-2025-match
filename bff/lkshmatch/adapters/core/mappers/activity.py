@@ -16,7 +16,7 @@ def map_activity(activity: activity_api.Activity) -> domain.Activity:
     return domain.Activity(
         id=activity.id,
         title=activity.title,
-        description=activity.description,
+        description= activity.description if activity.description else None,
         creator=map_core_player(activity.creator),
     )
 
