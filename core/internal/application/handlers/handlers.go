@@ -15,16 +15,16 @@ type ServerInterface struct {
 	createActivity              *CreateActivityHandler
 }
 
-func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context) error {
+func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context, params server.PostCoreActivityCreateParams) error {
 	return s.createActivity.CreateActivity(ctx)
 }
 
-func (s ServerInterface) PostCoreActivityDeleteById(ctx echo.Context, id int64) error {
+func (s ServerInterface) PostCoreActivityDeleteById(ctx echo.Context, id int64, params server.PostCoreActivityDeleteByIdParams) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s ServerInterface) PostCoreActivityUpdateById(ctx echo.Context, id int64) error {
+func (s ServerInterface) PostCoreActivityUpdateById(ctx echo.Context, id int64, params server.PostCoreActivityUpdateByIdParams) error {
 	//TODO implement me
 	panic("implement me")
 }
@@ -50,7 +50,7 @@ func (s ServerInterface) RegisterPlayer(ctx echo.Context) error {
 	return s.registerPlayer.RegisterUser(ctx)
 }
 
-func (s ServerInterface) GetCoreSportList(ctx echo.Context, params server.GetCoreSportListParams) error {
+func (s ServerInterface) GetCoreSportList(ctx echo.Context) error {
 	return s.getSportList.GetAllSportSection(ctx)
 }
 
