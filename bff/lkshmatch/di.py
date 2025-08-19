@@ -94,9 +94,3 @@ def all_providers() -> list[Provider]:
 
 
 app_container: Container = make_container(*all_providers())
-
-credentials = ServiceAccountCredentials.from_json_keyfile_name(
-    WEBSITE_CREDENTIALS_FILE, ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-)
-httpAuth = credentials.authorize(httplib2.Http())
-service = discovery.build("sheets", "v4", http=httpAuth)

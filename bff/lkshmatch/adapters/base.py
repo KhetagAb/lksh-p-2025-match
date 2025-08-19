@@ -47,11 +47,11 @@ class UnknownError(Exception):
 CoreID = int
 TgID = int
 
-
-@dataclass
-class CorePlayer:
-    core_id: CoreID
-    tg_id: TgID
+#
+# @dataclass
+# class CorePlayer:
+#     core_id: CoreID
+#     tg_id: TgID
 
 
 @dataclass
@@ -78,7 +78,7 @@ class SportSection:
 class Activity:
     id: int
     title: str
-    creator: CorePlayer
+    creator: Player
     description: Optional[str]
 
 
@@ -86,8 +86,8 @@ class Activity:
 class Team:
     id: int
     name: str
-    captain: CorePlayer
-    members: list[CorePlayer]
+    captain: Player
+    members: list[Player]
 
 
 class PlayerAdapter(ABC):
@@ -119,16 +119,16 @@ class SportAdapter(ABC):
 
 class ActivityAdminAdapter(ABC):
     @abstractmethod
-    async def create_activity(self, title: str, sport_section_id: int, creator_id: int, description: str) -> Activity:
+    async def create_activity(self, requester: int,title: str, sport_section_id: int, creator_id: int, description: str) -> Activity:
         raise NotImplementedError
 
     # TODO спросить про айди креатора
     @abstractmethod
-    async def delete_activity(self, core_id: CoreID) -> Activity:
+    async def delete_activity(self,requester: int, core_id: CoreID) -> Activity:
         raise NotImplementedError
 
     @abstractmethod
-    async def update_activity(self, title: str, description: str, core_id: CoreID) -> None:
+    async def update_activity(self,requester: int, title: str, description: str, core_id: CoreID) -> None:
         raise NotImplementedError
 
 

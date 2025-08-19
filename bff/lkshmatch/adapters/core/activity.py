@@ -10,7 +10,8 @@ from lkshmatch.adapters.base import (
     TgID,
     UnknownError, ActivityAdminAdapter, )
 from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
-from lkshmatch.adapters.core.mappers.activity import map_team, map_activity, map_core_player
+from lkshmatch.adapters.core.mappers.activity import map_team, map_activity
+from lkshmatch.adapters.core.mappers.player import map_player
 from lkshmatch.core_client.api.activities import get_core_teams_by_activity_id, post_core_activity_id_enroll, \
     post_core_activity_create, post_core_activity_delete_by_id, post_core_activity_update_by_id, \
     get_core_activities_by_sport_section_id
@@ -38,7 +39,7 @@ class CoreActivityAdapter(ActivityAdapter):
             activities.append(Activity(
                 id=activity.id,
                 title=activity.title,
-                creator=map_core_player(activity.creator),
+                creator=map_player(activity.creator),
                 description=activity.description if activity.description else ""
             ))
         return activities
