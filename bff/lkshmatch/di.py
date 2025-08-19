@@ -25,11 +25,6 @@ class CoreClientProvider(Provider):
         client = core_client.Client(base_url=self.url)
         yield client
 
-class CorePrivilegeChecker():
-    def __init__(self):
-        pass
-
-
 class MongoProvider(Provider):
 
     def __init__(self, uri: str, ping: bool = True):
@@ -39,7 +34,7 @@ class MongoProvider(Provider):
 
     @provide(scope=Scope.APP)
     def mongo_client(self) -> Iterable[MongoClient]:
-        client = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
+        client: MongoClient = MongoClient(self._uri, serverSelectionTimeoutMS=5000)
         if self._ping:
             client.admin.command("ping")
         try:

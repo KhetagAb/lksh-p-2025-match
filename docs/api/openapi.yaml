@@ -78,11 +78,7 @@ paths:
         - "Activities"
       summary: "Создает активность"
       parameters:
-        - in: header
-          name: Privilege-Token
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/PrivilegeToken"
       requestBody:
         required: true
         content:
@@ -107,11 +103,7 @@ paths:
           schema:
             type: integer
             format: int64
-        - in: header
-          name: Privilege-Token
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/PrivilegeToken"
       responses:
         "200":
           $ref: '#/components/responses/ActivityResponse'
@@ -131,11 +123,7 @@ paths:
           schema:
             type: integer
             format: int64
-        - in: header
-          name: Privilege-Token
-          schema:
-            type: string
-          required: true
+        - $ref: "#/components/parameters/PrivilegeToken"
       requestBody:
         required: true
         content:
@@ -338,6 +326,13 @@ components:
           type: integer
           format: int64
 
+  parameters:
+    PrivilegeToken:
+      name: Privilege-Token
+      in: header
+      schema:
+        type: string
+      required: true
 
   responses:
     AllSportSections:

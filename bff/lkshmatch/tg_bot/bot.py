@@ -225,10 +225,7 @@ async def start(mess: types.Message) -> None:
     if user_id is None:
         return
     try:
-        # TODO: What if user does not have username?
-        user_name = await students_repository.validate_register_user(
-            Player((username if username is not None else ""), int(user_id))
-        )
+        user_name = await students_repository.get_name_by_username(username)
         await msg_with_ibuttons(
             mess=mess,
             text=Msg.REGISTRATION_CONFIRM_QUESTION.value % user_name,
@@ -265,11 +262,13 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
         sport_markup.add(sport_btn)
 
         try:
-            user_name = await students_repository.validate_register_user(
-                Player(username, int(user_id))
-            )
+            user_name = await students_repository.get_name_by_username(username)
             await player_adapter.register_user(
-                PlayerToRegister(username, user_id, user_name)
+                PlayerToRegister(
+                    tg_id=user_id,
+                    tg_username=username,
+                    name=user_name
+                )
             )
 
             await edit_with_ibuttons(

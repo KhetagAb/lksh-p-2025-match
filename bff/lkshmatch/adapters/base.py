@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import NewType
 
+from lkshmatch.core_client.types import Unset, UNSET
+
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)
 SportSectionId = NewType("SportSectionId", int)
@@ -47,6 +49,7 @@ class UnknownError(Exception):
 CoreID = int
 TgID = int
 
+
 @dataclass
 class Player:
     core_id: CoreID
@@ -87,15 +90,11 @@ class Team:
 
 class PlayerAdapter(ABC):
     @abstractmethod
-    async def validate_register_user(self, user: Player) -> PlayerToRegister:
-        raise NotImplementedError
-
-    @abstractmethod
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_player_by_tg(self, tg_id: TgID, tg_username: str) -> Player:
+    async def get_player_by_tg(self, tg_id: int | Unset = UNSET, tg_username: str | Unset = UNSET) -> Player:
         raise NotImplementedError
 
 
@@ -115,7 +114,7 @@ class SportAdapter(ABC):
 class ActivityAdminAdapter(ABC):
     @abstractmethod
     async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int,
-                              description: str | None) -> Activity:
+                              description: str | Unset = UNSET) -> Activity:
         raise NotImplementedError
 
     # TODO спросить про айди креатора
@@ -124,7 +123,7 @@ class ActivityAdminAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_activity(self, requester: int, title: str, description: str | None, core_id: CoreID) -> None:
+    async def update_activity(self, requester: int, title: str,creator_id: int, description: str | None = None) -> Activity:
         raise NotImplementedError
 
 

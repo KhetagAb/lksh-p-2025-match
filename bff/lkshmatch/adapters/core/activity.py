@@ -1,5 +1,3 @@
-
-
 from lkshmatch import core_client
 from lkshmatch.adapters.base import (
     Activity,
@@ -11,7 +9,7 @@ from lkshmatch.adapters.base import (
     UnknownError, ActivityAdminAdapter, )
 from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
 from lkshmatch.adapters.core.mappers.activity import map_team, map_activity
-from lkshmatch.adapters.core.mappers.player import map_player
+from lkshmatch.adapters.core.mappers.player import map_player_from_api
 from lkshmatch.core_client.api.activities import get_core_teams_by_activity_id, post_core_activity_id_enroll, \
     post_core_activity_create, post_core_activity_delete_by_id, post_core_activity_update_by_id, \
     get_core_activities_by_sport_section_id
@@ -22,6 +20,7 @@ from lkshmatch.core_client.models import GetCoreActivitiesBySportSectionIdRespon
     PostCoreActivityCreateResponse400, PostCoreActivityCreateResponse200, PostCoreActivityDeleteByIdResponse400, \
     PostCoreActivityDeleteByIdResponse200, PostCoreActivityUpdateByIdResponse200, PostCoreActivityUpdateByIdResponse400, \
     UpdateActivityRequest
+from lkshmatch.core_client.types import Unset, UNSET
 
 
 class CoreActivityAdapter(ActivityAdapter):
@@ -39,7 +38,7 @@ class CoreActivityAdapter(ActivityAdapter):
             activities.append(Activity(
                 id=activity.id,
                 title=activity.title,
-                creator=map_player(activity.creator),
+                creator=map_player_from_api(activity.creator),
                 description=activity.description if activity.description else ""
             ))
         return activities
@@ -76,11 +75,12 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         self.client = coreclient
         self.privilege_checker = privilege_checker
 
-    async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int, description:  str | None) -> Activity:
+    async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int,
+                              description: str | Unset = UNSET )-> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_create.asyncio(client=self.client,
                                                            body=CreateActivityRequest(title, sport_section_id,
-                                                                                      creator_id,description),
+                                                                                      creator_id, description),
                                                            privilege_token=admin_token)
         if isinstance(response, PostCoreActivityCreateResponse400):
             raise InvalidParameters(f"create activity return 400 response: {response.message}")
@@ -90,9 +90,10 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         activity = response.activity
         return map_activity(activity)
 
-    async def delete_activity(self,requester: int, creator_id: int) -> Activity:
+    async def delete_activity(self, requester: int, creator_id: int) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
-        response = await post_core_activity_delete_by_id.asyncio(client=self.client, id=creator_id,privilege_token=admin_token)
+        response = await post_core_activity_delete_by_id.asyncio(client=self.client, id=creator_id,
+                                                                 privilege_token=admin_token)
         if isinstance(response, PostCoreActivityDeleteByIdResponse400):
             raise InvalidParameters(f"delete activity return 400 response: {response.message}")
         if not isinstance(response, PostCoreActivityDeleteByIdResponse200):
@@ -101,11 +102,11 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         activity = response.activity
         return map_activity(activity)
 
-    async def update_activity(self,requester: int,  title: str, description: str | None, creator_id: int) -> Activity:
+    async def update_activity(self, requester: int, title: str,creator_id: int, description: str | None = None) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_update_by_id.asyncio(client=self.client,
                                                                  id=creator_id,
-                                                                 body=UpdateActivityRequest(title, description),
+                                                                 body=UpdateActivityRequest(title, description or ""),
                                                                  privilege_token=admin_token)
         if isinstance(response, PostCoreActivityUpdateByIdResponse400):
             raise InvalidParameters(f"update activity return 400 response: {response.message}")

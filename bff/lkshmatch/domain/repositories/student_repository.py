@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 # bad, but i'm pissed off, smb fix it
-from lkshmatch.adapters.base import Player
+from lkshmatch.adapters.base import Player, TgID
 
 
 @dataclass
@@ -17,5 +17,5 @@ class LKSHStudentsRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def validate_register_user(self, user: Player) -> str:
+    async def get_name_by_username(self, tg_username: str) -> str:
         raise NotImplementedError
