@@ -97,8 +97,16 @@ jobs:
         run: make codegen
         working-directory: bff/
 
-      - name: Run checks
-        run: make check
+      - name: Run linter
+        run: make lint
+        working-directory: bff/
+
+      - name: Run typecheck
+        run: make typecheck
+        working-directory: bff/
+
+      - name: Run tests
+        run: make test
         working-directory: bff/
 
 

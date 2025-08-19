@@ -38,8 +38,7 @@ paths:
         - name: tg_username
           in: query
           schema:
-            type: integer
-            format: int64
+            type: string
       responses:
         "200":
           $ref: '#/components/responses/PlayerResponse'
@@ -78,6 +77,8 @@ paths:
       tags:
         - "Activities"
       summary: "Создает активность"
+      parameters:
+        - $ref: "#/components/parameters/PrivilegeToken"
       requestBody:
         required: true
         content:
@@ -102,6 +103,7 @@ paths:
           schema:
             type: integer
             format: int64
+        - $ref: "#/components/parameters/PrivilegeToken"
       responses:
         "200":
           $ref: '#/components/responses/ActivityResponse'
@@ -121,6 +123,7 @@ paths:
           schema:
             type: integer
             format: int64
+        - $ref: "#/components/parameters/PrivilegeToken"
       requestBody:
         required: true
         content:
@@ -323,6 +326,13 @@ components:
           type: integer
           format: int64
 
+  parameters:
+    PrivilegeToken:
+      name: Privilege-Token
+      in: header
+      schema:
+        type: string
+      required: true
 
   responses:
     AllSportSections:
