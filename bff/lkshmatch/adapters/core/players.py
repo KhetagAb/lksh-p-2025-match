@@ -1,8 +1,5 @@
 from typing import Optional
 
-import core_client
-from core_client.api.players import register_player, get_core_player_by_tg
-from core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201
 from lkshmatch.adapters.base import (
     CoreID,
     Player,
@@ -13,12 +10,15 @@ from lkshmatch.adapters.base import (
     UnknownError, TgID,
 )
 from lkshmatch.adapters.core.mappers.player import map_player_to_register_request, map_player
+from lkshmatch.core_client.api.players import get_core_player_by_tg, register_player
+from lkshmatch.core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201
+from lkshmatch import core_client
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
 class CorePlayerAdapter(PlayerAdapter):
-    def __init__(self, lksh_config: LKSHStudentsRepository, core_client: core_client.Client):
-        self.client = core_client
+    def __init__(self, lksh_config: LKSHStudentsRepository, coreclient: core_client.Client):
+        self.client = coreclient
         self.lksh_config = lksh_config
 
     async def validate_register_user(self, user: Player) -> PlayerToRegister:

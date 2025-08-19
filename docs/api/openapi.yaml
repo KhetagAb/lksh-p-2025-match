@@ -51,8 +51,6 @@ paths:
       tags:
         - "Sport sections"
       summary: "Возвращает список всех существующих видов спорта"
-
-
       responses:
         "200":
           $ref: '#/components/responses/AllSportSections'
@@ -82,11 +80,10 @@ paths:
       summary: "Создает активность"
       parameters:
         - in: header
-          name: PrivilegeToken
+          name: Privilege-Token
           schema:
             type: string
           required: true
-
       requestBody:
         required: true
         content:
@@ -104,7 +101,6 @@ paths:
       tags:
         - "Activities"
       summary: "Удаляет активность"
-
       parameters:
         - name: id
           in: path
@@ -112,13 +108,11 @@ paths:
           schema:
             type: integer
             format: int64
-              - in: header
-                name: PrivilegeToken
-                schema:
-                  type: string
-                required: true
-
-
+        - in: header
+          name: PrivilegeToken
+          schema:
+            type: string
+          required: true
       responses:
         "200":
           $ref: '#/components/responses/ActivityResponse'
@@ -131,7 +125,6 @@ paths:
       tags:
         - "Activities"
       summary: "Изменяет активность"
-
       parameters:
         - name: id
           in: path
@@ -139,13 +132,11 @@ paths:
           schema:
             type: integer
             format: int64
-              - in: header
-                name: PrivilegeToken
-                schema:
-                  type: string
-                required: true
-
-
+        - in: header
+          name: PrivilegeToken
+          schema:
+            type: string
+          required: true
       requestBody:
         required: true
         content:

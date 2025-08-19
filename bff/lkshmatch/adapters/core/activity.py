@@ -1,24 +1,6 @@
 from typing import Optional
 
-import core_client
-from core_client.api.activities import (
-    get_core_activities_by_sport_section_id,
-    get_core_teams_by_activity_id,
-    post_core_activity_id_enroll, post_core_activity_create, post_core_activity_delete_by_id,
-    post_core_activity_update_by_id,
-)
-from core_client.models import (
-    ActivityEnrollPlayerRequest,
-    GetCoreActivitiesBySportSectionIdResponse200,
-    GetCoreActivitiesBySportSectionIdResponse400,
-    GetCoreTeamsByActivityIdResponse200,
-    GetCoreTeamsByActivityIdResponse400,
-    PostCoreActivityIdEnrollResponse200,
-    PostCoreActivityIdEnrollResponse400, CreateActivityRequest, PostCoreActivityCreateResponse200,
-    PostCoreActivityCreateResponse400, UpdateActivityRequest, PostCoreActivityUpdateByIdResponse200,
-    PostCoreActivityUpdateByIdResponse400, PostCoreActivityDeleteByIdResponse400, PostCoreActivityIdEnrollResponse409,
-    PostCoreActivityDeleteByIdResponse200,
-)
+from lkshmatch import core_client
 from lkshmatch.adapters.base import (
     Activity,
     ActivityAdapter,
@@ -27,9 +9,18 @@ from lkshmatch.adapters.base import (
     Team,
     TgID,
     UnknownError, ActivityAdminAdapter, )
-from lkshmatch.adapters.core.mappers.activity import map_team, map_activity
-from lkshmatch.admin.admin_privilege import PrivilegeChecker
-from lkshmatch.config import settings
+from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
+from lkshmatch.adapters.core.mappers.activity import map_team, map_activity, map_core_player
+from lkshmatch.core_client.api.activities import get_core_teams_by_activity_id, post_core_activity_id_enroll, \
+    post_core_activity_create, post_core_activity_delete_by_id, post_core_activity_update_by_id, \
+    get_core_activities_by_sport_section_id
+from lkshmatch.core_client.models import GetCoreActivitiesBySportSectionIdResponse400, \
+    GetCoreActivitiesBySportSectionIdResponse200, GetCoreTeamsByActivityIdResponse400, \
+    GetCoreTeamsByActivityIdResponse200, PostCoreActivityIdEnrollResponse400, PostCoreActivityIdEnrollResponse409, \
+    PostCoreActivityIdEnrollResponse200, ActivityEnrollPlayerRequest, CreateActivityRequest, \
+    PostCoreActivityCreateResponse400, PostCoreActivityCreateResponse200, PostCoreActivityDeleteByIdResponse400, \
+    PostCoreActivityDeleteByIdResponse200, PostCoreActivityUpdateByIdResponse200, PostCoreActivityUpdateByIdResponse400, \
+    UpdateActivityRequest
 
 
 class CoreActivityAdapter(ActivityAdapter):
@@ -44,8 +35,12 @@ class CoreActivityAdapter(ActivityAdapter):
             raise UnknownError("get activity by sport section id returns unknown response")
         activities: list[Activity] = []
         for activity in response.activities:
-            desc: str = activity.description if activity.description else ""
-            activities.append(Activity(activity.id, activity.title, desc, map_core_player(activity.creator)))
+            activities.append(Activity(
+                id=activity.id,
+                title=activity.title,
+                creator=map_core_player(activity.creator),
+                description=activity.description if activity.description else ""
+            ))
         return activities
 
     # TODO перенести в TeamsAdapter
@@ -76,15 +71,16 @@ class CoreActivityAdapter(ActivityAdapter):
 
 
 class CoreActivityAdminAdapter(ActivityAdminAdapter):
-    def __init__(self, coreclient: core_client.Client):
+    def __init__(self, coreclient: core_client.Client, privilege_checker: PrivilegeChecker):
         self.client = coreclient
-        #TODO спросить self.privilege_checker =
+        self.privilege_checker = privilege_checker
 
-    async def create_activity(self, title: str, sport_section_id: int, creator_id: int, description: Optional[str]) -> Activity:
-        headers = self.privilege_checker.check_admin(creator_id)
+    async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int, description: Optional[str]) -> Activity:
+        admin_token = self.privilege_checker.get_admin_token(creator_id)
         response = await post_core_activity_create.asyncio(client=self.client,
                                                            body=CreateActivityRequest(title, sport_section_id,
-                                                                                      creator_id,description), headers=headers)
+                                                                                      creator_id,description),
+                                                           privilege_token=admin_token)
         if isinstance(response, PostCoreActivityCreateResponse400):
             raise InvalidParameters(f"create activity return 400 response: {response.message}")
         if not isinstance(response, PostCoreActivityCreateResponse200):

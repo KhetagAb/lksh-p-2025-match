@@ -1,11 +1,13 @@
 from collections.abc import Iterable
 
 from dishka import Container, Provider, Scope, make_container, provide
+
+from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
 from lkshmatch.core_client import Client
 from pymongo import MongoClient
 
-from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter
-from lkshmatch.adapters.core.activity import CoreActivityAdapter
+from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter, ActivityAdminAdapter
+from lkshmatch.adapters.core.activity import CoreActivityAdapter, CoreActivityAdminAdapter
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
 from lkshmatch.config import settings
@@ -24,13 +26,7 @@ class CoreClientProvider(Provider):
         client = Client(base_url=self.url)
         yield client
 
-class CorePrivilegeChecker():
-    def __init__(self):
-        pass
-
-
 class MongoProvider(Provider):
-
     def __init__(self, uri: str, ping: bool = True):
         super().__init__()
         self._uri = uri
@@ -54,8 +50,11 @@ class MongoRepositoryProvider(Provider):
 
 class RestAllAdapterProvider(Provider):
     scope = Scope.APP
+    admin_privilege_checker = provide(PrivilegeChecker, provides=PrivilegeChecker)
+
     core_player_adapter = provide(CorePlayerAdapter, provides=PlayerAdapter)
     core_activity_adapter = provide(CoreActivityAdapter, provides=ActivityAdapter)
+    core_admin_activity_adapter = provide(CoreActivityAdminAdapter, provides=ActivityAdminAdapter)
     core_sport_adapter = provide(CoreSportAdapter, provides=SportAdapter)
 
 
