@@ -137,7 +137,7 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:
+    async def enroll_player_in_activity(self, activity_id: int, player_id: CoreID) -> Team:
         raise NotImplementedError
 
 
