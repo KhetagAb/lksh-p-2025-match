@@ -1,5 +1,4 @@
 import hashlib
-from lkshmatch.core_client.types import Unset, UNSET
 
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
 

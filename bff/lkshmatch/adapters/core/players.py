@@ -4,10 +4,8 @@ from lkshmatch.adapters.base import (
     Player,
     PlayerAdapter,
     PlayerAlreadyRegistered,
-    PlayerNotFound,
     PlayerToRegister,
-    UnknownError, InvalidParameters, TgID,
-)
+    UnknownError, InvalidParameters, )
 from lkshmatch.adapters.core.mappers.player import map_player_to_register_request, map_player_from_api
 from lkshmatch.core_client.api.players import get_core_player_by_tg, register_player
 from lkshmatch.core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201, \
