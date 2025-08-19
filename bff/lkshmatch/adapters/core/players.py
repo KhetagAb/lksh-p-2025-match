@@ -7,7 +7,7 @@ from lkshmatch.adapters.base import (
     PlayerAlreadyRegistered,
     PlayerNotFound,
     PlayerToRegister,
-    UnknownError, TgID, InvalidParameters,
+    UnknownError, InvalidParameters,
 )
 from lkshmatch.adapters.core.mappers.player import map_player_to_register_request, map_player
 from lkshmatch.core_client.api.players import get_core_player_by_tg, register_player

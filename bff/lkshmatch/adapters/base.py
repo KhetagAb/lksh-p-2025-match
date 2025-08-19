@@ -79,7 +79,7 @@ class Activity:
     id: int
     title: str
     creator: Player
-    description: Optional[str]
+    description: str | None
 
 
 @dataclass
@@ -119,7 +119,7 @@ class SportAdapter(ABC):
 
 class ActivityAdminAdapter(ABC):
     @abstractmethod
-    async def create_activity(self, requester: int,title: str, sport_section_id: int, creator_id: int, description: str) -> Activity:
+    async def create_activity(self, requester: int,title: str, sport_section_id: int, creator_id: int, description:  str | None) -> Activity:
         raise NotImplementedError
 
     # TODO спросить про айди креатора
@@ -128,7 +128,7 @@ class ActivityAdminAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_activity(self,requester: int, title: str, description: str, core_id: CoreID) -> None:
+    async def update_activity(self,requester: int, title: str, description:  str | None, core_id: CoreID) -> None:
         raise NotImplementedError
 
 

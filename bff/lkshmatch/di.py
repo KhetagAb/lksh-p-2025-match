@@ -1,6 +1,8 @@
 from collections.abc import Iterable
 
 from dishka import Container, Provider, Scope, make_container, provide
+from lkshmatch.website.vars import WEBSITE_CREDENTIALS_FILE
+from oauth2client.service_account import ServiceAccountCredentials
 from pymongo import MongoClient
 
 import core_client
@@ -8,21 +10,12 @@ from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter
 from lkshmatch.adapters.core.activity import CoreActivityAdapter
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
-
-from lkshmatch.adapters.stub_core.activity import StubActivityAdapter
-from lkshmatch.adapters.stub_core.players import StubPlayerAdapter
-from lkshmatch.adapters.stub_core.sport_sections import StubSportAdapter
-
 from lkshmatch.config import settings
 from lkshmatch.domain.repositories.admin_repository import AdminRepository
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
 from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 
-from lkshmatch.website.vars import WEBSITE_CREDENTIALS_FILE
-import httplib2
-from googleapiclient import discovery
-from oauth2client.service_account import ServiceAccountCredentials
 
 class CoreClientProvider(Provider):
     def __init__(self, core_host: str, core_port: str):
