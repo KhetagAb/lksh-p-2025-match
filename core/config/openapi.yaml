@@ -1,5 +1,4 @@
 package: server
-output: internal/generated/server/api.gen.go
 generate:
   echo-server: true
   models: true
