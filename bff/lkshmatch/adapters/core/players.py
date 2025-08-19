@@ -1,4 +1,3 @@
-
 from lkshmatch import core_client
 from lkshmatch.adapters.base import (
     CoreID,
