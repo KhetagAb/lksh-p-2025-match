@@ -306,9 +306,6 @@ components:
 
     UpdateActivityRequest:
       type: object
-      required:
-        - title
-        - description
       properties:
         title:
           type: string
@@ -316,13 +313,20 @@ components:
         description:
           type: string
           description: Описание активности
+        sport_section_id:
+          type: integer
+          format: int64
+        creator_id:
+          type: integer
+          format: int64
+          description: Core-идентификатор создателя активности
 
     ActivityEnrollPlayerRequest:
       type: object
       required:
-        - tg_id
+        - id
       properties:
-        tg_id:
+        id:
           type: integer
           format: int64
 

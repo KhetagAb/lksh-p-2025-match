@@ -9,19 +9,19 @@ import (
 	"match/internal/infra"
 )
 
-func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*dto.Team, error) {
-	infra.Infof(ctx, "Enrolling player with tg_id=%v in activity with id=%v", playerTgID, activityID)
+func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID, playerID int64) (*dto.Team, error) {
+	infra.Infof(ctx, "Enrolling player with_id=%v in activity with id=%v", playerID, activityID)
 
 	infra.Infof(ctx, "Getting activity with id=%v", activityID)
 	_, err := s.activityRepository.GetActivityByID(ctx, activityID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get activity by id [activity_id=%d]: %w", activityID, err)
+		return nil, fmt.Errorf("cannot get activity by activity_id=%d: %w", activityID, err)
 	}
 
-	infra.Infof(ctx, "Getting player with tg_id=%v", playerTgID)
-	captain, err := s.playerRepository.GetPlayerByTgID(ctx, playerTgID)
+	infra.Infof(ctx, "Getting player with id=%v", playerID)
+	captain, err := s.playerService.GetPlayerByID(ctx, playerID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get player by tg_id [player_tg_id=%d]: %w", playerTgID, err)
+		return nil, fmt.Errorf("cannot get player by id=%v: %w", playerID, err)
 	}
 
 	infra.Infof(ctx, "Getting team by player and activity [player_id=%d] [activity_id=%d]", captain.ID, activityID)

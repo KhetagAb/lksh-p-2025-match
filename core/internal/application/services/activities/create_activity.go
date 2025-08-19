@@ -9,7 +9,7 @@ import (
 
 func (s *ActivityService) CreateActivity(ctx context.Context, creatorID, sportSectionId int64, title, description string) (*dto.Activity, error) {
 	infra.Infof(ctx, "Getting creator player with id=%v", creatorID)
-	creator, err := s.playerRepository.GetPlayerByTgID(ctx, creatorID)
+	creator, err := s.playerService.GetPlayerByID(ctx, creatorID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get player by tg_id [player_tg_id=%d]: %w", creatorID, err)
 	}

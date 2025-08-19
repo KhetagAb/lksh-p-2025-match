@@ -2,76 +2,66 @@ package handlers
 
 import (
 	"context"
-	"github.com/labstack/echo/v4"
+	"match/internal/application/handlers/mappers"
 	"match/internal/domain/dao"
 	"match/internal/generated/server"
 	"match/internal/infra"
-	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 type (
-	GetPlayerByIdService interface {
+	GetPlayerByTgService interface {
 		GetPlayerByTgID(ctx context.Context, telegramID int64) (*dao.Player, error)
-		GetPlayerByTgUsername(ctx context.Context, telegramUsername int64) (*dao.Player, error)
+		GetPlayerByTgUsername(ctx context.Context, telegramUsername string) (*dao.Player, error)
 	}
 
-	GetPlayerByIdHandler struct {
-		getPlayerByIdService GetPlayerByIdService
+	GetPlayerByTgHandler struct {
+		playerService GetPlayerByTgService
 	}
 )
 
-func NewGetPlayerByIdHandler(
-	getPlayerByIdService GetPlayerByIdService,
-) *GetPlayerByIdHandler {
-	return &GetPlayerByIdHandler{
-		getPlayerByIdService: getPlayerByIdService,
+func NewGetPlayerByTgHandler(
+	playerService GetPlayerByTgService,
+) *GetPlayerByTgHandler {
+	return &GetPlayerByTgHandler{
+		playerService: playerService,
 	}
 }
 
-func (h *GetPlayerByIdHandler) GetPlayerByTg(ectx echo.Context) error {
+func (h *GetPlayerByTgHandler) GetPlayerByTg(ectx echo.Context, params server.GetCorePlayerByTgParams) error {
+	if params.TgId == nil && params.TgUsername == nil {
+		return BadRequestErrorResponsef(ectx, "Either tg_id or tg_username must be provided")
+	}
+	if params.TgId != nil && params.TgUsername != nil {
+		return BadRequestErrorResponsef(ectx, "Only one of tg_id or tg_username must be provided")
+	}
+
 	ctx := context.Background()
-	request := new(server.GetCorePlayerByTgParams)
-
-	if err := ectx.Bind(request); err != nil {
-		infra.Errorf(ctx, "Bad request: register user requires body")
-		return ectx.String(http.StatusBadRequest, "Invalid request body")
+	var player *dao.Player
+	var err error
+	if params.TgId != nil {
+		infra.Infof(ctx, "Getting player by tg_id=%d", *params.TgId)
+		player, err = h.playerService.GetPlayerByTgID(ctx, *params.TgId)
+		if err != nil {
+			infra.Errorf(ctx, "Error getting player by tg_id %d: %v", *params.TgId, err)
+			return InternalErrorResponsef(ectx, "Error getting player by tg_id %d: %v", *params.TgId, err)
+		}
+		if player == nil {
+			return NotFoundErrorResponsef(ectx, "Player not found with tg_id %d", *params.TgId)
+		}
+	} else {
+		infra.Infof(ctx, "Getting player by tg_username=%s", *params.TgUsername)
+		player, err = h.playerService.GetPlayerByTgUsername(ctx, *params.TgUsername)
+		if err != nil {
+			infra.Errorf(ctx, "Error getting player by tg_username %s: %v", *params.TgUsername, err)
+			return InternalErrorResponsef(ectx, "Error getting player by tg_username %s: %v", *params.TgUsername, err)
+		}
+		if player == nil {
+			return NotFoundErrorResponsef(ectx, "Player not found with tg_username %s", *params.TgUsername)
+		}
 	}
 
-	if request.TgUsername == nil && request.TgId != nil {
-		infra.Infof(ctx, "Getting player with tg_id=%d", request.TgId)
-		player, err := h.getPlayerByIdService.GetPlayerByTgID(ctx, *request.TgId)
-		if err != nil {
-			infra.Errorf(ctx, "Internal server error while trying to get player by tgId %v: %v", request.TgId, err)
-			return InternalErrorResponse(ectx, err.Error())
-		}
-		return ectx.JSON(200, server.GetCorePlayerByTgParams{TgId: &player.TgID, TgUsername: &player.TgUsername})
-	} else if request.TgUsername != nil && request.TgId == nil {
-		infra.Infof(ctx, "Getting player with tg_username=%s", request.TgUsername)
-		player, err := h.getPlayerByIdService.GetPlayerByTgUsername(ctx, *request.TgId)
-		if err != nil {
-			infra.Errorf(ctx, "Internal server error while trying to get player by tg_username %v: %v", request.TgUsername, err)
-			return InternalErrorResponse(ectx, err.Error())
-		}
-		return ectx.JSON(200, server.GetCorePlayerByTgParams{TgId: &player.TgID, TgUsername: &player.TgUsername})
-	} else if request.TgUsername != nil && request.TgId != nil {
-		infra.Infof(ctx, "Getting player with tg_id=%d and tg_username=%s", request.TgId, request.TgUsername)
-		playerById, err := h.getPlayerByIdService.GetPlayerByTgID(ctx, *request.TgId)
-		if err != nil {
-			infra.Errorf(ctx, "Internal server error while trying to get player by tgId %v: %v", request.TgId, err)
-			return InternalErrorResponse(ectx, err.Error())
-		}
-		playerByUsername, err := h.getPlayerByIdService.GetPlayerByTgID(ctx, *request.TgId)
-		if err != nil {
-			infra.Errorf(ctx, "Internal server error while trying to get player by tg_username %v: %v", request.TgUsername, err)
-			return InternalErrorResponse(ectx, err.Error())
-		}
-		if playerById.ID == playerByUsername.ID {
-			return ectx.JSON(200, server.GetCorePlayerByTgParams{TgId: &playerByUsername.TgID, TgUsername: &playerByUsername.TgUsername})
-		} else {
-			infra.Errorf(ctx, "Internal server error while trying to get player by tg_username %v: %v, resulsts doesn't match", request.TgUsername, err)
-			return InternalErrorResponse(ectx, err.Error())
-		}
-
-	}
-	return ectx.String(http.StatusBadRequest, "Invalid request body")
+	response := mappers.MapPlayerToAPI(*player)
+	return ectx.JSON(200, response)
 }

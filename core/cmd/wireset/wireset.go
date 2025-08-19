@@ -39,7 +39,7 @@ var All = wire.NewSet(
 	teams.NewTeamService,
 
 	wire.Bind(new(activities.ActivityRepository), new(*repositories.Activities)),
-	wire.Bind(new(activities.PlayerRepository), new(*repositories.Players)),
+	wire.Bind(new(activities.PlayerService), new(*repositories.Players)),
 	wire.Bind(new(activities.TeamRepository), new(*repositories.Teams)),
 	wire.Bind(new(activities.SportRepository), new(*repositories.SportSections)),
 	activities.NewActivityService,
@@ -63,6 +63,15 @@ var All = wire.NewSet(
 
 	wire.Bind(new(handlers.CreateActivityService), new(*activities.ActivityService)),
 	handlers.NewCreateActivityHandler,
+
+	wire.Bind(new(handlers.DeleteActivityService), new(*activities.ActivityService)),
+	handlers.NewDeleteActivityHandler,
+
+	wire.Bind(new(handlers.UpdateActivityService), new(*activities.ActivityService)),
+	handlers.NewUpdateActivityHandler,
+
+	wire.Bind(new(handlers.GetPlayerByTgService), new(*players.PlayerService)),
+	handlers.NewGetPlayerByTgHandler,
 
 	handlers.NewServerInterface,
 

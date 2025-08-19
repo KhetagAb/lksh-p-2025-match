@@ -17,7 +17,7 @@ func (s *ActivityService) GetActivitiesBySportSectionID(ctx context.Context, spo
 
 	var activitiesDTO dto.Activities
 	for _, activity := range activities {
-		creator, err := s.playerRepository.GetPlayerByID(ctx, activity.CreatorID)
+		creator, err := s.playerService.GetPlayerByTgID(ctx, activity.CreatorID)
 		if err != nil {
 			return nil, fmt.Errorf("cannot get creator of activity by id [activity_id=%d] [activity_title=%s] [activity_creator_id=%d]: %w", activity.ID, activity.Title, activity.CreatorID, err)
 		}
