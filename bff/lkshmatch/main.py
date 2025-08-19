@@ -13,23 +13,23 @@ from lkshmatch.website.auth.login_middleware import LoginWallMiddleware
 from lkshmatch.website.activities_gsheets import table_adapter_router
 from lkshmatch.config import settings
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[FastAPI]:
-    _remove_webhook = await bot.remove_webhook()
-    _set_webhook = await bot.set_webhook(url=os.path.join(settings.get("BASE_URL"), f"bot/{token}")) 
+    await bot.remove_webhook()
+    await bot.set_webhook(url=f"{settings.get('BASE_URL')}/bot/{token}")
     yield app
-    _remove_webhook = await bot.remove_webhook()
+    await bot.remove_webhook()
 
 
 def start() -> None:
     uvloop.install()
-
     app = FastAPI(
         title="Match REST API",
         summary="REST API documentation for Match",
         version="0.1.0",
         redoc_url="/docs2",
-        # lifespan=lifespan, # type: ignore
+        lifespan=lifespan, # type: ignore
     )
     app.include_router(activities_router)
     app.include_router(auth_router, prefix="/auth")
@@ -38,15 +38,15 @@ def start() -> None:
 
     app.add_middleware(LoginWallMiddleware)
 
+
+
     uvicorn.run(
         app=app,
         host="0.0.0.0",
         port=8000,
-        # reload=True,
-        # reload_dirs=["."],
-        # log_config="../logging.ini",
-        # log_level="debug",
-        env_file="../.env",
+        log_config="logging.ini",
+        log_level="debug",
+        env_file=".env",
     )
 
 
