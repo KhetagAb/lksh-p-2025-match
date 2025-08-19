@@ -47,7 +47,7 @@ class Buttons(Enum):
     REGISTRATION_CONFIRM = ("✅ Подтверждаю", "reg_confirm")
     REGISTRATION_CANCEL = ("❌ Отмена регистрации", "reg_cancel")
     SPORTS_REGISTER_ON = ("Записаться на активность", "sports_register")
-    TECHNICAL_SUPPORT = ("Написать в техподдержку.", "")
+    TECHNICAL_SUPPORT = ("Написать в техподдержку.", "tech_sup")
 
     def __init__(self, text: str, callback_data: str):
         self.text = text
@@ -71,32 +71,27 @@ player_adapter = app_container.get(PlayerAdapter)
 students_repository = app_container.get(LKSHStudentsRepository)
 
 
+def get_required_param(param: str) -> str:
+    try:
+        answer = settings.get(param)
+        if answer is None:
+            raise ValueError(f"{param} required!")
+        logging.info(f"{param}: {answer}")
+    except Exception as e:
+        logging.error(f"Error in gettin {param}: {e}")
+        exit(1)
+    return answer
+
+
+token = get_required_param("TELEGRAM_TOKEN")
+support_chat_id = int(get_required_param("SUPPORT_CHAT_ID"))
+support_chat_thread_id = int(get_required_param("SUPPORT_CHAT_THREAD_ID"))
+
 try:
-    token = settings.get("TELEGRAM_TOKEN")
-    if token is None:
-        raise ValueError("TG token required!")
     bot = AsyncTeleBot(token)
-    logging.info(f"Telegram bot started, token: {token}")
+    logging.info("Telegram bot started")
 except Exception as e:
-    logging.error(f"Ошибка создания Telegram бота: {e}")
-    exit(1)
-
-try:
-    support_chat_id = settings.get("SUPPORT_CHAT_ID")
-    if support_chat_id is None:
-        raise ValueError("SUPPORT_CHAT_ID required!")
-    logging.info(f"Support chat ID: {support_chat_id}")
-except Exception as e:
-    logging.error(f"Error {e}")
-    exit(1)
-
-try:
-    support_chat_thread_id = settings.get("SUPPORT_CHAT_THREAD_ID")
-    if support_chat_thread_id is None:
-        raise ValueError("SUPPORT_CHAT_THREAD_ID required!")
-    logging.info(f"Support chat thread ID: {support_chat_thread_id}")
-except Exception as e:
-    logging.error(f"Error {e}")
+    logging.error(f"Telegram bot failed: {e}")
     exit(1)
 
 
@@ -180,8 +175,8 @@ async def msg_without_buttons(mess: types.Message, text: str) -> types.Message:
 
 async def edit_with_ibuttons(
     call: types.CallbackQuery, text: str, buttons: types.InlineKeyboardMarkup
-) -> None:
-    await bot.edit_message_text(
+) -> types.Message:
+    return await bot.edit_message_text(
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
         text=text,
@@ -246,7 +241,7 @@ async def start(mess: types.Message) -> None:
         return
     try:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
-        markup.add(types.KeyboardButton(Buttons.TECHNICAL_SUPPORT.value[0]))
+        markup.add(types.KeyboardButton(Buttons.TECHNICAL_SUPPORT.text))
         await msg_with_buttons(mess, "Здравствуйте!", markup)
         # TODO: What if user does not have username?
         user_name = await students_repository.validate_register_user(
@@ -294,12 +289,8 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
                 PlayerToRegister(username, user_id, user_name)
             )
 
-            await edit_with_ibuttons(call, Msg.REGISTRATION_CONFIRMED.value, sport_markup)
-            # await bot.pin_chat_message(call.message.chat.id, call.message.message_id)
-            await edit_with_ibuttons(
-                call, Msg.REGISTRATION_CONFIRMED.value, sport_markup
-            )
-            # await bot.pin_chat_message(call.message.chat.id, call.message.message_id)
+            to_pin = (await edit_with_ibuttons(call, Msg.REGISTRATION_CONFIRMED.value, sport_markup)).message_id
+            await bot.pin_chat_message(call.message.chat.id, to_pin)
         except PlayerNotFound:
             log_warning(
                 "User not found in lksh database. Validate failed.", call.message
@@ -320,13 +311,12 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
 @bot.message_handler(commands=["register_on_sport"])  # type: ignore
 async def register_on_sport(mess: types.Message) -> None:
     log_info("Called /register_on_sport.", mess)
-    to_pin = (await msg_with_ibuttons(
+    await msg_with_ibuttons(
         mess=mess,
         text="Выберите спортивную секцию.",
         buttons=await make_sports_buttons()
-    )).message_id
-    log_warning(str(to_pin), mess)
-    await bot.pin_chat_message(mess.chat.id, to_pin)
+    )
+    # await bot.pin_chat_message(mess.chat.id, to_pin)
     log_info("Finished /register_on_sport successfully.", mess)
 
 
@@ -396,15 +386,6 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
             numbered_teams = [f"{i + 1}. {team.name}" for i, team in enumerate(list_of_all_teams)]
             # todo сделать поддерждку команда/участник
             teams_text = f"🏆 {activity.title}\n\n{description}📋 Список участников:\n\n" + "\n".join(numbered_teams)
-            description = (
-                f"ℹ️ Описание: {activity.description}\n\n"
-                if activity.description
-                else ""
-            )
-            teams_text = (
-                f"🏆 {activity.title}\n\n{description}📋 Список участников:\n\n"
-                + "\n".join(numbered_teams)
-            )
         else:
             teams_text = f"🏆 {activity.title}\n\n📋 Пока нет участников."
 
@@ -491,12 +472,12 @@ async def signup_to_activity(call: types.CallbackQuery) -> None:
     await edit_without_buttons(call, "🚧 Функция записи в существующую команду находится в разработке. ")
 
 
-def parse_message(msg: str) -> int:
+def get_id_from_support_message(msg: str) -> int:
     str1 = msg.split(", id: ")[1]
     return int(str1[:str1.find("]")])
 
 
-async def change_message(mess: types.Message, answer: types.Message) -> None:
+async def change_support_message(mess: types.Message, answer: types.Message) -> None:
     await bot.edit_message_text(f"{mess.text}\n\nОтвечено: [username: {answer.from_user.username}, " # type: ignore
                                 f"id: {answer.from_user.id}]", mess.chat.id, mess.id) # type: ignore
 
@@ -507,7 +488,7 @@ async def notify_person(tg_id: int, text: str) -> None:
 
 @bot.message_handler(content_types=["text"]) # type: ignore
 async def answer_to_buttons(mess: types.Message) -> None:
-    if mess.text == Buttons.TECHNICAL_SUPPORT.value[0]:
+    if mess.text == Buttons.TECHNICAL_SUPPORT.text:
         await msg_without_buttons(mess, Msg.TECHNICAL_SUPPORT.value)
         log_info("User need help", mess)
         return
@@ -520,9 +501,9 @@ async def answer_to_buttons(mess: types.Message) -> None:
         return
     if mess.message_thread_id is not None and mess.message_thread_id == support_chat_thread_id:
         if mess.reply_to_message is not None:
-            await bot.send_message(parse_message(mess.reply_to_message.text), mess.text) # type: ignore
+            await bot.send_message(get_id_from_support_message(mess.reply_to_message.text), mess.text) # type: ignore
             log_info("Message has been sent to user", mess)
-            await change_message(mess.reply_to_message, mess)
+            await change_support_message(mess.reply_to_message, mess)
             return
     await msg_without_buttons(mess, "Я вас не понимаю. Используйте кнопки или команды.")
 
