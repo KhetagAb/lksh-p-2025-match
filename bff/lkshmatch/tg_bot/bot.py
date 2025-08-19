@@ -485,6 +485,6 @@ async def answer_to_buttons(mess: types.Message) -> None:
 
 @router.post(f"/{token}")
 async def telegram_webhook(request: dict) -> None:
-    if request and (update := types.Update.de_json(request)):
+    if request and (update := types.Update.de_json(request)):  # type: ignore[no-untyped-call]
         await bot.process_new_updates([update])
 
