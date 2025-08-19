@@ -71,14 +71,6 @@ player_adapter = app_container.get(PlayerAdapter)
 students_repository = app_container.get(LKSHStudentsRepository)
 
 
-# Защита от Шоно
-async def shono_fuse(mess: types.Message):
-    if mess.from_user.id == 1026324598:
-        await bot.send_message(mess.chat.id, "Шоно перестань, займись делом.", message_thread_id=mess.message_thread_id)
-        return True
-    return False
-
-
 try:
     token = settings.get("TELEGRAM_TOKEN")
     if token is None:
@@ -248,8 +240,6 @@ def log_error(text: str, mess: types.Message | types.InaccessibleMessage) -> Non
 
 @bot.message_handler(commands=["start"]) # type: ignore
 async def start(mess: types.Message) -> None:
-    if await shono_fuse(mess):
-        return
     log_info("Called /start.", mess)
     user_id, username = await validate_user(mess)
     if user_id is None:
@@ -286,8 +276,6 @@ async def start(mess: types.Message) -> None:
 ) # type: ignore
 async def processing_of_registration(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-    if await shono_fuse(call.message):
-        return
     if call.data == Buttons.REGISTRATION_CONFIRM.callback_data:
         log_info("Registration accepted.", call.message)
         user_id, username = call.from_user.id, call.from_user.username
@@ -332,8 +320,6 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
 
 @bot.message_handler(commands=["register_on_sport"])  # type: ignore
 async def register_on_sport(mess: types.Message) -> None:
-    if await shono_fuse(mess):
-        return
     log_info("Called /register_on_sport.", mess)
     to_pin = (await msg_with_ibuttons(
         mess=mess,
@@ -350,8 +336,6 @@ async def register_on_sport(mess: types.Message) -> None:
 )  # type: ignore
 async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-    if await shono_fuse(call.message):
-        return
     markup = await make_sports_buttons()
     await msg_with_ibuttons(call.message, "Выберите спортивную секцию:", markup)
 
@@ -359,8 +343,6 @@ async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
 @bot.callback_query_handler(func=lambda call: call.data.startswith("sport_")) # type: ignore
 async def select_sport(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-    if await shono_fuse(call.message):
-        return
     sport_id = int(call.data.split("_")[1])  # type: ignore
     for s in await sport_adapter.get_sport_list():
         if s.id == sport_id:
@@ -383,8 +365,6 @@ async def select_sport(call: types.CallbackQuery) -> None:
 @bot.callback_query_handler(func=lambda call: call.data.startswith("activity_")) # type: ignore
 async def processing_select_activity(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-    if await shono_fuse(call.message):
-        return
     activity_id = int(call.data.split("_")[1])  # type: ignore
     activity = await get_activity_by_id(activity_id)
     if not activity:
@@ -479,8 +459,6 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
 @bot.callback_query_handler(func=lambda call: call.data.startswith("create_")) # type: ignore
 async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-    if await shono_fuse(call.message):
-        return
     activity_id = int(call.data.split("_")[1])  # type: ignore
 
     try:
@@ -530,8 +508,6 @@ async def notify_person(tg_id: int, text: str) -> None:
 
 @bot.message_handler(content_types=["text"]) # type: ignore
 async def answer_to_buttons(mess: types.Message) -> None:
-    if await shono_fuse(mess):
-        return
     if mess.text == Buttons.TECHNICAL_SUPPORT.value[0]:
         await msg_without_buttons(mess, Msg.TECHNICAL_SUPPORT.value)
         log_info("User need help", mess)
