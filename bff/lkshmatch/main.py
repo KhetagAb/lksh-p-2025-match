@@ -1,26 +1,20 @@
-import asyncio
 from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
 
 import uvicorn
 import uvloop
 from fastapi import FastAPI
 
-from lkshmatch.tg_bot.bot import token, bot, router as bot_router
-from lkshmatch.website.auth.auth import auth_router
-from lkshmatch.website.activities import activities_router
-from lkshmatch.website.auth.login_middleware import LoginWallMiddleware
-from lkshmatch.website.activities_gsheets import table_adapter_router
 from lkshmatch.config import settings
+from lkshmatch.tg_bot.bot import token, bot, router as bot_router
+from lkshmatch.website.activities import activities_router
+from lkshmatch.website.activities_gsheets import table_adapter_router
+from lkshmatch.website.auth.auth import auth_router
+from lkshmatch.website.auth.login_middleware import LoginWallMiddleware
 
 
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator:
     await bot.remove_webhook()
-    await bot.set_webhook(
-        url=f"{settings.get('BASE_URL')}/bot/{token}",
-        drop_pending_updates=True,
-    )
-    print("zeliboba")
+    await bot.set_webhook(url=f"{settings.get('BASE_URL')}/bot/{token}")
     yield
     await bot.remove_webhook()
 
