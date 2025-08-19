@@ -1,15 +1,7 @@
-from lkshmatch.core_client.models import activity as activity_api
-from lkshmatch.core_client.models import player as player_api
-from lkshmatch.core_client.models import team as team_api
 from lkshmatch.adapters import base as domain
-from lkshmatch.adapters.base import CorePlayer
-
-
-def map_core_player(player: player_api.Player) -> CorePlayer:
-    return CorePlayer(
-        core_id=player.core_id,
-        tg_id=player.tg_id,
-    )
+from lkshmatch.adapters.core.mappers.player import map_player_from_api
+from lkshmatch.core_client.models import activity as activity_api
+from lkshmatch.core_client.models import team as team_api
 
 
 def map_activity(activity: activity_api.Activity) -> domain.Activity:
@@ -17,7 +9,7 @@ def map_activity(activity: activity_api.Activity) -> domain.Activity:
         id=activity.id,
         title=activity.title,
         description= activity.description if activity.description else None,
-        creator=map_core_player(activity.creator),
+        creator=map_player_from_api(activity.creator),
     )
 
 
@@ -25,6 +17,6 @@ def map_team(team: team_api.Team) -> domain.Team:
     return domain.Team(
         id=team.id,
         name=team.name,
-        captain=map_core_player(team.captain),
-        members=[map_core_player(member) for member in team.members],
+        captain=map_player_from_api(team.captain),
+        members=[map_player_from_api(member) for member in team.members],
     )

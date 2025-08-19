@@ -1,5 +1,5 @@
-from lkshmatch.core_client import models
 from lkshmatch.adapters import base as domain
+from lkshmatch.core_client import models
 
 
 def map_sport_section(sport: models.SportSection) -> domain.SportSection:
