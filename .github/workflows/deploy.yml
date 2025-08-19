@@ -1,33 +1,47 @@
-# name: push to registry
-
-# on:
-#   push:
-#     branches:
-#       - master
-
-# jobs:
-#   push:
-#     name: push
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v5
-#       - id: vars
-#         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-#       - id: login-cr
-#         uses: yc-actions/yc-cr-login@v3
-#         with:
-#           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-#       - uses: docker/setup-buildx-action@v3
-#       - run: |
-#           docker buildx build -f core/prod.dockerfile -t match/core:latest -t match/core:$TAG -o match/bin/ core
-#         env:
-#           REGISTRY: ${{ vars.REGISTRY }}  # REGISTRY identificator(without any prefixes)
-#           REPOSITORY: match/core
-#           TAG: ${{ steps.vars.outputs.sha_short }}
-#       - run: |
-#           docker push cr.yandex/$REGISTRY/match$TAG
-#           docker push cr.yandex/$REGISTRY/match:latest
-#         env:
-#           REGISTRY: ${{ vars.REGISTRY }}  # REGISTRY identificator(without any prefixes)
-#           REPOSITORY: match/core
-#           TAG: ${{ steps.vars.outputs.sha_short }}
+#name: push to registry
+#
+#on:
+# push:
+#   branches:
+#     - master
+#
+#jobs:
+#  push:
+#    name: push
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: checkout
+#        uses: actions/checkout@v5
+#      - id: vars
+#        name: set params
+#        run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+#      - id: login-cr
+#        name: login to registry
+#        uses: yc-actions/yc-cr-login@v3
+#        with:
+#          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+#      - name: setup docker
+#        uses: docker/setup-buildx-action@v3
+#      - name: build core
+#        run: |
+#          docker buildx build . -f core/dev.dockerfile -t match/core:latest -t match/core:$TAG -o match/bin/
+#        env:
+#          REGISTRY: ${{ vars.REGISTRY }}  # REGISTRY identificator(without any prefixes)
+#          REPOSITORY: match/core
+#          TAG: ${{ steps.vars.outputs.sha_short }}
+#      - name: build bff
+#        run: |
+#          docker buildx build . -f bff/dev.dockerfile -t match/bff:latest -t match/bff:$TAG -o match/bin/
+#        env:
+#          REGISTRY: ${{ vars.REGISTRY }}  # REGISTRY identificator(without any prefixes)
+#          REPOSITORY: match/core
+#          TAG: ${{ steps.vars.outputs.sha_short }}
+#      - name: push
+#        run: |
+#          docker push cr.yandex/$REGISTRY/match/core:$TAG
+#          docker push cr.yandex/$REGISTRY/match/core:latest
+#          docker push cr.yandex/$REGISTRY/match/bff:$TAG
+#          docker push cr.yandex/$REGISTRY/match/bff:latest
+#        env:
+#          REGISTRY: ${{ vars.REGISTRY }}  # REGISTRY identificator(without any prefixes)
+#          TAG: ${{ steps.vars.outputs.sha_short }}
