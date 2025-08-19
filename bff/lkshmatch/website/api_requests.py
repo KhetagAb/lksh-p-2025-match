@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import Response
 
-from lkshmatch.adapters.base import SportAdapter, ActivityAdapter
+from lkshmatch.adapters.base import SportAdapter, ActivityAdapter, Team, Activity
 from lkshmatch.di import app_container
 
 from lkshmatch.website.auth.auth import get_user_id_from_token, COOKIE_NAME
@@ -19,14 +19,27 @@ async def get_sport_sections_json(_request: Request) -> list | None:
     return sport_sections
 
 
-@api_requests_router.get("/get_activity_by_sport_section")
-async def get_activity_by_sport_section_json(
+@api_requests_router.get("/get_activities")
+async def get_activities_by_sport_section_id_json(
     _request: Request,
     sport_section_id: int
-) -> list | None:
+) -> list[Activity] | None:
     try:
         activity_adapter = app_container.get(ActivityAdapter)
         activities = await activity_adapter.get_activities_by_sport_section(sport_section_id)
     except BaseException:
         return None
     return activities
+
+
+@api_requests_router.get("/get_teams")
+async def get_teams_by_activity_id(
+    _request: Request,
+    activity_id: int
+) -> list[Team] | None:
+    try:
+        activity_adapter = app_container.get(ActivityAdapter)
+        teams = await activity_adapter.get_teams_by_activity_id(activity_id)
+    except BaseException:
+        return None
+    return teams

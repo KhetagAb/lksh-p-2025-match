@@ -141,7 +141,7 @@
         function get_sect() {
             function reco(callback) {
                 const idsect = but.value;
-                var nexturl = '/api/get_activity_by_sport_section?sport_section_id=';
+                var nexturl = '/api/get_activities?sport_section_id=';
                 nexturl += idsect;
                 fetch(nexturl)
                     .then(response => response.json())
