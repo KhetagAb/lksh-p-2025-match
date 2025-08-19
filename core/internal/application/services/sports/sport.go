@@ -1,4 +1,4 @@
-package sport
+package sports
 
 import (
 	"context"
@@ -6,23 +6,23 @@ import (
 )
 
 type (
-	Repository interface {
+	SportRepository interface {
 		GetSportsList(ctx context.Context) ([]dao.SportSection, error)
 	}
 
 	Service struct {
-		repository Repository
+		SportRepository SportRepository
 	}
 )
 
-func NewSportSectionService(repository Repository) *Service {
+func NewSportSectionService(SportRepository SportRepository) *Service {
 	return &Service{
-		repository: repository,
+		SportRepository: SportRepository,
 	}
 }
 
 func (s *Service) GetAllSportSection(ctx context.Context) ([]dao.SportSection, error) {
-	cnt, err := s.repository.GetSportsList(ctx)
+	cnt, err := s.SportRepository.GetSportsList(ctx)
 	if cnt == nil || err != nil {
 		return nil, err
 	} else {

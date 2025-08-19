@@ -29,7 +29,7 @@ func NewActivitiesRepository(pool *pgxpool.Pool) *Activities {
 func (a *Activities) CreateActivity(ctx context.Context, creatorID, sportSectionId int64, title, description string) (*dao.Activity, error) {
 	var activity dao.Activity
 	err := a.pool.QueryRow(ctx, createActivity, title, description, sportSectionId, creatorID).
-		Scan(activity.ID, activity.Title, activity.Description, activity.SportSectionID, activity.CreatorID)
+		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}

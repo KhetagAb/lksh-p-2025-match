@@ -22,11 +22,17 @@ type (
 		AddPlayerToTeam(ctx context.Context, teamID, playerID int64) error
 		GetTeamByPlayerAndActivity(ctx context.Context, playerID, activityID int64) (*dao.Team, error)
 	}
+	SportRepository interface {
+		GetSportsList(
+			ctx context.Context,
+		) ([]dao.SportSection, error)
+	}
 
 	ActivityService struct {
 		activityRepository ActivityRepository
 		playerRepository   PlayerRepository
 		teamRepository     TeamRepository
+		sportRepository    SportRepository
 	}
 )
 
@@ -34,10 +40,12 @@ func NewActivityService(
 	activityRepository ActivityRepository,
 	playerRepository PlayerRepository,
 	teamRepository TeamRepository,
+	sportRepository SportRepository,
 ) *ActivityService {
 	return &ActivityService{
 		activityRepository: activityRepository,
 		playerRepository:   playerRepository,
 		teamRepository:     teamRepository,
+		sportRepository:    sportRepository,
 	}
 }

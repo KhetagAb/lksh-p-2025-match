@@ -84,7 +84,7 @@ func (s *SportSections) DeleteSportSectionByID(ctx context.Context, id int64) er
 		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
 	if tag.RowsAffected() != 1 {
-		return &services.NotFoundError{Code: services.NotFound, Message: "sport section not found"}
+		return &services.NotFoundError{Code: services.NotFound, Message: "sports section not found"}
 	}
 	return nil
 }
