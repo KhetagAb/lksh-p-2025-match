@@ -18,3 +18,5 @@ RUN make codegen
 ENTRYPOINT []
 
 CMD ["uv", "run", "python", "-m", "lkshmatch.main"]
+
+EXPOSE 8000
