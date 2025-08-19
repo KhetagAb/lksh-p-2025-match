@@ -13,7 +13,7 @@ class LoginWallMiddleware(BaseHTTPMiddleware):
         super().__init__(app)
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
-        if request.url.path.startswith("/auth/"):
+        if request.url.path.startswith("/auth") or request.url.path.startswith("/bot"):
             return await call_next(request)
 
         token = request.cookies.get(COOKIE_NAME)

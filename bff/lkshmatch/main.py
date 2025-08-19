@@ -1,9 +1,9 @@
+import asyncio
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import uvicorn
 import uvloop
-import os
 from fastapi import FastAPI
 
 from lkshmatch.tg_bot.bot import token, bot, router as bot_router
@@ -14,11 +14,14 @@ from lkshmatch.website.activities_gsheets import table_adapter_router
 from lkshmatch.config import settings
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[FastAPI]:
+async def lifespan(app: FastAPI):
     await bot.remove_webhook()
-    await bot.set_webhook(url=f"{settings.get('BASE_URL')}/bot/{token}")
-    yield app
+    await bot.set_webhook(
+        url=f"{settings.get('BASE_URL')}/bot/{token}",
+        drop_pending_updates=True,
+    )
+    print("zeliboba")
+    yield
     await bot.remove_webhook()
 
 
@@ -28,8 +31,7 @@ def start() -> None:
         title="Match REST API",
         summary="REST API documentation for Match",
         version="0.1.0",
-        redoc_url="/docs2",
-        lifespan=lifespan, # type: ignore
+        lifespan=lifespan,
     )
     app.include_router(activities_router)
     app.include_router(auth_router, prefix="/auth")
@@ -38,15 +40,12 @@ def start() -> None:
 
     app.add_middleware(LoginWallMiddleware)
 
-
-
     uvicorn.run(
         app=app,
         host="0.0.0.0",
         port=8000,
         log_config="logging.ini",
-        log_level="debug",
-        env_file=".env",
+        log_level="info",
     )
 
 
