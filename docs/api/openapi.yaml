@@ -38,8 +38,7 @@ paths:
         - name: tg_username
           in: query
           schema:
-            type: integer
-            format: int64
+            type: string
       responses:
         "200":
           $ref: '#/components/responses/PlayerResponse'
@@ -109,7 +108,7 @@ paths:
             type: integer
             format: int64
         - in: header
-          name: PrivilegeToken
+          name: Privilege-Token
           schema:
             type: string
           required: true
@@ -133,7 +132,7 @@ paths:
             type: integer
             format: int64
         - in: header
-          name: PrivilegeToken
+          name: Privilege-Token
           schema:
             type: string
           required: true

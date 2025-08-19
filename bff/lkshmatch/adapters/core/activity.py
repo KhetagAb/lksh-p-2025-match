@@ -76,7 +76,7 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         self.privilege_checker = privilege_checker
 
     async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int, description: Optional[str]) -> Activity:
-        admin_token = self.privilege_checker.get_admin_token(creator_id)
+        admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_create.asyncio(client=self.client,
                                                            body=CreateActivityRequest(title, sport_section_id,
                                                                                       creator_id,description),
@@ -89,9 +89,9 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         activity = response.activity
         return map_activity(activity)
 
-    async def delete_activity(self, creator_id: int) -> Activity:
-        #TODO headers = PrivilegeChecker.check_admin(creator_id)
-        response = await post_core_activity_delete_by_id.asyncio(client=self.client, headers=headers)
+    async def delete_activity(self,requester: int, creator_id: int) -> Activity:
+        admin_token = self.privilege_checker.get_admin_token(requester)
+        response = await post_core_activity_delete_by_id.asyncio(client=self.client, id=creator_id,privilege_token=admin_token)
         if isinstance(response, PostCoreActivityDeleteByIdResponse400):
             raise InvalidParameters(f"delete activity return 400 response: {response.message}")
         if not isinstance(response, PostCoreActivityDeleteByIdResponse200):
@@ -100,11 +100,12 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         activity = response.activity
         return map_activity(activity)
 
-    async def update_activity(self, title: str, description: Optional[str], creator_id: int) -> Activity:
-        #TODO headers = PrivilegeChecker.check_admin(creator_id)
+    async def update_activity(self,requester: int,  title: str, description: Optional[str], creator_id: int) -> Activity:
+        admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_update_by_id.asyncio(client=self.client,
+                                                                 id=creator_id,
                                                                  body=UpdateActivityRequest(title, description),
-                                                                 headers=headers)
+                                                                 privilege_token=admin_token)
         if isinstance(response, PostCoreActivityUpdateByIdResponse400):
             raise InvalidParameters(f"update activity return 400 response: {response.message}")
         if not isinstance(response, PostCoreActivityUpdateByIdResponse200):
