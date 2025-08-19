@@ -245,7 +245,6 @@ async def start(mess: types.Message) -> None:
     if user_id is None:
         return
     try:
-        user_name = await students_repository.validate_register_user(Player(username, int(user_id)))
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         markup.add(types.KeyboardButton(Buttons.TECHNICAL_SUPPORT.value[0]))
         await msg_with_buttons(mess, "Здравствуйте!", markup)
@@ -337,7 +336,7 @@ async def register_on_sport(mess: types.Message) -> None:
 async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
     markup = await make_sports_buttons()
-    await msg_with_ibuttons(call.message, "Выберите спортивную секцию:", markup)
+    await msg_with_ibuttons(call.message, "Выберите спортивную секцию:", markup) #type: ignore
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("sport_")) # type: ignore
@@ -499,7 +498,7 @@ def parse_message(msg: str) -> int:
 
 async def change_message(mess: types.Message, answer: types.Message) -> None:
     await bot.edit_message_text(f"{mess.text}\n\nОтвечено: [username: {answer.from_user.username}, "
-                                f"id: {answer.from_user.id}]", mess.chat.id, mess.id)
+                                f"id: {answer.from_user.id}]", mess.chat.id, mess.id) # type: ignore
 
 
 async def notify_person(tg_id: int, text: str) -> None:
@@ -515,13 +514,13 @@ async def answer_to_buttons(mess: types.Message) -> None:
     if mess.reply_to_message is not None and mess.reply_to_message.text == Msg.TECHNICAL_SUPPORT.value:
         log_info(f"support_chat_id: {support_chat_id}, message_thread_id: {support_chat_thread_id}", mess)
         await bot.send_message(support_chat_id, f"[username: @{mess.from_user.username}, id: {mess.from_user.id}]"
-                                                f"\n\n{mess.text}", message_thread_id=support_chat_thread_id)
+                                                f"\n\n{mess.text}", message_thread_id=support_chat_thread_id) # type: ignore
         log_info("Message has been sent to support", mess)
         await msg_without_buttons(mess, "Сообщение отправлено в техподдержку. Через некоторое время с Вами свяжутся.")
         return
     if mess.message_thread_id is not None and mess.message_thread_id == support_chat_thread_id:
         if mess.reply_to_message is not None:
-            await bot.send_message(parse_message(mess.reply_to_message.text), mess.text)
+            await bot.send_message(parse_message(mess.reply_to_message.text), mess.text) # type: ignore
             log_info("Message has been sent to user", mess)
             await change_message(mess.reply_to_message, mess)
             return
