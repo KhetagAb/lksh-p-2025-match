@@ -47,13 +47,6 @@ class UnknownError(Exception):
 CoreID = int
 TgID = int
 
-
-@dataclass
-class CorePlayer:
-    core_id: CoreID
-    tg_id: TgID
-
-
 @dataclass
 class Player:
     core_id: CoreID
@@ -63,7 +56,9 @@ class Player:
 
 
 @dataclass
-class PlayerToRegister(Player):
+class PlayerToRegister:
+    tg_id: TgID
+    tg_username: str
     name: str
 
 
