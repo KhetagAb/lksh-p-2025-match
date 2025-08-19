@@ -10,7 +10,7 @@ services:
     ports:
       - "${MONGODB_PORT}:27017"
     volumes:
-      - ./mongodb_data:/data/db
+      - mongodb_data:/data/db
       - ./mongodb/mongo-init-scripts:/docker-entrypoint-initdb.d:ro
 
   app:
@@ -29,6 +29,9 @@ services:
       - match-shared-network
     volumes:
       - ./config.toml:/app/bff/config.toml:ro
+
+volumes:
+  mongodb_data:
 
 networks:
   match-shared-network:
