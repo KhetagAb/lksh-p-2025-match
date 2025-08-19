@@ -440,8 +440,9 @@ async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
     activity_id = int(call.data.split("_")[1])  # type: ignore
 
     try:
+        player = await app_container.get(PlayerAdapter).get_player_by_tg(tg_id=call.from_user.id)
         team = await app_container.get(ActivityAdapter).enroll_player_in_activity(
-            activity_id, call.from_user.id
+            activity_id, player.core_id
         )
         activity = await get_activity_by_id(activity_id)
         if activity is None:

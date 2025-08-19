@@ -5,8 +5,7 @@ from lkshmatch.adapters.base import (
     InvalidParameters,
     PlayerAlreadyInTeam,
     Team,
-    TgID,
-    UnknownError, ActivityAdminAdapter, )
+    UnknownError, ActivityAdminAdapter, CoreID, )
 from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
 from lkshmatch.adapters.core.mappers.activity import map_team, map_activity
 from lkshmatch.adapters.core.mappers.player import map_player_from_api
@@ -55,9 +54,9 @@ class CoreActivityAdapter(ActivityAdapter):
             teams.append(map_team(team))
         return teams
 
-    async def enroll_player_in_activity(self, activity_id: int, player_tg_id: TgID) -> Team:
+    async def enroll_player_in_activity(self, activity_id: int, player_id: CoreID) -> Team:
         response = await post_core_activity_id_enroll.asyncio(
-            client=self.client, id=activity_id, body=ActivityEnrollPlayerRequest(tg_id=player_tg_id)
+            client=self.client, id=activity_id, body=ActivityEnrollPlayerRequest(id=player_id)
         )
         if isinstance(response, PostCoreActivityIdEnrollResponse400):
             raise InvalidParameters(f"enroll player in activity returns 400 response: {response.message}")
