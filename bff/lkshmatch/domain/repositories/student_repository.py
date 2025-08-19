@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-# bad, but i'm pissed off, smb fix it
-from lkshmatch.adapters.base import Player, TgID
 
 
 @dataclass

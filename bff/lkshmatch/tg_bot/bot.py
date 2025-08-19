@@ -10,7 +10,6 @@ from lkshmatch.adapters.base import (
     Activity,
     ActivityAdapter,
     InsufficientRights,
-    Player,
     PlayerAdapter,
     PlayerAlreadyInTeam,
     PlayerNotFound,
