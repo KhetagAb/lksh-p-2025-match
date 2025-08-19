@@ -1,3 +1,5 @@
+import logging
+
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -17,6 +19,8 @@ from lkshmatch.config import settings
 
 def start() -> None:
     uvloop.install()
+
+    logging.basicConfig(level=logging.INFO)
 
     app = FastAPI(
         title="Match REST API",

@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Request
 from fastapi.responses import Response
 
@@ -24,7 +26,8 @@ async def get_sport_sections(
     sport_adapter = app_container.get(SportAdapter)
     try:
         sport_list = await sport_adapter.get_sport_list()
-    except BaseException:
+    except BaseException as exc:
+        logging.warning(exc)
         return templates.TemplateResponse(
             name="some_error.html", context={"request": request}
         )
@@ -45,7 +48,8 @@ async def get_activities_by_sport_section_id(
     activity_adapter = app_container.get(ActivityAdapter)
     try:
         list_of_activities = await activity_adapter.get_activities_by_sport_section(sport_section_id=sport_section_id)
-    except BaseException:
+    except BaseException as exc:
+        logging.warning(exc)
         return templates.TemplateResponse(
             name="some_error.html", context={'request': request}
         )
@@ -66,7 +70,8 @@ async def get_teams_by_activity_id(
         list_of_activities = await activity_adapter.get_activities_by_sport_section(
             sport_section_id=sport_section_id
         )
-    except BaseException:
+    except BaseException as exc:
+        logging.warning(exc)
         return templates.TemplateResponse(
             name="some_error.html", context={"request": request}
         )
