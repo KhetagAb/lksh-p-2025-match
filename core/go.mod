@@ -8,9 +8,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v4 v4.13.4
-	github.com/oapi-codegen/oapi-codegen/v2 v2.5.0
 	github.com/oapi-codegen/runtime v1.1.2
-	github.com/pressly/goose/v3 v3.24.3
 	github.com/spf13/viper v1.20.1
 	go.uber.org/zap v1.27.0
 )
@@ -54,6 +52,7 @@ require (
 	github.com/microsoft/go-mssqldb v1.8.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
+	github.com/oapi-codegen/oapi-codegen/v2 v2.5.0 // indirect
 	github.com/oasdiff/yaml v0.0.0-20250309154309-f31be36b4037 // indirect
 	github.com/oasdiff/yaml3 v0.0.0-20250309153720-d2182401db90 // indirect
 	github.com/paulmach/orb v0.11.1 // indirect
@@ -61,6 +60,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/pressly/goose/v3 v3.24.3 // indirect
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
@@ -104,4 +104,10 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.10.0 // indirect
 	modernc.org/sqlite v1.37.0 // indirect
+)
+
+tool (
+	github.com/google/wire/cmd/wire
+	github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
+	github.com/pressly/goose/v3/cmd/goose
 )
