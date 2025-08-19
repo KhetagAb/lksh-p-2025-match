@@ -86,9 +86,9 @@ async def create_activity(
     _title: str,
     _description: str,
 ) -> Response:
-    _user_id = get_user_id_from_token(
-        request.cookies.get(COOKIE_NAME)
-    )
+    # _user_id = get_user_id_from_token(
+    #     request.cookies.get(COOKIE_NAME)
+    # )
     # admin function 
     return templates.TemplateResponse(
         name="some_error.html", context={"request": request}
