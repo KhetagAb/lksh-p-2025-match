@@ -14,7 +14,6 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 from lkshmatch.repositories.mongo.admins import MongoAdminRepository
 from lkshmatch.repositories.mongo.students import MongoLKSHStudentsRepository
 
-
 class CoreClientProvider(Provider):
     def __init__(self, core_host: str, core_port: str):
         super().__init__()

@@ -6,7 +6,8 @@ from fastapi.responses import Response
 from lkshmatch.adapters.base import ActivityAdapter, SportAdapter, PlayerAdapter
 from lkshmatch.adapters.gheets.gsheets import (
     get_data_gsheet, change_data_gsheet,
-    WEBSITE_SERVICE_ACCOUNT_NAME, get_sheet_data_from_url
+    WEBSITE_SERVICE_ACCOUNT_NAME, get_sheet_data_from_url,
+    GSheetDoesNotResponseError
 )
 
 from lkshmatch.di import app_container
@@ -72,6 +73,8 @@ async def register_on_section_with_table_post(
     error = ""
     try:
         sheet_data = get_sheet_data_from_url(table_url)
+    except GSheetDoesNotResponseError:
+        error = "Возникли проблемы со связью с google-sheets"
     except BaseException:
         error = "Неправильная ссылка на таблицу"
 
@@ -82,6 +85,8 @@ async def register_on_section_with_table_post(
             if "values" not in results:
                 raise TableIsEmptyError
             sheet_values = results["values"][0]
+        except GSheetDoesNotResponseError:
+            error = "Возникли проблемы со связью с google-sheets"
         except TableIsEmptyError:
             error = "Таблица пуста"
         except BaseException:
@@ -96,8 +101,11 @@ async def register_on_section_with_table_post(
             except BaseException:
                 return_values[i] = "ОШИБКА"
                 error = "Возникли ошибки при регистрации"
-    
-        change_data_gsheet(sheet_data, "B1:B1000", [return_values]) # pyright: ignore[reportPossiblyUnboundVariable]
+
+        try:
+            change_data_gsheet(sheet_data, "B1:B1000", [return_values]) # pyright: ignore[reportPossiblyUnboundVariable]
+        except GSheetDoesNotResponseError:
+            error = "Возникли проблемы со связью с google-sheets"
 
     return templates.TemplateResponse(
         context={"request": request, "error": error, "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME, "username": "UU"},
