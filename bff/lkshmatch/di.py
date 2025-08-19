@@ -1,8 +1,6 @@
 from collections.abc import Iterable
 
 from dishka import Container, Provider, Scope, make_container, provide
-from lkshmatch.website.vars import WEBSITE_CREDENTIALS_FILE
-from oauth2client.service_account import ServiceAccountCredentials
 from pymongo import MongoClient
 
 import core_client

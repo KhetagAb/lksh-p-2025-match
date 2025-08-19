@@ -1,5 +1,5 @@
-from lkshmatch.core_client import models as api
 from lkshmatch.adapters import base as domain
+from lkshmatch.core_client import models as api
 
 
 def map_player_to_register_request(user: domain.PlayerToRegister) -> api.RegisterPlayerRequest:

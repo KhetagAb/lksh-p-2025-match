@@ -1,5 +1,5 @@
-from typing import Optional
 
+from lkshmatch import core_client
 from lkshmatch.adapters.base import (
     CoreID,
     Player,
@@ -13,7 +13,6 @@ from lkshmatch.adapters.core.mappers.player import map_player_to_register_reques
 from lkshmatch.core_client.api.players import get_core_player_by_tg, register_player
 from lkshmatch.core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201, \
     GetCorePlayerByTgResponse400, GetCorePlayerByTgResponse200
-from lkshmatch import core_client
 from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
@@ -43,7 +42,7 @@ class CorePlayerAdapter(PlayerAdapter):
             return response.id
         raise UnknownError("None response")
 
-    async def get_player_by_tg(self, tg_id: Optional[int], tg_username: Optional[str]) -> Player:
+    async def get_player_by_tg(self, tg_id: int | None, tg_username: str | None) -> Player:
         response = await get_core_player_by_tg.asyncio(
             client=self.client,
             tg_id=tg_id,
