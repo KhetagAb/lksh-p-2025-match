@@ -1,4 +1,3 @@
-from typing import Optional
 from urllib.parse import urlparse, parse_qs
 import httplib2
 from googleapiclient import discovery
@@ -6,10 +5,10 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 from lkshmatch.config import settings
 
-WEBSITE_CREDENTIALS_FILE: Optional[str] = settings.get(
+WEBSITE_CREDENTIALS_FILE: str | None = settings.get(
     "WEBSITE_CREDENTIALS_FILE"
 )
-WEBSITE_SERVICE_ACCOUNT_NAME: Optional[str] = settings.get(
+WEBSITE_SERVICE_ACCOUNT_NAME: str | None = settings.get(
     "WEBSITE_SERVICE_ACCOUNT_NAME"
 )  # почта сервисного аккаунта
 credentials = ServiceAccountCredentials.from_json_keyfile_name(

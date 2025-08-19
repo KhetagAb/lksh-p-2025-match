@@ -1,7 +1,6 @@
 import datetime
 import logging
 from enum import Enum
-from typing import Optional, Union
 
 from fastapi import APIRouter
 from telebot import types
@@ -176,7 +175,7 @@ async def edit_without_buttons(call: types.CallbackQuery, text: str) -> None:
     )
 
 
-async def validate_user(mess: types.Message) -> tuple[Optional[int], Optional[str]]:
+async def validate_user(mess: types.Message) -> tuple[int | None, str | None]:
     if mess.from_user is None:
         await msg_without_buttons(mess, Msg.INTERNAL_ERROR.value)
         log_warning("Fail to acquire from_user (is None)", mess)
@@ -188,7 +187,7 @@ async def validate_user(mess: types.Message) -> tuple[Optional[int], Optional[st
     return mess.from_user.id, mess.from_user.username
 
 
-def log_text(text: str, mess: Union[types.Message, types.InaccessibleMessage]) -> str:
+def log_text(text: str, mess: types.Message | types.InaccessibleMessage) -> str:
     match mess:
         case types.Message(from_user=user, date=date) if user is not None:
             username = f"@{user.username}" if user.username else "<no username>"
@@ -205,17 +204,17 @@ def log_text(text: str, mess: Union[types.Message, types.InaccessibleMessage]) -
             return text + " [unknown message type]"
 
 
-def log_info(text: str, mess: Union[types.Message, types.InaccessibleMessage]) -> None:
+def log_info(text: str, mess: types.Message | types.InaccessibleMessage) -> None:
     logging.info(log_text(text, mess))
 
 
 def log_warning(
-    text: str, mess: Union[types.Message, types.InaccessibleMessage]
+    text: str, mess: types.Message | types.InaccessibleMessage
 ) -> None:
     logging.warning(log_text(text, mess))
 
 
-def log_error(text: str, mess: Union[types.Message, types.InaccessibleMessage]) -> None:
+def log_error(text: str, mess: types.Message | types.InaccessibleMessage) -> None:
     logging.error(log_text(text, mess))
 
 
@@ -354,7 +353,7 @@ async def processing_select_activity(call: types.CallbackQuery) -> None:
     await select_activity(call, activity)
 
 
-async def get_activity_by_id(activity_id: int) -> Optional[Activity]:
+async def get_activity_by_id(activity_id: int) -> Activity | None:
     # TODO переделать на получение активности по id эффективнее
     activity = None
     for sport in await sport_adapter.get_sport_list():

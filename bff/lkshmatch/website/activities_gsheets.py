@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import Response
@@ -26,7 +26,7 @@ class TableIsEmptyError(Exception):
 table_adapter_router = APIRouter()
 
 @table_adapter_router.get("/get_sport_sections")
-async def get_sport_sections_json(_request: Request) -> Optional[list]:
+async def get_sport_sections_json(_request: Request) -> list | None:
     try:
         sport_adapter = app_container.get(SportAdapter)
         sport_sections = await sport_adapter.get_sport_list()
@@ -39,7 +39,7 @@ async def get_sport_sections_json(_request: Request) -> Optional[list]:
 async def get_activity_by_sport_section_json(
     _request: Request,
     sport_section_id: int
-) -> Optional[list]:
+) -> list | None:
     try:
         activity_adapter = app_container.get(ActivityAdapter)
         activities = await activity_adapter.get_activities_by_sport_section(sport_section_id)

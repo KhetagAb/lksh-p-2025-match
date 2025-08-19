@@ -42,6 +42,7 @@ dev-dependencies = [
 
 [tool.ruff.lint]
 ignore = []
+extend-select = ["UP006", "UP007", "UP019", "UP026", "UP035", "UP044", "UP045"]
 
 [tool.mypy]
 python_version = 3.12
