@@ -18,6 +18,7 @@ try:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive",
     )
+    service = discovery.build("sheets", "v4", )
     httpAuth = credentials.authorize(httplib2.Http())
     service = discovery.build("sheets", "v4", http=httpAuth)
 except BaseException:

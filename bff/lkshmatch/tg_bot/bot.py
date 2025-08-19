@@ -66,7 +66,7 @@ logging.basicConfig(level=logging.INFO)
 activity_adapter = app_container.get(ActivityAdapter)
 sport_adapter = app_container.get(SportAdapter)
 player_adapter = app_container.get(PlayerAdapter)
-router = APIRouter(prefix="/bot")
+router = APIRouter()
 students_repository = app_container.get(LKSHStudentsRepository)
 
 try:
