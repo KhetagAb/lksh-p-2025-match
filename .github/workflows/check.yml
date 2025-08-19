@@ -54,10 +54,6 @@ jobs:
           cache: true
           cache-dependency-path: core/go.sum
 
-      - name: Setup environment
-        run: cp .env.example .env.test
-        working-directory: core/
-
       - name: Generate code
         run: make codegen
         working-directory: core/
@@ -68,6 +64,12 @@ jobs:
       - name: Run tests
         run: make test
         working-directory: core/
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PORT: 5432
 
   bff:
     name: BFF CI
