@@ -9,23 +9,14 @@ import (
 )
 
 func (s *ActivityService) CreateActivity(ctx context.Context, creatorID, sportSectionId int64, title, description string) (*dto.Activity, error) {
-
-	//checking creator by tg_id
-	infra.Infof(ctx, "Checking if creator exists: %v", creatorID)
+	infra.Infof(ctx, "Getting creator player with id=%v", creatorID)
 	creator, err := s.playerRepository.GetPlayerByTgID(ctx, creatorID)
 	if err != nil {
-		infra.Errorf(ctx, "Creator doesn't exist: %v", creatorID)
+		infra.Errorf(ctx, "Creator with id=%v doesn't exists or err occured", creatorID)
 		return nil, fmt.Errorf("cannot get player by tg_id [player_tg_id=%d]: %w", creatorID, err)
 	}
-
-	if err != nil {
-		infra.Errorf(ctx, "Creator doesn't exist: %v", creatorID)
-		return nil, fmt.Errorf("cannot get player by tg_id [player_tg_id=%d]: %w", creatorID, err)
-	}
-
-	// Checking sports section existence
-	infra.Infof(ctx, "Checking if sports section exists: %v", sportSectionId)
-	sportSections, err := s.sportRepository.GetAllSportSection(ctx)
+	infra.Infof(ctx, "Getting sport sections with id=%v", sportSectionId)
+	sportSections, err := s.sportRepository.GetSportsList(ctx)
 	flag := false
 	for _, sportSection := range sportSections {
 		if sportSection.ID == sportSectionId {
@@ -43,8 +34,8 @@ func (s *ActivityService) CreateActivity(ctx context.Context, creatorID, sportSe
 	if err != nil {
 		infra.Errorf(ctx, "Cannot create activity using given creatorId, sportSectionId, title and description [creatorId=%d][sportSectionId=%d][title=%s][description=%s]",
 			creatorID, sportSectionId, title, description)
-		return nil, fmt.Errorf("cannot create activity using given creatorId, sportSectionId, title and description [creatorId=%d][sportSectionId=%d][title=%s][description=%s]",
-			creatorID, sportSectionId, title, description)
+		return nil, fmt.Errorf("cannot create activity using given creatorId, sportSectionId, title and description [creatorId=%d][sportSectionId=%d][title=%s][description=%s]: %w",
+			creatorID, sportSectionId, title, description, err)
 	}
 
 	result := dto.Activity{Activity: dao.Activity{
