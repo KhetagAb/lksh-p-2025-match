@@ -176,7 +176,7 @@ async def msg_without_buttons(mess: types.Message, text: str) -> types.Message:
 async def edit_with_ibuttons(
     call: types.CallbackQuery, text: str, buttons: types.InlineKeyboardMarkup
 ) -> types.Message:
-    return await bot.edit_message_text(
+    return await bot.edit_message_text( # type: ignore
         chat_id=call.message.chat.id,
         message_id=call.message.message_id,
         text=text,
