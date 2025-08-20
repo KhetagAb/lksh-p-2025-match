@@ -1,0 +1,1173 @@
+{% extends "basic_interface.html" %}
+
+{% block content %}
+
+<h2>Администраторская панель секций</h2>
+<p>
+    {{ error }}
+</p>
+
+
+
+
+
+
+
+
+<style>
+    input.tableurl {
+        width:  600px;
+    }
+    input.cact {
+        width:  1000px;
+    }
+    input.find_section {
+        width:  400px;
+    }
+    input.find_activity {
+        width:  800px;
+    }
+    .button-container {
+        display: inline-block;
+    }
+    .button-container .buttonel1{
+        margin-right: 10px;
+        display: inline;
+    }
+    .button-container .buttonel2{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel3-1{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel3-2{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel3-3{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel4{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel5{
+        margin-right: 10px;
+        display: none;
+
+    }
+
+
+
+</style>
+<div class="button-container">
+    <button  id="b1" class="buttonel1" onclick="bl1()">Раздел 1: выбор секции</button>
+    <button  id="b2" class="buttonel2" onclick="bl2()">Раздел 2: выбор активити (удаление, просмотр, создание)</button>
+    <button id="b3-1"  class="buttonel3-1" onclick="bl3_1()">Раздел 3: просмотр активити</button>
+    <button id="b3-2"  class="buttonel3-2" onclick="bl3_2()">Раздел 3: удаление активити</button>
+    <button id="b3-3"  class="buttonel3-3" onclick="bl3_3()">Раздел 3: создание активити</button>
+    <button id="b4"  class="buttonel4" onclick="bl4()">Раздел 4: просмотр участников активити</button>
+    <button id="b5"  onclick="subm()" class="buttonel5" form="gs_reg">Создать активность!</button>
+
+</div>
+
+<form id="gs_reg" method="post" action="/table/register_in_section">
+
+
+
+    <div id="rasd1">
+        <label for="section_name">Введите название секции</label><br>
+        <input type="text" id="section_name" name="section_name" autocomplete="off" placeholder="Начните вводить название секции для её поиска" class="find_section"><br>
+        <div id="sections_f" class="sections_f"></div>
+
+        <div id="chooseSection">Пока Вы не выбрали секцию</div>
+
+
+        <button type="button" value="NaN" id="view_act" style="display: none;" onclick="get_sect()">Посмотреть все активности данной секции</button>
+    </div>
+
+
+    <div id="rasd2">
+        <label for="activity_name" style="display: none;" id="activity_namel">Название активити</label>
+        <input type="text" id="activity_name" name="activity_name" autocomplete="off" placeholder="Начните вводить название активити для данной секции для её поиска или создания" class="find_activity" style="display: none;">
+        <div id="activity_f" class="sections_f" style="display: none;"></div>
+        <div id="chooseActivity" style="display: none;">Пока Вы не выбрали активити</div>
+
+        <div id="tos" style="display: none">
+
+        </div>
+        <div id="chooseActivity1" style="display: none;"></div>
+
+        <input type="text" id="r1" name="table_url" style="display: none;"></input>
+        <input type="text" id="r2" name="activity_id" style="display: none;"></input>
+        <div id="resact" style="display: none;"></div>
+        <div id="resact1" style="display: none;"></div>
+        <div id="action_id_submit" style="display: none;"></div>
+        <div id="info_action" style="display: none;"></div>
+
+        <div id="section_name_submit" style="display: none;">NaN</div>
+        <div id="action_name_submit" style="display: none;">NaN</div>
+        <input name="submit_info" style="display: none" id="submit1001"></input>
+        <input id="section_name_submit1" style="display: none;" value="" name="section_id"></input>
+
+        <input style="display: none" type="text" id="sdfghj" name="description" autocomplete="off" value=""><br>
+
+    </div>
+    <div id="privet1001" style="display: none"></div>
+    <div id="rasd3-r" style="display: none">
+
+
+    </div>
+    <div id="rasd3-a" style="display: none">
+        <br></br>
+        <label for="activityc_name" style="background: #B5B8B1; padding: 5px;">Введите название активити</label><br>
+        <input class="cact"   type="text" id="activityc_name" name="title" autocomplete="off" placeholder="Введите название нового активити" value=""><br>
+        <p><kbd style="background: #B5B8B1; padding: 5px;">ALT</kbd> + <kbd style="background: #B5B8B1; padding: 5px;">0</kbd> чтобы получить помощь по работе с редактором описания активити. Обязательно ставьте перенос строки перед переходом на новую строку,  иначе текст будет единой строкой</p>
+        <style>
+            #container {
+                width: 1600px;
+                margin: 20px auto;
+            }
+            .res {
+                width: 1583px;
+                margin: 20px auto;
+            }
+
+
+            .ck-editor__editable[role="textbox"] {
+                /* Editing area */
+                min-height: 200px;
+            }
+            .ck-content .image {
+                /* Block images */
+                max-width: 80%;
+                margin: 20px auto;
+            }
+        </style>
+        <div id="rasd3-a1">
+
+
+            <div id="container">
+                <div id="editor" contenteditable="true">
+                </div>
+            </div>
+            <div id="not" style="background: #B5B8B1; padding: 5px;">Превью описания активити</div>
+
+            <div class="ck-content">
+                <div id="res" class="res"></div>
+            </div>
+
+
+
+
+            <script src="ckeditor.js"></script>
+
+            <script src="ru.js"></script>
+
+            <script>
+
+                var editorInstance;
+
+                // This sample still does not showcase all CKEditor 5 features (!)
+                // Visit https://ckeditor.com/docs/ckeditor5/latest/features/index.html to browse all the features.
+                CKEDITOR.ClassicEditor.create(document.getElementById("editor"), {
+                    // https://ckeditor.com/docs/ckeditor5/latest/getting-started/setup/toolbar/toolbar.html#extended-toolbar-configuration-format
+                    toolbar: {
+                        items: [
+                            //   'exportPDF','exportWord', '|',
+                            'findAndReplace', 'selectAll', '|',
+                            'heading', '|',
+                            'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
+                            'bulletedList', 'numberedList', 'todoList', '|',
+                            'outdent', 'indent', '|',
+                            'undo', 'redo',
+                            '-',
+                            'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
+                            'alignment', '|',
+                            'link', 'uploadImage', 'blockQuote', 'insertTable', 'mediaEmbed', 'codeBlock', 'htmlEmbed', '|',
+                            'specialCharacters', 'horizontalLine', 'pageBreak', '|',
+                            //  'textPartLanguage', '|',
+                            'sourceEditing'
+                        ],
+                        shouldNotGroupWhenFull: true
+                    },
+                    // Changing the language of the interface requires loading the language file using the <script> tag.
+                    language: 'ru',
+                    list: {
+                        properties: {
+                            styles: true,
+                            startIndex: true,
+                            reversed: true
+                        }
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/headings.html#configuration
+                    heading: {
+                        options: [
+                            { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                            { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                            { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
+                            { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
+                            { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
+                            { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
+                        ]
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/editor-placeholder.html#using-the-editor-configuration
+                    placeholder: 'Введите описание вашего активити',
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/font.html#configuring-the-font-family-feature
+                    fontFamily: {
+                        options: [
+                            'default',
+                            'Arial, Helvetica, sans-serif',
+                            'Courier New, Courier, monospace',
+                            'Georgia, serif',
+                            'Lucida Sans Unicode, Lucida Grande, sans-serif',
+                            'Tahoma, Geneva, sans-serif',
+                            'Times New Roman, Times, serif',
+                            'Trebuchet MS, Helvetica, sans-serif',
+                            'Verdana, Geneva, sans-serif'
+                        ],
+                        supportAllValues: true
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/font.html#configuring-the-font-size-feature
+                    fontSize: {
+                        options: [ 10, 12, 14, 'default', 18, 20, 22 ],
+                        supportAllValues: true
+                    },
+                    // Be careful with the setting below. It instructs CKEditor to accept ALL HTML markup.
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/general-html-support.html#enabling-all-html-features
+                    htmlSupport: {
+                        allow: [
+                            {
+                                name: /.*/,
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            }
+                        ]
+                    },
+                    // Be careful with enabling previews
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/html-embed.html#content-previews
+                    htmlEmbed: {
+                        showPreviews: false
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/link.html#custom-link-attributes-decorators
+                    link: {
+                        decorators: {
+                            addTargetToExternalLinks: true,
+                            defaultProtocol: 'https://',
+                            toggleDownloadable: {
+                                mode: 'manual',
+                                label: 'Downloadable',
+                                attributes: {
+                                    download: 'file'
+                                }
+                            }
+                        }
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/mentions.html#configuration
+                    mention: {
+                        feeds: [
+                            {
+                                marker: '@',
+                                feed: [
+                                    '@apple', '@bears', '@brownie', '@cake', '@cake', '@candy', '@canes', '@chocolate', '@cookie', '@cotton', '@cream',
+                                    '@cupcake', '@danish', '@donut', '@dragée', '@fruitcake', '@gingerbread', '@gummi', '@ice', '@jelly-o',
+                                    '@liquorice', '@macaroon', '@marzipan', '@oat', '@pie', '@plum', '@pudding', '@sesame', '@snaps', '@soufflé',
+                                    '@sugar', '@sweet', '@topping', '@wafer'
+                                ],
+                                minimumCharacters: 1
+                            }
+                        ]
+                    },
+                    // The "superbuild" contains more premium features that require additional configuration, disable them below.
+                    // Do not turn them on unless you read the documentation and know how to configure them and setup the editor.
+                    removePlugins: [
+                        // These two are commercial, but you can try them out without registering to a trial.
+                        // 'ExportPdf',
+                        // 'ExportWord',
+                        'AIAssistant',
+                        'CKBox',
+                        'CKFinder',
+                        'EasyImage',
+                        // This sample uses the Base64UploadAdapter to handle image uploads as it requires no configuration.
+                        // https://ckeditor.com/docs/ckeditor5/latest/features/images/image-upload/base64-upload-adapter.html
+                        // Storing images as Base64 is usually a very bad idea.
+                        // Replace it on production website with other solutions:
+                        // https://ckeditor.com/docs/ckeditor5/latest/features/images/image-upload/image-upload.html
+                        // 'Base64UploadAdapter',
+                        'MultiLevelList',
+                        'RealTimeCollaborativeComments',
+                        'RealTimeCollaborativeTrackChanges',
+                        'RealTimeCollaborativeRevisionHistory',
+                        'PresenceList',
+                        'Comments',
+                        'TrackChanges',
+                        'TrackChangesData',
+                        'RevisionHistory',
+                        'Pagination',
+                        'WProofreader',
+                        // Careful, with the Mathtype plugin CKEditor will not load when loading this sample
+                        // from a local file system (file://) - load this site via HTTP server if you enable MathType.
+                        'MathType',
+                        // The following features require additional license.
+                        'SlashCommand',
+                        'Template',
+                        'DocumentOutline',
+                        'FormatPainter',
+                        'TableOfContents',
+                        'PasteFromOfficeEnhanced',
+                        'CaseChange'
+                    ]
+                }).then(editor => {
+                    editorInstance = editor; // Сохраняем экземпляр редактора
+                    editor.model.document.on('change:data', () => {
+                        document.getElementById('res').innerHTML=editor.getData();
+                    });
+                });
+
+
+
+            </script>
+            <script>
+                const editor = document.getElementById('editor');
+
+
+
+
+
+
+
+
+
+
+                var res1=false;
+                const ri0 = document.getElementById('container');
+                var rk = document.getElementById('res');
+                function f1(m){
+
+                    //const te = document.querySelector('.ck-body-wrapper .ck ck-reset_all ck-body ck-rounded-corners .ck ck-balloon-panel ck-balloon-panel_position_border-side_right ck-powered-by-balloon .ck ck-powered-by');
+                    const te = document.querySelector('.ck-body-wrapper .ck.ck-reset_all.ck-body.ck-rounded-corners .ck.ck-balloon-panel.ck-balloon-panel_position_border-side_right.ck-powered-by-balloon .ck.ck-powered-by');
+
+
+
+
+
+                    if (te) {
+                        te.innerHTML = te.innerHTML.replace("<a href=\"https://ckeditor.com/?utm_source=ckeditor&amp;utm_medium=referral&amp;utm_campaign=701Dn000000hVgmIAE_powered_by_ckeditor_logo\" target=\"_blank\" tabindex=\"-1\"><span class=\"ck ck-powered-by__label\">Powered by", "<a target=\"_blank\" tabindex=\"-1\"><span class=\"ck ck-powered-by__label\">")
+
+                        te.innerHTML = te.innerHTML.replace("d=\"M6.016 6.69a1.592 1.592 0 0 0-.614.21c-.23.132-.422.32-.56.546-.044.072-.287.539-.287.539l-.836 1.528.009.006c.038.025.08.046.123.063.127.046.26.07.395.073.505.023 1.011-.007 1.517-.003.29.009.58.002.869-.022a.886.886 0 0 0 .395-.116.962.962 0 0 0 .312-.286c.056-.083.114-.163.164-.249.24-.408.48-.816.718-1.226.075-.128.148-.257.222-.386l.112-.192a1.07 1.07 0 0 0 .153-.518l-1.304.023s-1.258-.005-1.388.01Z\"", "d=\"\"")
+
+
+                        te.innerHTML = te.innerHTML.replace("d=\"m2.848 9.044.76-1.39.184-.352c-.124-.067-.245-.14-.367-.21-.346-.204-.706-.384-1.045-.6a.984.984 0 0 1-.244-.207c-.108-.134-.136-.294-.144-.46-.021-.409-.002-.818-.009-1.227-.003-.195 0-.39.003-.585.004-.322.153-.553.427-.713l.833-.488c.22-.13.44-.257.662-.385.05-.029.105-.052.158-.077.272-.128.519-.047.76.085l.044.028c.123.06.242.125.358.196.318.178.635.357.952.537.095.056.187.117.275.184.194.144.254.35.266.578.016.284.007.569.006.853-.001.28.004.558 0 .838.592-.003 1.259 0 1.259 0l.723-.013c-.003-.292-.007-.584-.007-.876 0-.524.015-1.048-.016-1.571-.024-.42-.135-.8-.492-1.067a5.02 5.02 0 0 0-.506-.339A400.52 400.52 0 0 0 5.94.787C5.722.664 5.513.524 5.282.423 5.255.406 5.228.388 5.2.373 4.758.126 4.305-.026 3.807.21c-.097.046-.197.087-.29.14A699.896 699.896 0 0 0 .783 1.948c-.501.294-.773.717-.778 1.31-.004.36-.009.718-.001 1.077.016.754-.017 1.508.024 2.261.016.304.07.6.269.848.127.15.279.28.448.382.622.4 1.283.734 1.92 1.11l.183.109Z\"", "d=\"\"")
+
+
+                        te.innerHTML = te.innerHTML.replace("d=\"M31.724 1.492a15.139 15.139 0 0 0 .045 1.16 2.434 2.434 0 0 0-.687-.34 3.68 3.68 0 0 0-1.103-.166 2.332 2.332 0 0 0-1.14.255 1.549 1.549 0 0 0-.686.87c-.15.41-.225.98-.225 1.712 0 .939.148 1.659.444 2.161.297.503.792.754 1.487.754.452.015.9-.094 1.294-.316.296-.174.557-.4.771-.669l.14.852h1.282V.007h-1.623v1.485ZM31 6.496a1.77 1.77 0 0 1-.494.061.964.964 0 0 1-.521-.127.758.758 0 0 1-.296-.466 3.984 3.984 0 0 1-.093-.992 4.208 4.208 0 0 1 .098-1.052.753.753 0 0 1 .307-.477 1.08 1.08 0 0 1 .55-.122c.233-.004.466.026.69.089l.483.144v2.553c-.11.076-.213.143-.307.2a1.73 1.73 0 0 1-.417.189ZM35.68 0l-.702.004c-.322.002-.482.168-.48.497l.004.581c.002.33.164.493.486.49l.702-.004c.322-.002.481-.167.48-.496L36.165.49c-.002-.33-.164-.493-.486-.491ZM36.145 2.313l-1.612.01.034 5.482 1.613-.01-.035-5.482ZM39.623.79 37.989.8 38 2.306l-.946.056.006 1.009.949-.006.024 2.983c.003.476.143.844.419 1.106.275.26.658.39 1.148.387.132 0 .293-.01.483-.03.19-.02.38-.046.57-.08.163-.028.324-.068.482-.119l-.183-1.095-.702.004a.664.664 0 0 1-.456-.123.553.553 0 0 1-.14-.422l-.016-2.621 1.513-.01-.006-1.064-1.514.01-.01-1.503ZM46.226 2.388c-.41-.184-.956-.274-1.636-.27-.673.004-1.215.101-1.627.29-.402.179-.72.505-.888.91-.18.419-.268.979-.264 1.68.004.688.1 1.24.285 1.655.172.404.495.724.9.894.414.18.957.268 1.63.264.68-.004 1.224-.099 1.632-.284.4-.176.714-.501.878-.905.176-.418.263-.971.258-1.658-.004-.702-.097-1.261-.28-1.677a1.696 1.696 0 0 0-.888-.9Zm-.613 3.607a.77.77 0 0 1-.337.501 1.649 1.649 0 0 1-1.317.009.776.776 0 0 1-.343-.497 4.066 4.066 0 0 1-.105-1.02 4.136 4.136 0 0 1 .092-1.03.786.786 0 0 1 .337-.507 1.59 1.59 0 0 1 1.316-.008.79.79 0 0 1 .344.502c.078.337.113.683.105 1.03.012.343-.019.685-.092 1.02ZM52.114 2.07a2.67 2.67 0 0 0-1.128.278c-.39.191-.752.437-1.072.73l-.157-.846-1.273.008.036 5.572 1.623-.01-.024-3.78c.35-.124.646-.22.887-.286.26-.075.53-.114.8-.118l.45-.003.144-1.546-.286.001ZM22.083 7.426l-1.576-2.532a2.137 2.137 0 0 0-.172-.253 1.95 1.95 0 0 0-.304-.29.138.138 0 0 1 .042-.04 1.7 1.7 0 0 0 .328-.374l1.75-2.71c.01-.015.025-.028.024-.048-.01-.01-.021-.007-.031-.007L20.49 1.17a.078.078 0 0 0-.075.045l-.868 1.384c-.23.366-.46.732-.688 1.099a.108.108 0 0 1-.112.06c-.098-.005-.196-.001-.294-.002-.018 0-.038.006-.055-.007.002-.02.002-.039.005-.058a4.6 4.6 0 0 0 .046-.701V1.203c0-.02-.009-.032-.03-.03h-.033L16.93 1.17c-.084 0-.073-.01-.073.076v6.491c-.001.018.006.028.025.027h1.494c.083 0 .072.007.072-.071v-2.19c0-.055-.003-.11-.004-.166a3.366 3.366 0 0 0-.05-.417h.06c.104 0 .209.002.313-.002a.082.082 0 0 1 .084.05c.535.913 1.07 1.824 1.607 2.736a.104.104 0 0 0 .103.062c.554-.003 1.107-.002 1.66-.002l.069-.003-.019-.032-.188-.304ZM27.112 6.555c-.005-.08-.004-.08-.082-.08h-2.414c-.053 0-.106-.003-.159-.011a.279.279 0 0 1-.246-.209.558.558 0 0 1-.022-.15c0-.382 0-.762-.002-1.143 0-.032.007-.049.042-.044h2.504c.029.003.037-.012.034-.038V3.814c0-.089.013-.078-.076-.078h-2.44c-.07 0-.062.003-.062-.06v-.837c0-.047.004-.093.013-.14a.283.283 0 0 1 .241-.246.717.717 0 0 1 .146-.011h2.484c.024.002.035-.009.036-.033l.003-.038.03-.496c.01-.183.024-.365.034-.548.005-.085.003-.087-.082-.094-.218-.018-.437-.038-.655-.05a17.845 17.845 0 0 0-.657-.026 72.994 72.994 0 0 0-1.756-.016 1.7 1.7 0 0 0-.471.064 1.286 1.286 0 0 0-.817.655c-.099.196-.149.413-.145.633v3.875c0 .072.003.144.011.216a1.27 1.27 0 0 0 .711 1.029c.228.113.48.167.734.158.757-.005 1.515.002 2.272-.042.274-.016.548-.034.82-.053.03-.002.043-.008.04-.041-.008-.104-.012-.208-.019-.312a69.964 69.964 0 0 1-.05-.768ZM16.14 7.415l-.127-1.075c-.004-.03-.014-.04-.044-.037a13.125 13.125 0 0 1-.998.073c-.336.01-.672.02-1.008.016-.116-.001-.233-.014-.347-.039a.746.746 0 0 1-.45-.262c-.075-.1-.132-.211-.167-.33a3.324 3.324 0 0 1-.126-.773 9.113 9.113 0 0 1-.015-.749c0-.285.022-.57.065-.852.023-.158.066-.312.127-.46a.728.728 0 0 1 .518-.443 1.64 1.64 0 0 1 .397-.048c.628-.001 1.255.003 1.882.05.022.001.033-.006.036-.026l.003-.031.06-.55c.019-.177.036-.355.057-.532.004-.034-.005-.046-.04-.056a5.595 5.595 0 0 0-1.213-.21 10.783 10.783 0 0 0-.708-.02c-.24-.003-.48.01-.719.041a3.477 3.477 0 0 0-.625.14 1.912 1.912 0 0 0-.807.497c-.185.2-.33.433-.424.688a4.311 4.311 0 0 0-.24 1.096c-.031.286-.045.572-.042.86-.006.43.024.86.091 1.286.04.25.104.497.193.734.098.279.26.53.473.734.214.205.473.358.756.446.344.11.702.17 1.063.177a8.505 8.505 0 0 0 1.578-.083 6.11 6.11 0 0 0 .766-.18c.03-.008.047-.023.037-.057a.157.157 0 0 1-.003-.025Z\"", "d=\"\"")
+                        te.innerHTML = te.innerHTML.replace("<svg class=\"ck ck-icon ck-reset_all-excluded\" viewBox=\"0 0 53 10\" style=\"width: 53px; height: 10px;\">", "")
+                        te.innerHTML = te.innerHTML.replace("<svg class=\"ck ck-icon ck-reset_all-excluded\" viewBox=\"0 0 53 10\" style=\"width: 53px; height: 10px;\">", "")
+
+                        te.innerHTML = te.innerHTML.replace("<a target=\"_blank\" tabindex=\"-1\"><span class=\"ck ck-powered-by__label\"></span><path fill=\"#1C2331\" d=\"\"></path><path fill=\"#AFE229\" d=\"\"></path><path fill=\"#771BFF\" d=\"\"></path></a>", "")
+                    }
+
+
+                }
+
+
+
+
+
+
+                const obs = new MutationObserver((ml) => {
+                    if (!res1) {
+                        for (let m of ml) {
+
+                            if (m.type === 'childList') {
+                                f1(m);
+                                res1 = true;
+                            }
+                        }
+                    }
+
+                });
+
+                const cfg = {
+                    childList: true,
+                    subtree: true
+                };
+
+                const bel = document.querySelector('.ck.ck-reset_all.ck-body.ck-rounded-corners');
+
+                obs.observe(bel, cfg);
+
+
+
+
+
+
+
+            </script>
+        </div>
+    </div>
+    <input type="text" value="" id="cashedd" style="display: none">
+    <input type="text" value='' id="cashedhtml1" style="display: none">
+    <div id="rasd3-d" style="display: none">
+
+
+    </div>
+    <div id="rasd4" style="display: none">
+
+    </div>
+
+
+
+</form>
+<script>
+    function bl4() {
+        function reco1(callback) {
+            const idsect = document.getElementById('action_id_submit').innerHTML;
+            var nexturl = '/table/get_teams_by_activity_id?activity_id=';
+            nexturl += idsect;
+
+            fetch(nexturl)
+                .then(response => response.json())
+                .then(data => callback(null, data))
+                .catch(error => callback(error));
+        }
+
+        function bl41(callback) {
+            reco1(function (error, result) {
+                if (error) {
+                    callback(error);
+                } else {
+                    callback(null, result);
+                }
+            });
+        }
+
+        bl41(function (error, response_a) {
+
+            document.getElementById('rasd1').style.display = 'none';
+            document.getElementById('rasd2').style.display = 'none';
+            document.getElementById('rasd3-r').style.display = 'none';
+            document.getElementById('rasd3-a').style.display = 'none';
+            document.getElementById('rasd3-d').style.display = 'none';
+
+            const kz = document.getElementById("privet" + document.getElementById("action_id_submit").innerHTML);
+            if (kz)
+                kz.style.display = "none";
+            document.getElementById('rasd4').style.display = 'block';
+
+            const elk = document.getElementById('rasd4');
+            elk.innerHTML='<input type="checkbox" id="ch1">Отобразить таблицей (по командам) с сылкой для связи</input><br><input type="checkbox" id="ch2">Отобразить списком (все участники с именами и фамилиями), без ссылки для связи</input><br><input type="checkbox" id="ch3">Отобразить списком (все участники с именами и фамилиями), с ссылкой для связи</input><div id="spisokkomand"></div>'
+
+
+        })
+    }
+
+
+</script>
+<button id="submit_form" style="display: none" onclick="submitf()"></button>
+<script>
+    function bl1(){
+        document.getElementById('rasd2').style.display='none';
+        document.getElementById('rasd3-r').style.display='none';
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="none";
+        document.getElementById('rasd4').style.display='none';
+
+        document.getElementById('rasd3-a').style.display='none';
+        document.getElementById('rasd3-d').style.display='none';
+        document.getElementById('rasd4').style.display='none';
+
+        document.getElementById('rasd1').style.display='block';
+
+    }
+    function bl2(){
+        document.getElementById('rasd1').style.display='none';
+        document.getElementById('rasd3-r').style.display='none';
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="none";
+        document.getElementById('rasd4').style.display='none';
+
+        document.getElementById('rasd3-a').style.display='none';
+        document.getElementById('rasd3-d').style.display='none';
+
+        document.getElementById('rasd2').style.display='block';
+    }
+    function bl3_1 (){
+        document.getElementById('rasd1').style.display='none';
+        document.getElementById('rasd2').style.display='none';
+        document.getElementById('rasd3-d').style.display='none';
+        document.getElementById('rasd3-a').style.display='none';
+        document.getElementById('rasd3-r').style.display='block';
+        document.getElementById('rasd4').style.display='none';
+
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="block";
+    }
+    function bl3_2 (){
+        document.getElementById('rasd1').style.display='none';
+        document.getElementById('rasd2').style.display='none';
+        document.getElementById('rasd3-d').style.display='block';
+        document.getElementById('rasd3-a').style.display='none';
+        document.getElementById('rasd3-r').style.display='none';
+        document.getElementById('rasd4').style.display='none';
+
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="none";
+    }
+    function bl3_3 (){
+        document.getElementById('rasd1').style.display='none';
+        document.getElementById('rasd2').style.display='none';
+        document.getElementById('rasd3-r').style.display='none';
+        document.getElementById('rasd3-a').style.display='block';
+        document.getElementById('rasd3-d').style.display='none';
+        document.getElementById('rasd4').style.display='none';
+
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="none";
+    }
+
+</script>
+<script>
+
+    const but_a = document.getElementById('submit_form');
+    const chel = document.getElementById("resact1");
+    const chel_a = document.getElementById("resact");
+    function subm(){
+        var lkj=confirm('Вы уверены, что хотите сохранить актвити '+document.getElementById('activityc_name').value+'?')
+        if (lkj) {
+            document.getElementById('gs_reg').action = '/table/create_new_activity'
+            document.getElementById('sdfghj').value = document.getElementById('res').innerHTML;
+            document.getElementById('section_name_submit1').value=document.getElementById('view_act').value;
+        }
+        else{
+            event.preventDefault();
+        }
+    }
+
+    function cra(){
+
+        if (document.getElementById('activityc_name').value!=="")
+            var tew = confirm("У вас есть несохраненные изменения в редакторе для нового активити " + document.getElementById('activityc_name').value + ". Не сохранять их?");
+        else
+            tew=true;
+        if (tew) {
+            document.getElementById('activityc_name').value='';
+            editorInstance.setData('');
+
+            // document.getElementById('container').innerHTML='<div id="editor" contenteditable="true">\n' +
+            // '                </div>'
+            // const htmlp1=document.getElementById('cashedhtml1').value;
+            // const htmlp2=document.getElementById('cashedhtml2').value;
+            // document.getElementById('rasd3-a1').innerHTML=htmlp1+htmlp2;
+            bl3_2();
+            document.getElementById('button_create_activity').style.display = 'none';
+            document.getElementById('b3-3').style.display = "inline";
+            document.getElementById('rasd3-a').style.display = "block";
+            document.getElementById('b3-1').style.display = 'none';
+            document.getElementById('b3-2').style.display = 'none';
+            document.getElementById('b4').style.display = 'none';
+            document.getElementById('activityc_name').value = document.getElementById('activity_name').value;
+            document.getElementById('b5').style.display = 'inline';
+            document.getElementById('rasd1').style.display = 'none'
+            document.getElementById('rasd2').style.display = 'none'
+            document.getElementById('rasd3-r').style.display = 'none'
+            document.getElementById('rasd3-d').style.display = 'none'
+            document.getElementById('rasd4').style.display = 'none'
+        }
+
+    }
+    function submitf(p) {
+
+        if (p==="2") {
+            const elm=document.getElementById("rasd3-d");
+            elm.style.display = "block";
+            var str="<p>Вы действительно хотите удалить активити " + document.getElementById('action_name_submit').innerHTML+" в секции "+document.getElementById('section_name_submit').innerHTML+"? Данное действие будет занесено в журнал и отменить его будет нельзя</p>"
+            str+="<button type='submit'>Да</button>";
+            document.getElementById('gs_reg').action='/table/delete_activity_by_activity_id?activity_id='+document.getElementById('action_id_submit').innerHTML;
+            elm.innerHTML=str;
+
+            document.getElementById("rasd3-a").style.display = "none";
+            document.getElementById("rasd3-r").style.display = "none";
+            const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+            if (kz)
+                kz.style.display="none";
+            document.getElementById("b4").style.display="none"
+            document.getElementById("rasd2").style.display = "none";
+            document.getElementById("rasd1").style.display = "none";
+            document.getElementById("rasd4").style.display = "none";
+
+        }
+        if (p==="1") {
+            document.getElementById("rasd3-r").style.display = "block";
+
+
+
+            document.getElementById("rasd4").style.display = "none";
+
+            document.getElementById("rasd3-a").style.display = "none";
+            document.getElementById("rasd3-d").style.display = "none";
+            document.getElementById("rasd2").style.display = "none";
+            document.getElementById("rasd1").style.display = "none";
+            const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+            if (kz)
+                kz.style.display="block";
+            document.getElementById('b4').style.display="inline";
+        }
+
+
+
+
+
+        document.getElementById("b3-1").style.display="none";
+        document.getElementById("b3-2").style.display="none";
+        document.getElementById("b3-3").style.display="none";
+        document.getElementById("b5").style.display="none";
+
+        document.getElementById("b3"+"-"+p).style.display="inline";
+
+
+    }
+
+
+
+</script>
+</form>
+
+<script>
+
+
+
+
+
+    //тоду
+    async function m3() {
+        const jst = await fetch("/table/get_sport_sections");
+        const jsts=await jst.json();
+
+
+        return JSON.stringify(jsts);
+    }
+
+    async function main_get() {
+
+        document.getElementById('cashedhtml1').value=document.getElementById('rasd3-a1').innerHTML;
+        const response = await m3();
+
+
+        const sect = document.getElementById('sections_f');
+        const outel = document.getElementById('chooseSection');
+        const but = document.getElementById('view_act');
+        var chel;
+        var chel_a;
+        const sep = '{@#(&!&)@}';
+
+        const responseParse = JSON.parse(response);
+
+        const sectionName = document.getElementById('section_name');
+        const result = document.getElementById('res');
+        const but_a = document.getElementById('submit_form');
+        const hre = document.getElementById("table_url");
+
+
+
+
+
+        //старт
+        function get_sect() {
+            function reco(callback) {
+                const idsect = but.value;
+                var nexturl = '/table/get_activity_by_sport_section?activity_id=';
+                nexturl += idsect;
+
+                fetch(nexturl)
+                    .then(response => response.json())
+                    .then(data => callback(null, data))
+                    .catch(error => callback(error));
+            }
+
+            function main1(callback) {
+                reco(function (error, result) {
+                    if (error) {
+                        callback(error);
+                    } else {
+                        callback(null, result);
+                    }
+                });
+            }
+
+            main1(function (error, response_a) {
+                var hsl={};
+
+                document.getElementById('rasd2').style.display='block';
+                b2=document.getElementById('b2');
+
+                b2.style.display="inline";
+                rasd1=document.getElementById('rasd1')
+                rasd1.style.display="none";
+                document.getElementById('chooseActivity1').style.display='none';
+
+                var nbv;
+                const responseParse_a = response_a;
+                //туду
+                var ch=0;
+                var stra="";
+                for (var i=0;i<responseParse_a.length;i++){
+                    stra += '<div id=\"privet' + responseParse_a[i]["id"] + '\" style="display: none"> ' +
+                        '<p style="background: #B5B8B1; padding: 5px;">Полная информация о активити ' + responseParse_a[i]["title"] + ' в секции ' + chel.value + '</p>' +
+                        '<p style="background: #B5B8B1; padding: 5px;">Создано:</p>' +
+                        responseParse_a[i]["creator"] +
+                        '<p style="background: #B5B8B1; padding: 5px;">Описание:</p>' +
+                        '<div class=\"ck-content\">\n' + responseParse_a[i]["description"] + '</div>' +
+                        '</div>';
+
+                }
+
+                document.getElementById("rasd3-r").innerHTML=stra;
+                const sect_a = document.getElementById('activity_f');
+                const outel_a = document.getElementById('chooseActivity');
+                outel_a.style.display="block";
+                outel_a.innerText = "Пока Вы не выбрали ни одной активити";
+
+                const activityName = document.getElementById('activity_name');
+                activityName.value = "";
+                const activityNamel = document.getElementById('activity_namel');
+
+                sect_a.style.display = "block";
+                activityName.style.display = "block";
+                activityNamel.style.display = "block";
+                document.getElementById('tos').style.display='none';
+                document.getElementById('b3-1').style.display='none';
+                document.getElementById('b3-2').style.display='none';
+                document.getElementById('b3-3').style.display='none';
+                document.getElementById('b5').style.display='none';
+
+                document.getElementById('b4').style.display='none';
+
+                function per_a(stringen_a,siz) {
+                    const stren_a = stringen_a.toLowerCase();
+                    var mas_b=['ё', 'ё', 'х', 'х', 'ъ', 'ъ', 'э', 'э', 'ж', 'ж', 'ю', 'ю', 'б', 'б', 'ф', 'и', 'с', 'в', 'у', 'а', 'п', 'р', 'ш', 'о', 'л', 'д', 'ь', 'т', 'щ', 'з', 'й', 'к', 'ы', 'е', 'г', 'м', 'ц', 'ч', 'н', 'я'];
+                    var mas_a = ['`', '~', '{', '[', '}', ']', '"', "'", ';', ":", ">", ".", "<", ",", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+                    var alph_a = {
+                        '`': "ё",
+                        '~': "ё",
+                        '{': "х",
+                        '[': "х",
+                        '}': "ъ",
+                        ']': "ъ",
+                        '"': "э",
+                        "'": "э",
+                        ';': "ж",
+                        ":": "ж",
+                        ">": "ю",
+                        ".": "ю",
+                        "<": "б",
+                        ",": "б",
+                        'a': 'ф',
+                        'b': "и",
+                        'c': "с",
+                        'd': "в",
+                        'e': "у",
+                        'f': "а",
+                        'g': "п",
+                        'h': "р",
+                        'i': "ш",
+                        'j': "о",
+                        'k': "л",
+                        'l': "д", 'm': "ь",
+                        'n': "т",
+                        'o': "щ",
+                        'p': "з",
+                        'q': "й",
+                        'r': "к",
+                        's': "ы",
+                        't': "е",
+                        'u': "г",
+                        'v': "м",
+                        'w': "ц",
+                        'x': "ч",
+                        'y': "н",
+                        'z': "я"
+                    };
+                    var alph_b={'ё': '~', 'х': '[', 'ъ': ']', 'э': "'", 'ж': ':', 'ю': '.', 'б': ',', 'ф': 'a', 'и': 'b', 'с': 'c', 'в': 'd', 'у': 'e', 'а': 'f', 'п': 'g', 'р': 'h', 'ш': 'i', 'о': 'j', 'л': 'k', 'д': 'l', 'ь': 'm', 'т': 'n', 'щ': 'o', 'з': 'p', 'й': 'q', 'к': 'r', 'ы': 's', 'е': 't', 'г': 'u', 'м': 'v', 'ц': 'w', 'ч': 'x', 'н': 'y', 'я': 'z'};
+
+                    var mas1_a = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '@', '№', '#', '$', '%', '^', '&', '?', '*', '(', ')', '-', '_', '+', '=', ' '];
+                    var chr_a = stren_a.split('');
+                    var chr_b = siz.split('');
+                    var restr_a = '';
+
+                    var cvz=Math.min(chr_a.length,chr_b.length);
+                    for (var i = 0; i < cvz; i++) {
+                        if (mas_a.includes(chr_a[i]) && !mas_a.includes(chr_b[i]) && ((i===cvz-1) || (!mas_a.includes(chr_b[i+1]))))
+                            restr_a += alph_a[chr_a[i]];
+                        else {
+                            if (mas_b.includes(chr_a[i]) && !mas_b.includes(chr_b[i]) && ((i===cvz-1) || (!mas_b.includes(chr_b[i+1]))))
+                                restr_a += alph_b[chr_a[i]];
+                            else
+                            if (mas1_a.includes(chr_a[i]))
+                                continue;
+                            else {
+                                if (mas_a.includes(chr_a[i])){
+                                    restr_a+=chr_a[i]
+
+                                }
+                                else{
+                                    if (mas_b.includes(chr_a[i])){
+                                        restr_a+=chr_a[i]
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                    return restr_a;
+                }
+
+                function check_a(sa_a, sb_a) {
+                    if (sa_a.length === 0)
+                        return true;
+                    const tobr_a = 2;
+                    const s1_a = sa_a;
+                    const s2_a = sb_a;
+                    var chi_a = 0;
+                    for (var i = 0; i < s1_a.length; i++) {
+                        if (chi_a >= tobr_a)
+                            return false;
+                        if (i >= s2_a.length) {
+                            chi_a += s1_a.length - s2_a.length;
+                            break;
+                        }
+                        if ((s1_a[i] !== s2_a[i]))
+                            chi_a++;
+                    }
+                    return chi_a < tobr_a;
+                }
+
+                function findr_a(se_a) {
+                    // var fdg=document.getElementById('tos');
+                    // if (fdg)
+                    //     fdg.style.display='none'
+                    //
+
+                    var mas_a = [];
+
+                    for (var i = 0; i < responseParse_a.length; i++) {
+
+
+                        const eli_a = responseParse_a[i];
+                        const eli_a2 = eli_a["title"]
+                        const eli_a1=eli_a2.toLowerCase();
+                        const sk_a = per_a(se_a,eli_a1);
+                        if (check_a(sk_a, per_a(eli_a1,eli_a1)))
+                            mas_a.push([eli_a["id"], eli_a2]);
+
+                    }
+                    if (mas_a.length===0){
+                        outel_a.innerText = "Ни одной активити с введеным названием не найдено. Вы можете создать активити с заданным именем или попробовать найти активити еще раз!";
+                        if (document.getElementById('activity_name').value!==" ".repeat(document.getElementById('activity_name').value.length)) {
+                            sect_a.innerHTML = "<div style=\"display: flex; align-items: center;\">\n" +
+                                "  \n" +
+                                "  <input type='button' id=\"button_create_activity\" onclick=\"cra()\" value='Создать новую активность" + " с названием " + document.getElementById('activity_name').value+"'></input></div>"
+                        }
+                        else
+                            sect_a.innerHTML=""
+                    }
+                    else {
+                        outel_a.innerText="Пока Вы не выбрали активити";
+
+
+                        var htmlc_a = '<div style="display: flex; align-items: center;"><select style="margin-right: 10px;" id="activityList" class="activityList"><option value="NaN" selected disabled>---</option>';
+                        for (var i = 0; i < mas_a.length; i++) {
+                            htmlc_a += '<option id="' + mas_a[i][0] + '" value="' + mas_a[i][1] + '">' + mas_a[i][1] + '</option>';
+                        }
+                        htmlc_a += '</select>  ';
+                        lhg=document.getElementById('activity_name').value;
+                        var xmn=(lhg===(" ".repeat(lhg.length)));
+
+                        if (!xmn) {
+
+                            htmlc_a+= "<input type=\"button\" id=\"button_create_activity\" onclick=\"cra()\" value=\"Создать новую активность" + " с названием " +                        document.getElementById('activity_name').value
+                                + "\"></input></div>"
+                        }
+                        else {
+                            htmlc_a += "</div>"
+                        }
+                        sect_a.innerHTML = htmlc_a;
+
+                        chel_a = document.getElementById('activityList');
+                        chel_a.value=document.getElementById('action_name_submit').innerHTML;
+                        if (chel_a) {
+                            chel_a.addEventListener('change', function (event) {
+                                if (document.getElementById('activityc_name').value !== ""){
+
+                                    var tew = confirm("У вас есть несохраненные изменения в редакторе для нового активити " + document.getElementById('activityc_name').value + ". Не сохранять их?");
+                                    if (!tew){
+                                        chel_a.value="NaN";
+
+                                        event.preventDefault()
+                                    }
+                                    if (tew){
+                                        document.getElementById('activityc_name').value='';
+
+                                    }
+                                }
+                                else
+                                    var tew=true;
+
+                                if (tew){
+
+                                    const outel_a = document.getElementById('chooseActivity');
+                                    if (document.getElementById('activity_name').value!==" ".repeat(document.getElementById('activity_name').value.length))
+                                        sect_a.innerHTML = "<div style=\"display: flex; align-items: center;\">\n" +
+                                            "  \n" +
+                                            "  <input type='button' id=\"button_create_activity\" onclick=\"cra()\" value='Создать новую активность" + " с названием " + document.getElementById('activity_name').value+"'></input></div>"
+
+                                    outel_a.style.display = 'none';
+                                    const but_a = document.getElementById('submit_form');
+                                    const zna = this.options[this.selectedIndex].id;
+                                    const sv_a = this.value;
+
+                                    document.getElementById("resact").value = sv_a;
+                                    const z11 = document.getElementById('chooseActivity1');
+                                    z11.style.display = 'block';
+                                    z11.textContent = "Пока вы не выбрали действие с активностью " + sv_a + " в секции " + chel.value;
+                                    document.getElementById('privet1001').innerHTML="1";
+                                    outel_a.textContent = 'Вы выбрали активность: ' + sv_a + ' в секции ' + chel.value;
+                                    document.getElementById("action_name_submit").innerHTML = sv_a;
+                                    document.getElementById("section_name_submit").innerHTML = chel.value;
+                                    document.getElementById("action_id_submit").innerHTML = zna;
+                                    but_a.value = zna;
+                                    document.getElementById('tos').style.display = 'none';
+                                    document.getElementById('b3-1').style.display = 'none';
+                                    document.getElementById('b3-2').style.display = 'none';
+                                    document.getElementById('b3-3').style.display = 'none';
+                                    document.getElementById('b5').style.display = 'none';
+
+                                    document.getElementById('b4').style.display='none';
+
+                                    document.getElementById('tos').innerHTML = "<select id=\"nbv\" autoComplete=\"off\">\n" +
+                                        "                                <option value=\"NaN\" selected disabled>---</option>\n" +
+                                        "                                <option value=\"1\">Посмотреть информацию о активити</option>\n" +
+                                        "                                <option value=\"2\">Удалить активити</option>\n" +
+                                        "                            </select>";
+                                    document.getElementById('tos').style.display = 'block';
+                                    nbv = document.getElementById('nbv');
+
+                                    if (nbv) {
+
+                                        nbv.addEventListener('change', function (event1) {
+                                            if (document.getElementById('activityc_name').value !== ""){
+
+                                                var tew = confirm("У вас есть несохраненные изменения в редакторе для нового активити " + document.getElementById('activityc_name').value + ". Не сохранять их?");
+                                                if (!tew){
+                                                    this.value="NaN";
+
+                                                    event1.preventDefault()
+                                                }
+                                                if (tew){
+                                                    document.getElementById('activityc_name').value="";
+
+                                                }
+                                            }
+                                            else
+                                                var tew=true;
+                                            if (tew) {
+
+                                                const z1 = document.getElementById('chooseActivity1');
+                                                z1.style.display = 'block';
+                                                document.getElementById('chooseActivity').style.display = 'none';
+                                                but_a.textContent = z1.value;
+                                                var vib;
+                                                if (nbv.value === "1")
+                                                    vib = "посмотреть информацию об активити";
+                                                else
+                                                    vib = "удалить активити";
+                                                document.getElementById('privet1001').innerHTML = "0";
+                                                z1.innerText = outel_a.textContent + ", чтобы " + vib;
+                                                submitf(nbv.value);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+
+                function main_a() {
+                    const se_a = activityName.value;
+                    findr_a(se_a);
+                }
+
+
+                activityName.addEventListener('input', main_a);
+                main_a();
+
+            });
+        }
+
+
+        //конец
+
+
+        function per(stringen) {
+            const stren = stringen.toLowerCase();
+            var mas = ['`', '~', '{', '[', '}', ']', '"', "'", ';', ":", ">", ".", "<", ",", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+            var alph = {
+                '`': "ё",
+                '~': "ё",
+                '{': "х",
+                '[': "х",
+                '}': "ъ",
+                ']': "ъ",
+                '"': "э",
+                "'": "э",
+                ';': "ж",
+                ":": "ж",
+                ">": "ю",
+                ".": "ю",
+                "<": "б",
+                ",": "б",
+                'a': 'ф',
+                'b': "и",
+                'c': "с",
+                'd': "в",
+                'e': "у",
+                'f': "а",
+                'g': "п",
+                'h': "р",
+                'i': "ш",
+                'j': "о",
+                'k': "л",
+                'l': "д",
+                'm': "ь",
+                'n': "т",
+                'o': "щ",
+                'p': "з",
+                'q': "й",
+                'r': "к",
+                's': "ы",
+                't': "е",
+                'u': "г",
+                'v': "м",
+                'w': "ц",
+                'x': "ч",
+                'y': "н",
+                'z': "я"
+            };
+            var mas1 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '@', '№', '#', '$', '%', '^', '&', '?', '*', '(', ')', '-', '_', '+', '=', ' '];
+            var chr = stren.split('');
+            var restr = '';
+            for (var i = 0; i < chr.length; i++) {
+                if (mas.includes(chr[i]))
+                    restr += alph[chr[i]];
+                else {
+                    if (mas1.includes(chr[i]))
+                        continue;
+                    else {
+                        restr += chr[i];
+                    }
+                }
+            }
+            return restr;
+        }
+
+        function check(sa, sb) {
+            if (sa.length === 0)
+                return true;
+            const tobr = 4;
+            const s1 = sa;
+            const s2 = sb;
+            var chi = 0;
+            for (var i = 0; i < s1.length; i++) {
+                if (chi >= tobr)
+                    return false;
+                if (i >= s2.length) {
+                    chi += s1.length - s2.length;
+                    break;
+                }
+                if (s1[i] !== s2[i])
+                    chi++;
+            }
+            return chi < tobr;
+        }
+
+        function findr(se) {
+            const sk = per(se);
+            var mas = [];
+            for (var i = 0; i < responseParse.length; i++) {
+                const eli = responseParse[i];
+                const enname1 = eli["name"]
+                const enname=enname1.toLowerCase();
+                if (check(sk, enname) || check(se,enname))
+                    mas.push([eli["id"], enname1]);
+            }
+
+            var htmlc = '<select id="sectionsList" class="sectionsList"><option value="NaN" selected disabled>---</option>';
+            for (var i = 0; i < mas.length; i++) {
+                htmlc += `<option id="${mas[i][0]}" value="${mas[i][1]}">${mas[i][1]}</option>`;
+            }
+            htmlc += "</select>";
+            sect.innerHTML = htmlc;
+
+            chel = document.querySelector('.sections_f .sectionsList');
+            if (chel) {
+                chel.addEventListener('change', function (event) {
+                    if (document.getElementById('activityc_name').value !== "") {
+
+
+                        var tew = confirm("У вас есть несохраненные изменения в редакторе для нового активити " + document.getElementById('activityc_name').value + ". Не сохранять их?");
+                        if (!tew) {
+                            chel.value = "NaN";
+                            event.preventDefault();
+                        }
+                        if (tew){
+                            document.getElementById('activityc_name').value="";
+                        }
+                    }
+                    else {
+                        var tew=true;
+                    }
+                    if (tew) {
+                        const sv = this.value;
+                        outel.textContent = 'Вы выбрали секцию: ' + sv;
+                        document.getElementById("resact1").value = sv;
+                        but.value = this.options[this.selectedIndex].id;
+                        document.getElementById('section_name_submit').value=this.value;
+                        document.getElementById('action_name_submit').value="NaN"
+
+                        get_sect();
+                    }
+                });
+            }
+        }
+
+        function main() {
+            const se = sectionName.value;
+            findr(se);
+        }
+
+        sectionName.addEventListener('input', main);
+        main();
+
+
+
+
+    }
+    main_get();
+
+
+</script>
+<a href="/">Main page</a>
+
+{% endblock %}
