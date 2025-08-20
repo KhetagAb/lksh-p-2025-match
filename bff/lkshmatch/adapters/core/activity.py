@@ -1,5 +1,4 @@
 from lkshmatch import core_client
-import datetime
 from lkshmatch.adapters.base import (
     Activity,
     ActivityAdapter,
@@ -88,13 +87,11 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         self.privilege_checker = privilege_checker
 
     async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int,
-                              description: str | Unset = UNSET,
-                              enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
+                              description: str | Unset = UNSET) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_create.asyncio(client=self.client,
                                                            body=CreateActivityRequest(title, sport_section_id,
-                                                                                      creator_id, description,
-                                                                                      enroll_deadline),
+                                                                                      creator_id, description),
                                                            privilege_token=admin_token)
         if isinstance(response, PostCoreActivityCreateResponse400):
             raise InvalidParameters(f"create activity return 400 response: {response.message}")
@@ -120,7 +117,10 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
                               description: str | None = None,
                               enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
-        response = await post_core_activity_update_by_id.asyncio(client=self.client,                                                   privilege_token=admin_token)
+        response = await post_core_activity_update_by_id.asyncio(client=self.client,
+                                                                 id=creator_id,
+                                                                 body=UpdateActivityRequest(title, description or ""),
+                                                                 privilege_token=admin_token)
         if isinstance(response, PostCoreActivityUpdateByIdResponse400):
             raise InvalidParameters(f"update activity return 400 response: {response.message}")
         if not isinstance(response, PostCoreActivityUpdateByIdResponse200):

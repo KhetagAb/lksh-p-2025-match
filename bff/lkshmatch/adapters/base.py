@@ -41,10 +41,6 @@ class InsufficientRights(Exception):
 class InvalidParameters(Exception):
     pass
 
-class EnrollmentFinish(Exception):
-    pass
-
-
 class EnrollmentFinished(Exception):
     pass
 
@@ -131,8 +127,7 @@ class ActivityAdminAdapter(ABC):
 
     @abstractmethod
     async def update_activity(self, requester: int, title: str, creator_id: int,
-                              description: str | None = None,
-                              enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
+                              description: str | None = None) -> Activity:
         raise NotImplementedError
 
 
