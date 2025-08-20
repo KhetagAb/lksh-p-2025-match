@@ -346,9 +346,6 @@ components:
         description:
           type: string
           description: Описание активности
-        sport_section_id:
-          type: integer
-          format: int64
         creator_id:
           type: integer
           format: int64

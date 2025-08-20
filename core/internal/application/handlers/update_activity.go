@@ -48,7 +48,6 @@ func (h *UpdateActivityHandler) UpdateActivity(ectx echo.Context, id int64, para
 			CreatorID:      *requestBody.CreatorId,
 			Title:          *requestBody.Title,
 			Description:    *requestBody.Description,
-			SportSectionID: *requestBody.SportSectionId,
 			EnrollDeadline: *requestBody.EnrollDeadline,
 		},
 		Creator: dao.Player{ID: *requestBody.CreatorId},

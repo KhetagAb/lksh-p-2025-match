@@ -106,18 +106,13 @@ func (a *Activities) UpdateActivity(ctx context.Context, activity dto.Activity) 
 		finalDescription = activity.Activity.Description
 	}
 
-	finalSportSectionID := currentActivity.SportSectionID
-	if activity.Activity.SportSectionID != 0 {
-		finalSportSectionID = activity.Activity.SportSectionID
-	}
-
 	finalCreatorID := currentActivity.CreatorID
 	if activity.Activity.CreatorID != 0 {
 		finalCreatorID = activity.Activity.CreatorID
 	}
 
 	var resActivity dao.Activity
-	err = a.pool.QueryRow(ctx, updateActivity, activity.Activity.ID, finalTitle, finalDescription, finalSportSectionID, finalCreatorID, activity.Activity.EnrollDeadline).
+	err = a.pool.QueryRow(ctx, updateActivity, activity.Activity.ID, finalTitle, finalDescription, finalCreatorID, activity.Activity.EnrollDeadline).
 		Scan(&resActivity.ID, &resActivity.Title, &resActivity.Description, &resActivity.SportSectionID, &resActivity.CreatorID, &resActivity.EnrollDeadline)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
