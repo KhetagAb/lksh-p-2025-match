@@ -38,8 +38,7 @@ paths:
         - name: tg_username
           in: query
           schema:
-            type: integer
-            format: int64
+            type: string
       responses:
         "200":
           $ref: '#/components/responses/PlayerResponse'
@@ -78,6 +77,8 @@ paths:
       tags:
         - "Activities"
       summary: "Создает активность"
+      parameters:
+        - $ref: "#/components/parameters/PrivilegeToken"
       requestBody:
         required: true
         content:
@@ -102,6 +103,7 @@ paths:
           schema:
             type: integer
             format: int64
+        - $ref: "#/components/parameters/PrivilegeToken"
       responses:
         "200":
           $ref: '#/components/responses/ActivityResponse'
@@ -121,6 +123,7 @@ paths:
           schema:
             type: integer
             format: int64
+        - $ref: "#/components/parameters/PrivilegeToken"
       requestBody:
         required: true
         content:
@@ -175,6 +178,30 @@ paths:
         "400":
           $ref: '#/components/responses/ErrorResponse'
         "409":
+          $ref: '#/components/responses/ErrorResponse'
+
+  /core/activity/{id}/leave:
+    post:
+      tags:
+        - "Activities"
+      summary: "Отписывает человека из активности, удаляет из команды"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivityLeavePlayerRequest'
+      responses:
+        "200":
+          description: Игрок успешно удалён из активности
+        "404":
           $ref: '#/components/responses/ErrorResponse'
 
 components:
@@ -303,9 +330,6 @@ components:
 
     UpdateActivityRequest:
       type: object
-      required:
-        - title
-        - description
       properties:
         title:
           type: string
@@ -313,16 +337,39 @@ components:
         description:
           type: string
           description: Описание активности
+        sport_section_id:
+          type: integer
+          format: int64
+        creator_id:
+          type: integer
+          format: int64
+          description: Core-идентификатор создателя активности
 
     ActivityEnrollPlayerRequest:
       type: object
       required:
-        - tg_id
+        - id
       properties:
-        tg_id:
+        id:
           type: integer
           format: int64
 
+    ActivityLeavePlayerRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+
+  parameters:
+    PrivilegeToken:
+      name: Privilege-Token
+      in: header
+      schema:
+        type: string
+      required: true
 
   responses:
     AllSportSections:

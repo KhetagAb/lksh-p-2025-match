@@ -10,11 +10,14 @@ type (
 		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]dao.Activity, error)
 		GetActivityByID(ctx context.Context, id int64) (*dao.Activity, error)
 		CreateActivity(ctx context.Context, creatorID, sportSectionId int64, title, description string) (*dao.Activity, error)
+		DeleteActivity(ctx context.Context, activityID int64) (*dao.Activity, error)
+		UpdateActivity(ctx context.Context, activityID int64, title, description *string, sportSectionID, creatorID *int64) (*dao.Activity, error)
 	}
 
-	PlayerRepository interface {
-		GetPlayerByID(ctx context.Context, id int64) (*dao.Player, error)
-		GetPlayerByTgID(ctx context.Context, tgID int64) (*dao.Player, error)
+	PlayerService interface {
+		GetPlayerByID(ctx context.Context, tgId int64) (*dao.Player, error)
+		GetPlayerByTgID(ctx context.Context, tgId int64) (*dao.Player, error)
+		GetPlayerByTgUsername(ctx context.Context, tgUsername string) (*dao.Player, error)
 	}
 
 	TeamRepository interface {
@@ -23,21 +26,28 @@ type (
 		GetTeamByPlayerAndActivity(ctx context.Context, playerID, activityID int64) (*dao.Team, error)
 	}
 
+	SportRepository interface {
+		GetSportSectionByID(ctx context.Context, sportSectionID int64) (*dao.SportSection, error)
+	}
+
 	ActivityService struct {
 		activityRepository ActivityRepository
-		playerRepository   PlayerRepository
+		playerService      PlayerService
 		teamRepository     TeamRepository
+		sportRepository    SportRepository
 	}
 )
 
 func NewActivityService(
 	activityRepository ActivityRepository,
-	playerRepository PlayerRepository,
+	playerService PlayerService,
 	teamRepository TeamRepository,
+	sportRepository SportRepository,
 ) *ActivityService {
 	return &ActivityService{
 		activityRepository: activityRepository,
-		playerRepository:   playerRepository,
+		playerService:      playerService,
 		teamRepository:     teamRepository,
+		sportRepository:    sportRepository,
 	}
 }

@@ -2,10 +2,11 @@ package handlers
 
 import (
 	"context"
-	"github.com/labstack/echo/v4"
+	"fmt"
 	"match/internal/generated/server"
 	"match/internal/infra"
-	"net/http"
+
+	"github.com/labstack/echo/v4"
 )
 
 type (
@@ -26,19 +27,41 @@ func NewRegisterPlayerHandler(
 	}
 }
 
+func validateRegisterPlayerRequest(request *server.RegisterPlayerRequest) error {
+	if len(request.Name) == 0 {
+		return fmt.Errorf("name field is required and cannot be empty")
+	}
+
+	if len(request.TgUsername) == 0 {
+		return fmt.Errorf("tgUsername field is required and cannot be empty")
+	}
+
+	if request.TgId == 0 {
+		return fmt.Errorf("tgId field is required and cannot be zero")
+	}
+
+	return nil
+}
+
 func (h *RegisterPlayerHandler) RegisterUser(ectx echo.Context) error {
 	ctx := context.Background()
 	request := new(server.RegisterPlayerRequest)
 
 	if err := ectx.Bind(request); err != nil {
 		infra.Errorf(ctx, "Bad request: register user requires body")
-		return ectx.String(http.StatusBadRequest, "Invalid request body")
+		return BadRequestErrorResponsef(ectx, "Invalid request body: %v", err)
 	}
+
+	if err := validateRegisterPlayerRequest(request); err != nil {
+		infra.Errorf(ctx, "Validation error: %v", err)
+		return BadRequestErrorResponsef(ectx, err.Error())
+	}
+
 	infra.Infof(ctx, "Registering player with tg: %v", request.TgUsername)
 	playerId, isRegistered, err := h.registerPlayerService.RegisterUser(ctx, request.Name, request.TgUsername, request.TgId)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find %v: %v", request.TgUsername, err)
-		return InternalErrorResponse(ectx, err.Error())
+		return InternalErrorResponsef(ectx, err.Error())
 	}
 	if isRegistered {
 		infra.Infof(ctx, "Player %v registered", request.TgUsername)

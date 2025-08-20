@@ -12,7 +12,7 @@ activities_router = APIRouter()
 @activities_router.get("/")
 async def root(request: Request, username: str = "UU") -> Response:
     return templates.TemplateResponse(
-        name="index.html", context={"request": request, "username": username}
+        name="index.html", context={"request": request}
     )
 
 
@@ -37,7 +37,27 @@ async def get_sport_sections(
 
 
 @activities_router.get("/sections/{sport_section_id}")
-async def get_activity_by_sport_section_id(request: Request, sport_section_id: int) -> Response:
+async def get_activities_by_sport_section_id(
+    request: Request,
+    sport_section_id: int
+) -> Response:
+    activity_adapter = app_container.get(ActivityAdapter)
+    try:
+        list_of_activities = await activity_adapter.get_activities_by_sport_section(sport_section_id=sport_section_id)
+    except BaseException:
+        return templates.TemplateResponse(
+            name="some_error.html", context={'request': request}
+        )
+    return templates.TemplateResponse(
+        name="list_of_activities.html",
+        context={
+            'request': request,
+            'list_of_activities': list_of_activities
+        }
+    )
+
+@activities_router.get("/sections/activities/{activity_id}")
+async def get_teams_by_activity_id(request: Request, sport_section_id: int) -> Response:
     activity_adapter = app_container.get(ActivityAdapter)
     try:
         list_of_activities = await activity_adapter.get_activities_by_sport_section(

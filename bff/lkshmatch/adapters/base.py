@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import NewType
 
+from lkshmatch.core_client.types import Unset, UNSET
+
 PlayerId = NewType("PlayerId", int)
 TeamId = NewType("TeamId", int)
 SportSectionId = NewType("SportSectionId", int)
@@ -49,19 +51,17 @@ TgID = int
 
 
 @dataclass
-class CorePlayer:
-    core_id: CoreID
-    tg_id: TgID
-
-
-@dataclass
 class Player:
-    tg_username: str
+    core_id: CoreID
+    name: str
     tg_id: TgID
+    tg_username: str
 
 
 @dataclass
-class PlayerToRegister(Player):
+class PlayerToRegister:
+    tg_id: TgID
+    tg_username: str
     name: str
 
 
@@ -76,25 +76,32 @@ class SportSection:
 class Activity:
     id: int
     title: str
+    creator: Player
     description: str | None
-    creator: CorePlayer
 
 
 @dataclass
 class Team:
     id: int
     name: str
-    captain: CorePlayer
-    members: list[CorePlayer]
+    captain: Player
+    members: list[Player]
 
 
 class PlayerAdapter(ABC):
     @abstractmethod
-    async def validate_register_user(self, user: Player) -> PlayerToRegister:
+    async def register_user(self, user: PlayerToRegister) -> CoreID:
         raise NotImplementedError
 
     @abstractmethod
-    async def register_user(self, user: PlayerToRegister) -> CoreID:
+    async def get_player_by_tg(self, tg_id: int | Unset = UNSET, tg_username: str | Unset = UNSET) -> Player:
+        raise NotImplementedError
+
+
+# TODO спросить куда это поместить
+class PlayerAdminAdapter(ABC):
+    @abstractmethod
+    async def admin_register_user(self, user: PlayerToRegister, player_info: Player) -> CoreID:
         raise NotImplementedError
 
 
@@ -104,24 +111,25 @@ class SportAdapter(ABC):
         raise NotImplementedError
 
 
-# class TournamentAdminAdapter(ABC):
-#     @abstractmethod
-#     async def create_tournament(
-#         self, tournament_interval: TournamentInterval, sport_name: SportSectionName, player_info: Admin
-#     ) -> None:
-#         raise NotImplementedError
-#
-#
-#     @abstractmethod
-#     async def modify_tournament(self, activity: Activity, player_info: Admin) -> None:
-#         raise NotImplementedError
+class ActivityAdminAdapter(ABC):
+    @abstractmethod
+    async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int,
+                              description: str | Unset = UNSET) -> Activity:
+        raise NotImplementedError
+
+    # TODO спросить про айди креатора
+    @abstractmethod
+    async def delete_activity(self, requester: int, core_id: CoreID) -> Activity:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_activity(self, requester: int, title: str,creator_id: int, description: str | None = None) -> Activity:
+        raise NotImplementedError
 
 
 class ActivityAdapter(ABC):
     @abstractmethod
-    async def get_activities_by_sport_section(
-        self, sport_section_id: int
-    ) -> list[Activity]:
+    async def get_activities_by_sport_section(self, sport_section_id: int) -> list[Activity]:
         raise NotImplementedError
 
     @abstractmethod
@@ -129,17 +137,13 @@ class ActivityAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def enroll_player_in_activity(
-        self, activity_id: int, player_tg_id: TgID
-    ) -> Team:
+    async def enroll_player_in_activity(self, activity_id: int, player_id: CoreID) -> Team:
         raise NotImplementedError
 
 
 class TeamAdapter(ABC):
     @abstractmethod
-    async def create_team(
-        self, section: SportSection, user: Player, name_team: str
-    ) -> str:
+    async def create_team(self, section: SportSection, user: Player, name_team: str) -> None:
         raise NotImplementedError
 
     @abstractmethod

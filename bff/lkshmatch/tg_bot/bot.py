@@ -9,7 +9,6 @@ from lkshmatch.adapters.base import (
     Activity,
     ActivityAdapter,
     InsufficientRights,
-    Player,
     PlayerAdapter,
     PlayerAlreadyInTeam,
     PlayerNotFound,
@@ -67,7 +66,6 @@ logging.basicConfig(level=logging.INFO)
 activity_adapter = app_container.get(ActivityAdapter)
 sport_adapter = app_container.get(SportAdapter)
 player_adapter = app_container.get(PlayerAdapter)
-
 students_repository = app_container.get(LKSHStudentsRepository)
 
 
@@ -244,9 +242,7 @@ async def start(mess: types.Message) -> None:
         markup.add(types.KeyboardButton(Buttons.TECHNICAL_SUPPORT.text))
         await msg_with_buttons(mess, "Здравствуйте!", markup)
         # TODO: What if user does not have username?
-        user_name = await students_repository.validate_register_user(
-            Player((username if username is not None else ""), int(user_id))
-        )
+        user_name = await students_repository.get_name_by_username(username)
         await msg_with_ibuttons(
             mess=mess,
             text=Msg.REGISTRATION_CONFIRM_QUESTION.value % user_name,
@@ -282,11 +278,13 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
         sport_markup.add(sport_btn)
 
         try:
-            user_name = await students_repository.validate_register_user(
-                Player(username, int(user_id))
-            )
+            user_name = await students_repository.get_name_by_username(username)
             await player_adapter.register_user(
-                PlayerToRegister(username, user_id, user_name)
+                PlayerToRegister(
+                    tg_id=user_id,
+                    tg_username=username,
+                    name=user_name
+                )
             )
 
             to_pin = (await edit_with_ibuttons(call, Msg.REGISTRATION_CONFIRMED.value, sport_markup)).message_id
@@ -442,7 +440,8 @@ async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
     activity_id = int(call.data.split("_")[1])  # type: ignore
 
     try:
-        team = await activity_adapter.enroll_player_in_activity(activity_id, call.from_user.id)
+        player = await app_container.get(PlayerAdapter).get_player_by_tg(tg_id=call.from_user.id)
+        team = await activity_adapter.enroll_player_in_activity(activity_id, player.core_id)
         activity = await get_activity_by_id(activity_id)
         if activity is None:
             log_error(

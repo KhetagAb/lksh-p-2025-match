@@ -13,25 +13,30 @@ type ServerInterface struct {
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler
 	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
 	createActivity              *CreateActivityHandler
+	deleteActivity              *DeleteActivityHandler
+	updateActivity              *UpdateActivityHandler
+	getPlayerByTg               *GetPlayerByTgHandler
 }
 
-func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context) error {
-	return s.createActivity.CreateActivity(ctx)
-}
-
-func (s ServerInterface) PostCoreActivityDeleteById(ctx echo.Context, id int64) error {
+func (s ServerInterface) PostCoreActivityIdLeave(ctx echo.Context, id int64) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s ServerInterface) PostCoreActivityUpdateById(ctx echo.Context, id int64) error {
-	//TODO implement me
-	panic("implement me")
+func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context, params server.PostCoreActivityCreateParams) error {
+	return s.createActivity.CreateActivity(ctx, params)
+}
+
+func (s ServerInterface) PostCoreActivityDeleteById(ctx echo.Context, id int64, params server.PostCoreActivityDeleteByIdParams) error {
+	return s.deleteActivity.DeleteActivity(ctx, id, params)
+}
+
+func (s ServerInterface) PostCoreActivityUpdateById(ctx echo.Context, id int64, params server.PostCoreActivityUpdateByIdParams) error {
+	return s.updateActivity.UpdateActivity(ctx, id, params)
 }
 
 func (s ServerInterface) GetCorePlayerByTg(ctx echo.Context, params server.GetCorePlayerByTgParams) error {
-	//TODO implement me
-	panic("implement me")
+	return s.getPlayerByTg.GetPlayerByTg(ctx, params)
 }
 
 func (s ServerInterface) GetCoreTeamsByActivityId(ctx echo.Context, id int64) error {
@@ -63,6 +68,9 @@ func NewServerInterface(
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler,
 	enrollPlayerInActivity *EnrollPlayerInActivityHandler,
 	createActivity *CreateActivityHandler,
+	deleteActivity *DeleteActivityHandler,
+	updateActivity *UpdateActivityHandler,
+	getPlayerByTg *GetPlayerByTgHandler,
 ) *ServerInterface {
 	return &ServerInterface{
 		getSportList:                getSportList,
@@ -71,5 +79,8 @@ func NewServerInterface(
 		getActivityBySportSectionID: getActivityBySportSectionID,
 		enrollPlayerInActivity:      enrollPlayerInActivity,
 		createActivity:              createActivity,
+		deleteActivity:              deleteActivity,
+		updateActivity:              updateActivity,
+		getPlayerByTg:               getPlayerByTg,
 	}
 }

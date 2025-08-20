@@ -35,7 +35,7 @@ func (h *GetTeamsByActivityIDHandler) GetTeamsByActivityID(ectx echo.Context, ac
 	teams, err := h.teamService.GetTeamsByActivityID(ctx, activityID)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
-		return InternalErrorResponse(ectx, err.Error())
+		return InternalErrorResponsef(ectx, err.Error())
 	}
 	infra.Infof(ctx, "%d teams have been found and extracted succesfully", 1)
 

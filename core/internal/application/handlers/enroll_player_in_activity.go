@@ -33,31 +33,27 @@ func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context
 	ctx := context.Background()
 
 	var requestBody server.PostCoreActivityIdEnrollJSONRequestBody
-
 	if err := ectx.Bind(&requestBody); err != nil {
-		return ectx.JSON(400, &server.ErrorResponse{
-			Message: "Invalid request body: " + err.Error(),
-		})
+		return BadRequestErrorResponsef(ectx, "Invalid request body: %s", err.Error())
 	}
 
-	infra.Infof(ctx, "Creating Team by tgID (%d)", id)
-	team, err := h.activityService.EnrollPlayerInActivity(ctx, id, requestBody.TgId)
+	infra.Infof(ctx, "Creating Team in activity [id=%d]", id)
+	team, err := h.activityService.EnrollPlayerInActivity(ctx, id, requestBody.Id)
 	if err != nil {
 		var invalidOpErr *services.InvalidOperationError
 		if errors.As(err, &invalidOpErr) {
 			infra.Warnf(ctx, "Player already enrolled in activity: %v", err)
-			return ConflictErrorResponse(ectx, "Player is already enrolled in a team for this activity")
+			return ConflictErrorResponsef(ectx, "Player is already enrolled in a team for this activity")
 		}
 
 		infra.Errorf(ctx, "Internal server error while trying to create team: %v", err)
-		return InternalErrorResponse(ectx, err.Error())
+		return InternalErrorResponsef(ectx, err.Error())
 	}
 
-	infra.Infof(ctx, "Team created successfully [team_id=%d][team_name=%s][team_captain_id=%d]",
+	infra.Infof(ctx, "Team created successfully [team_id=%d] [team_name=%s] [team_captain_id=%d]",
 		team.Team.ID, team.Team.Name, team.Captain.ID)
 
 	resultTeam := mappers.MapTeamToAPI(*team)
-
 	return ectx.JSON(200, server.CreatedTeamResponse{
 		Team: resultTeam,
 	})

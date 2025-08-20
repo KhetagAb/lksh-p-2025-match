@@ -4,8 +4,12 @@ services:
     build:
       context: ..
       dockerfile: core/test.dockerfile
-    env_file:
-      - .env.test
+    environment:
+      APP_POSTGRES_HOST: ${POSTGRES_HOST}
+      APP_POSTGRES_USER: ${POSTGRES_USER}
+      APP_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      APP_POSTGRES_PORT: ${POSTGRES_PORT}
+      APP_POSTGRES_DATABASE: ${POSTGRES_DB}
     depends_on:
       postgres:
         condition: service_healthy
@@ -18,8 +22,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
-    env_file:
-      - .env.test
     command:
       - -p ${POSTGRES_PORT}
     ports:

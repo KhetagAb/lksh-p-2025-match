@@ -2,11 +2,9 @@ package handlers
 
 import (
 	"context"
-	"errors"
 	"github.com/labstack/echo/v4"
 	"match/internal/application/handlers/mappers"
 	"match/internal/domain/dto"
-	"match/internal/domain/services"
 	"match/internal/generated/server"
 	"match/internal/infra"
 )
@@ -29,33 +27,28 @@ func NewCreateActivityHandler(
 	}
 }
 
-func (h *CreateActivityHandler) CreateActivity(ectx echo.Context) error {
+func (h *CreateActivityHandler) CreateActivity(ectx echo.Context, params server.PostCoreActivityCreateParams) error {
 	ctx := context.Background()
+	infra.Infof(ctx, "Processing CreateActivity handler with params: %+v", params)
 
-	var requestBody server.PostCoreActivityCreateJSONRequestBody
-
-	if err := ectx.Bind(&requestBody); err != nil {
-		return ectx.JSON(400, &server.ErrorResponse{
-			Message: "Invalid request body: " + err.Error(),
-		})
+	if len(params.PrivilegeToken) == 0 {
+		infra.Errorf(ctx, "Privilege token is required")
+		return UnauthorizedErrorResponsef(ectx, "Privilege token is required")
 	}
 
-	//infra.Infof(ctx, "Creating Team by tgID (%d)", id)
-	activity, err := h.createActivityService.CreateActivity(ctx, requestBody.CreatorId, requestBody.SportSectionId, *requestBody.Description, requestBody.Title)
-	if err != nil {
-		var invalidOpErr *services.InvalidOperationError
-		if errors.As(err, &invalidOpErr) {
-			infra.Warnf(ctx, "Activity already exists: %v", err)
-			return ConflictErrorResponse(ectx, "Activity already exists")
-		}
+	var requestBody server.PostCoreActivityCreateJSONRequestBody
+	if err := ectx.Bind(&requestBody); err != nil {
+		infra.Errorf(ctx, "Invalid request body: %v", err)
+		return BadRequestErrorResponsef(ectx, "Invalid request body: "+err.Error())
+	}
 
+	activity, err := h.createActivityService.CreateActivity(ctx, requestBody.CreatorId, requestBody.SportSectionId, requestBody.Title, *requestBody.Description)
+	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to create activity: %v", err)
-		return InternalErrorResponse(ectx, err.Error())
+		return InternalErrorResponsef(ectx, err.Error())
 	}
 
 	resultActivity := mappers.MapActivityToAPI(*activity)
-	infra.Infof(ctx, "Activity succesfully created: %v", resultActivity)
-
 	return ectx.JSON(200, server.ActivityResponse{
 		Activity: resultActivity,
 	})

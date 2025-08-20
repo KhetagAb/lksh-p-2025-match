@@ -29,13 +29,13 @@ func NewGetAllSportSectionHandler(
 
 func (h *GetAllSportSectionHandler) GetAllSportSection(ectx echo.Context) error {
 	ctx := context.Background()
-	infra.Infof(ctx, "Trying to get the list of all sport sections")
+	infra.Infof(ctx, "Trying to get the list of all sports sections")
 	allSections, err := h.sportSectionService.GetAllSportSection(ctx)
 	if err != nil {
-		infra.Infof(ctx, "An error occupied during getting the list of all sport sections: %v", err)
-		return ectx.JSON(500, err)
+		infra.Infof(ctx, "An error occupied during getting the list of all sports sections: %v", err)
+		return InternalErrorResponsef(ectx, err.Error())
 	}
-	infra.Infof(ctx, "The list of all sport sections has been succesfully received")
+	infra.Infof(ctx, "The list of all sports sections has been succesfully received")
 	sportSections := mappers.MapSportSectionsToAPI(allSections)
 	return ectx.JSON(200, server.AllSportSections{
 		SportsSections: sportSections,

@@ -1,7 +1,7 @@
 from lkshmatch import core_client
-from lkshmatch.core_client.api.sport_sections import get_core_sport_list
 from lkshmatch.adapters.base import SportAdapter, SportSection, UnknownError
 from lkshmatch.adapters.core.mappers.sport_section import map_sport_section
+from lkshmatch.core_client.api.sport_sections import get_core_sport_list
 
 
 class CoreSportAdapter(SportAdapter):

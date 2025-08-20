@@ -10,4 +10,4 @@ class MongoAdminRepository(AdminRepository):
         self.client: MongoClient = mongo_client
 
     def get_admins(self) -> list[Admin]:
-        return list(self.client[DATABASE_NAME]["admins"].find())
+        return list(self.client[DATABASE_NAME]["students"].find({'paraller' : 'admin'}))
