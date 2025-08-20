@@ -22,34 +22,35 @@ create table activities
     title            varchar(64) not null,
     description      text        not null,
     sport_section_id bigint      not null references sport_sections (id),
-    creator_id bigint not null references players (id),
+    creator_id       bigint      not null references players (id),
+    enroll_deadline  timestamptz,
     constraint activities_title_unique unique (title)
 );
 
 create table teams
 (
-    id            bigserial primary key,
-    name          varchar(64) not null,
-    captain_id    bigint      not null references players (id),
-    activity_id bigint not null references activities (id) ON DELETE CASCADE,
+    id          bigserial primary key,
+    name        varchar(64) not null,
+    captain_id  bigint      not null references players (id),
+    activity_id bigint      not null references activities (id) ON DELETE CASCADE,
     constraint teams_captain_id_activity_id_unique unique (captain_id, activity_id)
 );
 
 create table team_players
 (
     player_id bigint not null references players (id),
-    team_id bigint not null references teams (id) ON DELETE CASCADE,
+    team_id   bigint not null references teams (id) ON DELETE CASCADE,
     primary key (player_id, team_id)
 );
 
 create table meetings
 (
-    id           bigserial primary key,
-    activity_id bigint not null references activities (id) ON DELETE CASCADE,
-    title        varchar(64)              not null,
-    date         timestamp with time zone not null,
-    details      text                     not null,
-    status       varchar(32)              not null
+    id          bigserial primary key,
+    activity_id bigint                   not null references activities (id) ON DELETE CASCADE,
+    title       varchar(64)              not null,
+    date        timestamp with time zone not null,
+    details     text                     not null,
+    status      varchar(32)              not null
 );
 
 create table meeting_participants

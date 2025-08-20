@@ -63,5 +63,5 @@ func (h *GetPlayerByTgHandler) GetPlayerByTg(ectx echo.Context, params server.Ge
 	}
 
 	response := mappers.MapPlayerToAPI(*player)
-	return ectx.JSON(200, response)
+	return ectx.JSON(200, server.PlayerResponse{Player: response})
 }

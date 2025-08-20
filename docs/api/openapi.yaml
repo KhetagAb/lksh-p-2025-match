@@ -292,6 +292,9 @@ components:
           type: string
         creator:
           $ref: "#/components/schemas/Player"
+        EnrollDeadline:
+          type: string
+          format: date-time
 
     # Requests
     RegisterPlayerRequest:
@@ -351,6 +354,9 @@ components:
           type: integer
           format: int64
           description: Core-идентификатор создателя активности
+        enroll_deadline:
+          type: string
+          format: date-time
 
     ActivityEnrollPlayerRequest:
       type: object
