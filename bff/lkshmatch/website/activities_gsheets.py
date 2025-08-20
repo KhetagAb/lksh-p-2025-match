@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import Response
 
-from lkshmatch.adapters.base import ActivityAdapter, SportAdapter, PlayerAdapter
+from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter
 from lkshmatch.adapters.gheets.gsheets import (
     get_data_gsheet, change_data_gsheet,
     WEBSITE_SERVICE_ACCOUNT_NAME, get_sheet_data_from_url,
@@ -24,29 +24,7 @@ class TableIsEmptyError(Exception):
         return "Table is empty"
 
 
-table_adapter_router = APIRouter()
-
-@table_adapter_router.get("/get_sport_sections")
-async def get_sport_sections_json(_request: Request) -> list | None:
-    try:
-        sport_adapter = app_container.get(SportAdapter)
-        sport_sections = await sport_adapter.get_sport_list()
-    except BaseException:
-        return None
-    return sport_sections
-
-
-@table_adapter_router.get("/get_activity_by_sport_section")
-async def get_activity_by_sport_section_json(
-    _request: Request,
-    sport_section_id: int
-) -> list | None:
-    try:
-        activity_adapter = app_container.get(ActivityAdapter)
-        activities = await activity_adapter.get_activities_by_sport_section(sport_section_id)
-    except BaseException:
-        return None
-    return activities
+table_adapter_router = APIRouter(prefix="/table")
 
 
 @table_adapter_router.get("/register_in_section")
@@ -63,8 +41,6 @@ async def register_on_section_with_table_post(
     table_url: Annotated[str, Form()],
     activity_id: Annotated[int, Form()],
 ) -> Response:
-    print("table_url:", table_url)
-    print("activity_id:", activity_id)
     _activity_adapter = app_container.get(ActivityAdapter)
     _player_adapter = app_container.get(PlayerAdapter)
     cookie_token = request.cookies.get(COOKIE_NAME)

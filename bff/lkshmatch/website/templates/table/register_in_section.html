@@ -106,7 +106,7 @@
 
     //тоду
     async function m3() {
-        const jst = await fetch("/table/get_sport_sections");
+        const jst = await fetch("/api/get_sport_sections");
         const jsts=await jst.json();
 
 
@@ -141,7 +141,7 @@
         function get_sect() {
             function reco(callback) {
                 const idsect = but.value;
-                var nexturl = '/table/get_activity_by_sport_section?sport_section_id=';
+                var nexturl = '/api/get_activities?sport_section_id=';
                 nexturl += idsect;
                 fetch(nexturl)
                     .then(response => response.json())

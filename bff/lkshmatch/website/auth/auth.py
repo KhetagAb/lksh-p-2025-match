@@ -1,6 +1,6 @@
 import hmac
 import hashlib
-from typing import Annotated, Any
+from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import PlainTextResponse, RedirectResponse, Response
@@ -13,11 +13,11 @@ BOT_TOKEN_HASH = hashlib.sha256(settings.get("TELEGRAM_TOKEN").encode())
 COOKIE_NAME = "auth-token"
 ALGORITHM = "HS256"
 
-auth_router = APIRouter()
+auth_router = APIRouter(prefix="/auth")
 
-def get_user_id_from_token(token: str) -> Any:
+def get_user_id_from_token(token: str) -> int:
     token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
-    return token_parts["user_id"]
+    return int(token_parts["user_id"])
 
 
 # Код взят из https://github.com/tm-a-t/telegram-auth-wall

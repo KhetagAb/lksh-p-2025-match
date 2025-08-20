@@ -61,13 +61,12 @@ class Buttons(Enum):
         return types.KeyboardButton(self.text)
 
 
-logging.basicConfig(level=logging.INFO)
-
 activity_adapter = app_container.get(ActivityAdapter)
 sport_adapter = app_container.get(SportAdapter)
 player_adapter = app_container.get(PlayerAdapter)
 students_repository = app_container.get(LKSHStudentsRepository)
 
+logging.basicConfig(level=logging.INFO)
 
 def get_required_param(param: str) -> str:
     try:
