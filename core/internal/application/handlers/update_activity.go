@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/labstack/echo/v4"
 	"match/internal/application/handlers/mappers"
+	"match/internal/domain/dao"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
 	"match/internal/infra"
@@ -11,7 +12,7 @@ import (
 
 type (
 	UpdateActivityService interface {
-		UpdateActivity(ctx context.Context, activityID int64, title, description *string, sportSectionID, creatorID *int64) (*dto.Activity, error)
+		UpdateActivity(ctx context.Context, activity dto.Activity) (*dto.Activity, error)
 	}
 
 	UpdateActivityHandler struct {
@@ -42,7 +43,16 @@ func (h *UpdateActivityHandler) UpdateActivity(ectx echo.Context, id int64, para
 		return BadRequestErrorResponsef(ectx, "Invalid request body: %s", err.Error())
 	}
 
-	activity, err := h.updateActivityService.UpdateActivity(ctx, id, requestBody.Title, requestBody.Description, requestBody.SportSectionId, requestBody.CreatorId)
+	activity, err := h.updateActivityService.UpdateActivity(ctx, dto.Activity{
+		Activity: dao.Activity{
+			CreatorID:      *requestBody.CreatorId,
+			Title:          *requestBody.Title,
+			Description:    *requestBody.Description,
+			SportSectionID: *requestBody.SportSectionId,
+			EnrollDeadline: *requestBody.EnrollDeadline,
+		},
+		Creator: dao.Player{ID: *requestBody.CreatorId},
+	})
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to update activity: %v", err)
 		return InternalErrorResponsef(ectx, err.Error())
