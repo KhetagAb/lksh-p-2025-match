@@ -120,10 +120,7 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
                               description: str | None = None,
                               enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
-        response = await post_core_activity_update_by_id.asyncio(client=self.client,
-                                                                 id=creator_id,
-                                                                 body=UpdateActivityRequest(title, description or "",enroll_deadline),
-                                                                 privilege_token=admin_token)
+        response = await post_core_activity_update_by_id.asyncio(client=self.client,                                                   privilege_token=admin_token)
         if isinstance(response, PostCoreActivityUpdateByIdResponse400):
             raise InvalidParameters(f"update activity return 400 response: {response.message}")
         if not isinstance(response, PostCoreActivityUpdateByIdResponse200):
