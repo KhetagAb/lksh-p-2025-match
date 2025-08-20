@@ -98,7 +98,7 @@ async def delete_activity(
     admin_activity_adapter = app_container.get(ActivityAdminAdapter)
     error = ''
     try:
-        admin_activity_adapter.delete_activity(user_id, activity_id)
+        await admin_activity_adapter.delete_activity(user_id, activity_id)
     except BaseException as exc:
         logging.warning(exc)
         error = "Какая-то ошибка"
@@ -116,7 +116,7 @@ async def update_activity(
     admin_activity_adapter = app_container.get(ActivityAdminAdapter)
     error = ''
     try:
-        admin_activity_adapter.update_activity(user_id, title, sport_section_id, user_id, description)
+        await admin_activity_adapter.update_activity(user_id, title, sport_section_id, user_id, description)
     except BaseException as exc:
         logging.warning(exc)    
         error = "Какая-то ошибка"
@@ -131,10 +131,11 @@ async def create_activity(
 ) -> Response:
     cookie_token = request.cookies.get(COOKIE_NAME)
     user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
+    username = get_user_id_from_token(cookie_token if cookie_token is not None else "")
     admin_activity_adapter = app_container.get(ActivityAdminAdapter)
     error = ''
     try:
-        admin_activity_adapter.create_activity(user_id, title, sport_section_id, user_id, description)
+        await admin_activity_adapter.create_activity(username, title, sport_section_id, user_id, description)
     except BaseException as exc:
         logging.warning(exc)    
         error = "Какая-то ошибка"

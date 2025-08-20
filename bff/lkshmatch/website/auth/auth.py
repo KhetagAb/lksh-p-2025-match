@@ -9,7 +9,7 @@ from jose import jwt
 from lkshmatch.di import settings
 
 JWT_SECRET_KEY = settings.get("WEBSITE_JWT_SECRET_KEY")
-BOT_TOKEN_HASH = hashlib.sha256(settings.get("TELEGRAM_TOKEN").encode())
+BOT_TOKEN_HASH = hashlib.sha256(settings.get("WEBSITE_TELEGRAM_TOKEN").encode())
 COOKIE_NAME = "auth-token"
 ALGORITHM = "HS256"
 
@@ -19,12 +19,17 @@ def get_user_id_from_token(token: str) -> int:
     token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
     return int(token_parts["user_id"])
 
+def get_username_from_token(token: str) -> int:
+    token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
+    return int(token_parts["username"])
+
 
 # Код взят из https://github.com/tm-a-t/telegram-auth-wall
 @auth_router.get("/telegram-callback")
 async def telegram_callback(
     request: Request,
     user_id: Annotated[int, Query(alias="id")],
+    username: Annotated[str, Query(alias="username")],
     query_hash: Annotated[str, Query(alias="hash")],
 ) -> Response:
     params = request.query_params.items()
@@ -34,7 +39,7 @@ async def telegram_callback(
     if not is_correct:
         return PlainTextResponse("Authorization failed. Please try again", status_code=401)
 
-    token = jwt.encode(claims={"user_id": user_id}, key=JWT_SECRET_KEY, algorithm=ALGORITHM)
+    token = jwt.encode(claims={"user_id": user_id, "username": username}, key=JWT_SECRET_KEY, algorithm=ALGORITHM)
     response = RedirectResponse("/")
     response.set_cookie(key=COOKIE_NAME, value=token)
     return response
