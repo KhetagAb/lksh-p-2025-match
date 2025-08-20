@@ -87,11 +87,13 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         self.privilege_checker = privilege_checker
 
     async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int,
-                              description: str | Unset = UNSET) -> Activity:
+                              description: str | Unset = UNSET,
+                              enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_create.asyncio(client=self.client,
                                                            body=CreateActivityRequest(title, sport_section_id,
-                                                                                      creator_id, description),
+                                                                                      creator_id, description,
+                                                                                      enroll_deadline),
                                                            privilege_token=admin_token)
         if isinstance(response, PostCoreActivityCreateResponse400):
             raise InvalidParameters(f"create activity return 400 response: {response.message}")
