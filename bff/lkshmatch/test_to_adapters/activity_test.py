@@ -143,7 +143,7 @@ async def test_get_teams_by_activity_id_error400(activity_adapter, test_server, 
         await activity_adapter.get_teams_by_activity_id(activity_id)
 
 @pytest.mark.parametrize("activity_id", [4])
-async def test_get_teams_by_activity_id_error400(activity_adapter, test_server, activity_id: int):
+async def test_get_teams_by_activity_id_error409(activity_adapter, test_server, activity_id: int):
     with pytest.raises(UnknownError):
         test_server.expect_request(
             f"/core/teams/by_activity/{activity_id}"
