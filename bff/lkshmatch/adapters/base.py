@@ -124,7 +124,8 @@ class ActivityAdminAdapter(ABC):
 
     @abstractmethod
     async def update_activity(self, requester: int, title: str, creator_id: int,
-                              description: str | None = None) -> Activity:
+                              description: str | None = None,
+                              enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
         raise NotImplementedError
 
 

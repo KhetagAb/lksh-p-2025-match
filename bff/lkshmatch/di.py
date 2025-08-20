@@ -54,7 +54,6 @@ class MongoRepositoryProvider(Provider):
 class RestAllAdapterProvider(Provider):
     scope = Scope.APP
     privilege_checker = provide(PrivilegeChecker)
-
     core_player_adapter = provide(CorePlayerAdapter, provides=PlayerAdapter)
     core_activity_adapter = provide(CoreActivityAdapter, provides=ActivityAdapter)
     core_admin_activity_adapter = provide(CoreActivityAdminAdapter, provides=ActivityAdminAdapter)
