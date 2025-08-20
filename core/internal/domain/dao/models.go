@@ -21,6 +21,7 @@ type Activity struct {
 	Description    string
 	SportSectionID int64
 	CreatorID      int64
+	EnrollDeadline time.Time
 }
 
 type Meeting struct {

@@ -12,5 +12,5 @@ postgres:
   host: "localhost"
   user: "postgres"
   password: "postgres"
-  port: 5432
+  port: 5435
   database: "postgres"
