@@ -89,7 +89,7 @@ async def get_teams_by_activity_id(
     )
 
 @activities_router.post("/sections/activities/delete")
-async def update_activity(
+async def delete_activity(
     request: Request,
     activity_id: Annotated[int, Form()],
 ) -> Response:

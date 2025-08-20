@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse
 
 from lkshmatch.adapters.base import SportAdapter, ActivityAdapter, Team, Activity
 from lkshmatch.di import app_container
-from lkshmatch.website.templating import templates, templates_path
+from lkshmatch.website.templating import templates_path
 
 
 api_requests_router = APIRouter(prefix="/api")
