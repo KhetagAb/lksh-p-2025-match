@@ -10,12 +10,12 @@ class MongoLKSHStudentsRepository(LKSHStudentsRepository):
     def __init__(self, mongo_client: MongoClient):
         self.mongo_client = mongo_client
 
-    async def get_students(self) -> list[Student]:
+    async def get_students(self) -> list[dict]:
         return list(self.mongo_client[DATABASE_NAME]["students"].find())
 
     async def get_name_by_username(self, tg_username: str) -> str:
         students = await self.get_students()
         for student in students:
-            if student.tg_username == tg_username:
-                return student.name
+            if student['tg_username'] == tg_username:
+                return student['name']
         raise PlayerNotFound

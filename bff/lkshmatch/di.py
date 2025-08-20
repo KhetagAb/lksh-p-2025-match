@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from dishka import Container, Provider, Scope, make_container, provide
 from pymongo import MongoClient
 
-import core_client
+from lkshmatch import core_client
 from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter
 from lkshmatch.adapters.core.activity import CoreActivityAdapter
 from lkshmatch.adapters.core.players import CorePlayerAdapter

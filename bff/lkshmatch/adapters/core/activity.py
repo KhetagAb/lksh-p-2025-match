@@ -1,4 +1,5 @@
 from lkshmatch import core_client
+import logging
 from lkshmatch.adapters.base import (
     Activity,
     ActivityAdapter,
@@ -44,7 +45,8 @@ class CoreActivityAdapter(ActivityAdapter):
 
     # TODO перенести в TeamsAdapter
     async def get_teams_by_activity_id(self, activity_id: int) -> list[Team]:
-        response = await get_core_teams_by_activity_id.asyncio(client=self.client, id=activity_id)
+        response: GetCoreTeamsByActivityIdResponse200 = await get_core_teams_by_activity_id.asyncio(client=self.client, id=activity_id)
+        logging.info(response.teams)
         if isinstance(response, GetCoreTeamsByActivityIdResponse400):
             raise InvalidParameters(f"get teams by activity id returns 400 response: {response.message}")
         if not isinstance(response, GetCoreTeamsByActivityIdResponse200):
