@@ -73,6 +73,9 @@ var All = wire.NewSet(
 	wire.Bind(new(handlers.GetPlayerByTgService), new(*players.PlayerService)),
 	handlers.NewGetPlayerByTgHandler,
 
+	wire.Bind(new(handlers.DeletePlayerFromActivity), new(*activities.ActivityService)),
+	handlers.NewDeletePlayerFromActivityHandler,
+
 	handlers.NewServerInterface,
 
 	// ---
