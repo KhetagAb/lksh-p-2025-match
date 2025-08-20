@@ -11,9 +11,5 @@ class Student:
 
 class LKSHStudentsRepository(ABC):
     @abstractmethod
-    async def get_students(self) -> list[Student]:
-        raise NotImplementedError
-
-    @abstractmethod
     async def get_name_by_username(self, tg_username: str) -> str:
         raise NotImplementedError

@@ -6,7 +6,7 @@ import (
 	"match/internal/domain/dao"
 	"match/internal/domain/services"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jmoiron/sqlx"
 )
 
 //go:embed queries/sport_section/create.sql
@@ -22,68 +22,51 @@ var listSportSectionsQuery string
 var deleteSportSectionQuery string
 
 type SportSections struct {
-	pool *pgxpool.Pool
+	db *sqlx.DB
 }
 
-func NewSportSectionsRepository(pool *pgxpool.Pool) *SportSections {
-	return &SportSections{pool: pool}
+func NewSportSectionsRepository(db *sqlx.DB) *SportSections {
+	return &SportSections{db: db}
 }
 
-func (s *SportSections) CreateSportSection(
-	ctx context.Context,
-	enName, ruName string,
-) (*int64, error) {
+func (s *SportSections) CreateSportSection(ctx context.Context, enName, ruName string) (*int64, error) {
 	var id int64
-	if err := s.pool.QueryRow(ctx, createSportSectionQuery, enName, ruName).Scan(&id); err != nil {
+	if err := s.db.QueryRowxContext(ctx, createSportSectionQuery, enName, ruName).Scan(&id); err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
 	return &id, nil
 }
 
-func (s *SportSections) GetSportSectionByID(
-	ctx context.Context,
-	id int64,
-) (*dao.SportSection, error) {
-	var enName, ruName string
-	if err := s.pool.QueryRow(ctx, getSportSectionByIDQuery, id).Scan(&id, &enName, &ruName); err != nil {
+func (s *SportSections) GetSportSectionByID(ctx context.Context, id int64) (*dao.SportSection, error) {
+	var section dao.SportSection
+	if err := s.db.GetContext(ctx, &section, getSportSectionByIDQuery, id); err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
-	return &dao.SportSection{ID: id, EnName: enName, RuName: ruName}, nil
+	return &section, nil
 }
 
-func (s *SportSections) GetSportsList(
-	ctx context.Context,
-) ([]dao.SportSection, error) {
-
-	rows, err := s.pool.Query(ctx, listSportSectionsQuery)
+func (s *SportSections) GetSportsList(ctx context.Context) ([]dao.SportSection, error) {
+	var sections []dao.SportSection
+	err := s.db.SelectContext(ctx, &sections, listSportSectionsQuery)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
-	}
-	defer rows.Close()
-
-	sections := make([]dao.SportSection, 0)
-
-	for rows.Next() {
-		var sec dao.SportSection
-		if scanErr := rows.Scan(&sec.ID, &sec.EnName, &sec.RuName); scanErr != nil {
-			return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: scanErr.Error()}
-		}
-		sections = append(sections, sec)
-	}
-
-	if rows.Err() != nil {
-		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: rows.Err().Error()}
 	}
 
 	return sections, nil
 }
 
 func (s *SportSections) DeleteSportSectionByID(ctx context.Context, id int64) error {
-	tag, err := s.pool.Exec(ctx, deleteSportSectionQuery, id)
+	result, err := s.db.ExecContext(ctx, deleteSportSectionQuery, id)
 	if err != nil {
 		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
-	if tag.RowsAffected() != 1 {
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
+	}
+
+	if rowsAffected != 1 {
 		return &services.NotFoundError{Code: services.NotFound, Message: "sports section not found"}
 	}
 	return nil

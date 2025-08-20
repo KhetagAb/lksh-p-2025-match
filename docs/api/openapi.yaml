@@ -154,6 +154,24 @@ paths:
         "400":
           $ref: '#/components/responses/ErrorResponse'
 
+  /core/activity/{id}:
+    get:
+      tags:
+        - "Activities"
+      summary: "Получение активности по идентификатору"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          $ref: '#/components/responses/ActivityResponse'
+        "404":
+          $ref: '#/components/responses/ErrorResponse'
+
   /core/activity/{id}/enroll:
     post:
       tags:
