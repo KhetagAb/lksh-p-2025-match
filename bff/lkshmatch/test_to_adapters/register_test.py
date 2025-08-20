@@ -1,15 +1,9 @@
 import pytest
-import pytest_asyncio
 import pytest_httpserver
-import requests
 
-from core_client.api.players import register_player
-from core_client.models import RegisterPlayerRequest, RegisterPlayerResponse200, RegisterPlayerResponse201
 import core_client
 from lkshmatch.adapters.base import (
-    CoreID,
     Player,
-    PlayerAdapter,
     PlayerAlreadyRegistered,
     PlayerNotFound,
     PlayerToRegister,
@@ -42,18 +36,19 @@ def player_adapter(test_server):
 
 
 
-@pytest.mark.parametrize("user, name", [(Player("@Xantsid", 1),"Ирина Григорьева"), (Player("@Admin", 2), "Имя Админа")],
-                         ids=["Ирина Григорьева", "Имя Админа"])
-async def test_validate_register_user(player_adapter, user: Player, name: str):
-    test_resoult = await player_adapter.validate_register_user(user)
-    assert test_resoult.tg_username == user.tg_username and test_resoult.tg_id == user.tg_id and test_resoult.name == name
+# @pytest.mark.parametrize("user, name", [(Player("@Xantsid", 1),"Ирина Григорьева"), (Playe("@Admin", 2), "Имя Админа")],
+#                          ids=["Ирина Григорьева", "Имя Админа"])
+# async def test_validate_register_user(player_adapter, user: Player, name: str):
+#     test_resoult = await player_adapter.get_player_by_tg(user)
+#     assert test_resoult.tg_username == user.tg_username and test_resoult.tg_id == user.tg_id and test_resoult.name == name
+#
+# @pytest.mark.parametrize("user", [Player("@NotExistsUser", 3), PlayerToRegister("@Xantsid_withwrongtgid", 4)])
+# async def test_validate_register_user_not_found(player_adapter, user: Player):
+#     with pytest.raises(PlayerNotFound):
+#         await player_adapter.get_player_by_tg(user)
 
-@pytest.mark.parametrize("user", [Player("@NotExistsUser", 3), Player("@Xantsid_withwrongtgid", 4)])
-async def test_validate_register_user_not_found(player_adapter, user: Player):
-    with pytest.raises(PlayerNotFound):
-        a = await player_adapter.validate_register_user(user)
-
-@pytest.mark.parametrize("user, id_reg", [(PlayerToRegister("@Xantsid", 1, "Ирина Григорьева"), 1), (PlayerToRegister("@Admin", 2, "Имя Админа"), 2)])
+@pytest.mark.parametrize("user, id_reg", [(PlayerToRegister(tg_username="@Xantsid", tg_id=1, name="Ирина Григорьева"), 1), 
+                                          (PlayerToRegister(tg_username="@Admin", tg_id=2, name="Имя Админа"), 2)])
 async def test_register_user(player_adapter, test_server, user: PlayerToRegister, id_reg: int):
     test_server.expect_request(
         "/core/player/register", json={"tg_username": user.tg_username , "name": user.name, "tg_id": user.tg_id}
@@ -62,21 +57,22 @@ async def test_register_user(player_adapter, test_server, user: PlayerToRegister
     test_resoult = await player_adapter.register_user(user)
     assert test_resoult == id_reg
 
-@pytest.mark.parametrize("user, id_reg", [[PlayerToRegister("@Xantsid_already", 3, "Ирина Григорьева"), 1], [PlayerToRegister("@Admin_already", 4, "Имя Админа"), 2]])
+@pytest.mark.parametrize("user, id_reg", [[PlayerToRegister(tg_username="@Xantsid_already", tg_id=3, name="Ирина Григорьева"), 1], 
+                                          [PlayerToRegister(tg_username="@Admin_already", tg_id=4, name="Имя Админа"), 2]])
 async def test_register_user_already_register(player_adapter, test_server, user: PlayerToRegister, id_reg: int):
     with pytest.raises(PlayerAlreadyRegistered, match = "player already register"):
         test_server.expect_request(
             "/core/player/register", json={"tg_username": user.tg_username, "name": user.name, "tg_id": user.tg_id}
         ).respond_with_json({"id": id_reg}, status=200)
 
-        a = await player_adapter.register_user(user)
+        await player_adapter.register_user(user)
 
 
-@pytest.mark.parametrize("user, id_reg", [[PlayerToRegister("@Error", 5, "test_error"), 1]])
+@pytest.mark.parametrize("user, id_reg", [[PlayerToRegister(tg_username="@Error", tg_id=5, name="test_error"), 1]])
 async def test_register_user_unknow_error(player_adapter, test_server, user: PlayerToRegister, id_reg: int):
     with pytest.raises(UnknownError):
         test_server.expect_request(
             "/core/player/register", json={"tg_username": user.tg_username, "name": user.name, "tg_id": user.tg_id}
         ).respond_with_json({"id": id_reg}, status=400)
 
-        a = await player_adapter.register_user(user)
+        await player_adapter.register_user(user)

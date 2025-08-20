@@ -51,7 +51,7 @@ async def test_get_activities_by_sport_section_error400(activity_adapter, test_s
             f"/core/activities/by_sport_section/{sport_id}"
         ).respond_with_json({"message": message}, status=400)
 
-        await activity_adapter.get_activities_by_sport_section(sport_id)
+        test_resoult = await activity_adapter.get_activities_by_sport_section(sport_id)
 
 
 @pytest.mark.parametrize("sport_id, message", [[4, "bulk-bulk"]])
@@ -61,7 +61,7 @@ async def test_get_activities_by_sport_section_error(activity_adapter, test_serv
             f"/core/activities/by_sport_section/{sport_id}"
         ).respond_with_json({"message": message}, status=404)
 
-        await activity_adapter.get_activities_by_sport_section(sport_id)
+        test_resoult = await activity_adapter.get_activities_by_sport_section(sport_id)
 
 
 @pytest.mark.parametrize("sport_id, user_tg_id, team", [[1, 1, {"id": 1, "name": "one",
@@ -92,7 +92,7 @@ async def test_enroll_player_in_activity_error400(activity_adapter, test_server,
             f"/core/activity/{sport_id}/enroll", json={"id": user_tg_id}
         ).respond_with_json({"message": message}, status=400)
 
-        await activity_adapter.enroll_player_in_activity(sport_id, user_tg_id)
+        test_resoult = await activity_adapter.enroll_player_in_activity(sport_id, user_tg_id)
 
 
 @pytest.mark.parametrize("sport_id, user_tg_id, message", [[1, 3, "bulk"]])
@@ -103,7 +103,7 @@ async def test_enroll_player_in_activity_error409(activity_adapter, test_server,
             f"/core/activity/{sport_id}/enroll", json={"id": user_tg_id}
         ).respond_with_json({"message": message}, status=409)
 
-        await activity_adapter.enroll_player_in_activity(sport_id, user_tg_id)
+        test_resoult = await activity_adapter.enroll_player_in_activity(sport_id, user_tg_id)
 
 
 @pytest.mark.parametrize("activity_id, teams", [[1, [{"id": 1, "name": "one",
@@ -140,7 +140,7 @@ async def test_get_teams_by_activity_id_error400(activity_adapter, test_server, 
             f"/core/teams/by_activity/{activity_id}"
         ).respond_with_data(status=400)
 
-        await activity_adapter.get_teams_by_activity_id(activity_id)
+        test_resoult = await activity_adapter.get_teams_by_activity_id(activity_id)
 
 @pytest.mark.parametrize("activity_id", [4])
 async def test_get_teams_by_activity_id_error400(activity_adapter, test_server, activity_id: int):
@@ -149,4 +149,4 @@ async def test_get_teams_by_activity_id_error400(activity_adapter, test_server, 
             f"/core/teams/by_activity/{activity_id}"
         ).respond_with_data(status=409)
 
-        await activity_adapter.get_teams_by_activity_id(activity_id)
+        test_resoult = await activity_adapter.get_teams_by_activity_id(activity_id)

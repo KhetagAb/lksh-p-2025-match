@@ -1,15 +1,9 @@
 import pytest
-import pytest_asyncio
 import pytest_httpserver
-import requests
 
 from lkshmatch import core_client
-from lkshmatch.core_client.models import sport_section as sport_api
-from lkshmatch.core_client.api.sport_sections import get_core_sport_list
-from lkshmatch.adapters.base import SportAdapter, SportSection, UnknownError
-from lkshmatch.adapters.core.mappers.sport_section import map_sport_section
+from lkshmatch.adapters.base import UnknownError
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
-from core_client.models.get_core_sport_list_response_200 import GetCoreSportListResponse200
 
 @pytest.fixture(scope="module")
 def test_server():
@@ -41,4 +35,4 @@ async def test_get_sport_list_error(activity_adapter, test_server):
             "/core/sport/list"
         ).respond_with_data(status=400)
 
-        test_resoult = await activity_adapter.get_sport_list()
+        await activity_adapter.get_sport_list()
