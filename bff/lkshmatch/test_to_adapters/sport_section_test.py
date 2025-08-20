@@ -12,7 +12,7 @@ def test_server() -> Generator[pytest_httpserver.HTTPServer]:
         yield httpserver
 
 @pytest.fixture(scope="module")
-def activity_adapter(test_server) -> Generator[CoreSportAdapter]:
+def activity_adapter(test_server: pytest_httpserver.HTTPServer) -> Generator[CoreSportAdapter]:
     client = core_client.Client(base_url=f"http://localhost:{test_server.port}")
     yield CoreSportAdapter(client)
 

@@ -28,7 +28,7 @@ def test_server() -> Generator[pytest_httpserver.HTTPServer]:
         yield httpserver
 
 @pytest.fixture(scope="module")
-def player_adapter(test_server) -> Generator[CorePlayerAdapter]:
+def player_adapter(test_server: pytest_httpserver.HTTPServer) -> Generator[CorePlayerAdapter]:
     client = core_client.Client(base_url=f"http://localhost:{test_server.port}")
     yield CorePlayerAdapter(client)
 
