@@ -19,9 +19,9 @@ def get_user_id_from_token(token: str) -> int:
     token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
     return int(token_parts["user_id"])
 
-def get_username_from_token(token: str) -> int:
+def get_username_from_token(token: str) -> str:
     token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
-    return int(token_parts["username"])
+    return token_parts["username"]
 
 
 # Код взят из https://github.com/tm-a-t/telegram-auth-wall

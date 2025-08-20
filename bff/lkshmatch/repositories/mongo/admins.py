@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import logging
 
 from lkshmatch.domain.repositories.admin_repository import Admin, AdminRepository
 
@@ -10,4 +11,4 @@ class MongoAdminRepository(AdminRepository):
         self.client: MongoClient = mongo_client
 
     def get_admins(self) -> list[Admin]:
-        return list(self.client[DATABASE_NAME]["students"].find({'paraller' : 'admin'}))
+        return list(self.client[DATABASE_NAME]["students"].find({'parallel' : 'admin'}))

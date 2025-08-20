@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Admin:
-    core_id: int
+    tg_username: str
 
 
 class AdminRepository(ABC):

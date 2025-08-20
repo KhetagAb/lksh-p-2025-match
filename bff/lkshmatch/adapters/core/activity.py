@@ -80,7 +80,7 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         self.client = coreclient
         self.privilege_checker = privilege_checker
 
-    async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int,
+    async def create_activity(self, requester: str, title: str, sport_section_id: int, creator_id: int,
                               description: str | Unset = UNSET) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_create.asyncio(client=self.client,
@@ -95,7 +95,7 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         activity = response.activity
         return map_activity(activity)
 
-    async def delete_activity(self, requester: int, creator_id: int) -> Activity:
+    async def delete_activity(self, requester: str, creator_id: int) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_delete_by_id.asyncio(client=self.client, id=creator_id,
                                                                  privilege_token=admin_token)
@@ -107,7 +107,7 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         activity = response.activity
         return map_activity(activity)
 
-    async def update_activity(self, requester: int, title: str, creator_id: int,
+    async def update_activity(self, requester: str, title: str, creator_id: int,
                               description: str | None = None) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_update_by_id.asyncio(client=self.client,
