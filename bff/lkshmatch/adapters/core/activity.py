@@ -6,6 +6,7 @@ from lkshmatch.adapters.base import (
     InvalidParameters,
     PlayerAlreadyInTeam,
     Team,
+    EnrollmentFinish,
     UnknownError, ActivityAdminAdapter, CoreID, )
 from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
 from lkshmatch.adapters.core.mappers.activity import map_team, map_activity
@@ -64,7 +65,7 @@ class CoreActivityAdapter(ActivityAdapter):
         if isinstance(response, PostCoreActivityIdEnrollResponse400):
             raise InvalidParameters(f"enroll player in activity returns 400 response: {response.message}")
         if isinstance(response, PostCoreActivityIdEnrollResponse403):
-            raise PlayerAlreadyInTeam(f"enrollment is finish: {response.message}")
+            raise EnrollmentFinish(f"enrollment is finish: {response.message}")
         if isinstance(response, PostCoreActivityIdEnrollResponse409):
             raise PlayerAlreadyInTeam(f"Player is already enrolled in a team for this activity: {response.message}")
         if not isinstance(response, PostCoreActivityIdEnrollResponse200):
