@@ -11,7 +11,7 @@ class Student:
 
 class LKSHStudentsRepository(ABC):
     @abstractmethod
-    async def get_students(self) -> list[Student]:
+    async def get_students(self) -> list[dict]:
         raise NotImplementedError
 
     @abstractmethod

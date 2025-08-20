@@ -39,7 +39,7 @@ class Msg(Enum):
         "Извините, что-то пошло не так. Обратитесь в 4-ый комповник к команде P."
     )
 
-    TECHNICAL_SUPPORT = "Опишите свою проблему в ответном сообщении, мы постараемся оперативно ответить."
+    TECHNICAL_SUPPORT = "Опишите свою проблему в ОТВЕТНОМ сообщении, мы постараемся оперативно ответить."
 
 
 class Buttons(Enum):
@@ -384,12 +384,16 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
             # todo сделать поддерждку команда/участник
             teams_text = f"🏆 {activity.title}\n\n{description}📋 Список участников:\n\n" + "\n".join(numbered_teams)
         else:
-            teams_text = f"🏆 {activity.title}\n\n📋 Пока нет участников."
+            teams_text = f"🏆 {activity.title}\n\n{description}📋 Пока нет участников."
 
         # TODO вынести
         markup = types.InlineKeyboardMarkup() # type: ignore
+        text = "Записаться"
+        logging.info(call.message.chat.id)
+        if any(team.captain.tg_id == call.message.chat.id for team in list_of_all_teams):
+            text = "Отписаться"
         create = types.InlineKeyboardButton(
-            "Записаться", callback_data=f"create_{activity.id}"
+            text, callback_data=f"create_{activity.id}"
         )
         # todo сделать поддерждку записи в команду если это командный турнир
         # signup = types.InlineKeyboardButton("Записаться в команду", callback_data=f"signup_{activity.id}")
@@ -397,7 +401,7 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
 
         await edit_with_ibuttons(call, f"{teams_text}", markup)
     except UnknownError as ue:
-        print(ue)
+        log_error(str(ue), call.message)
         await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
 
 
@@ -439,9 +443,13 @@ async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
     activity_id = int(call.data.split("_")[1])  # type: ignore
 
     try:
-        player = await app_container.get(PlayerAdapter).get_player_by_tg(tg_id=call.from_user.id)
+        log_info("begin", call.message)
+        player = await player_adapter.get_player_by_tg(tg_id=call.from_user.id)
+        log_info("player", call.message)
         team = await activity_adapter.enroll_player_in_activity(activity_id, player.core_id)
+        log_info("team", call.message)
         activity = await get_activity_by_id(activity_id)
+        log_info("activity", call.message)
         if activity is None:
             log_error(
                 "Couldn't find activity by activity id received from ActivityAdapter (activity_id: %i)",
