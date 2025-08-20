@@ -3,9 +3,7 @@ import pytest_httpserver
 
 import core_client
 from lkshmatch.adapters.base import (
-    Player,
     PlayerAlreadyRegistered,
-    PlayerNotFound,
     PlayerToRegister,
     UnknownError,
 )
