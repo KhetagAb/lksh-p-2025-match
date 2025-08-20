@@ -292,7 +292,8 @@ components:
           type: string
         creator:
           $ref: "#/components/schemas/Player"
-        enroll_deadline:
+        EnrollDeadline:
+          type: string
           format: date-time
 
     # Requests
