@@ -2,7 +2,7 @@ import pytest
 import pytest_httpserver
 from collections.abc import Generator
 
-import core_client
+from lkshmatch import core_client
 from lkshmatch.adapters.base import (
     PlayerAlreadyRegistered,
     PlayerToRegister,
@@ -29,7 +29,7 @@ def test_server() -> Generator[pytest_httpserver.HTTPServer]:
 
 @pytest.fixture(scope="module")
 def player_adapter(test_server: pytest_httpserver.HTTPServer) -> Generator[CorePlayerAdapter]:
-    client = core_client.Client(base_url=f"http://localhost:{test_server.port}")
+    client = core_client.client.Client(base_url=f"http://localhost:{test_server.port}")
     yield CorePlayerAdapter(client)
 
 
