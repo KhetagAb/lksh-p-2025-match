@@ -388,18 +388,20 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
 
         # TODO вынести
         markup = types.InlineKeyboardMarkup() # type: ignore
-        text = "Записаться"
+
         logging.info(call.message.chat.id)
         if any(team.captain.tg_id == call.message.chat.id for team in list_of_all_teams):
             text = "Отписаться"
-        create = types.InlineKeyboardButton(
-            text, callback_data=f"create_{activity.id}"
-        )
-        # todo сделать поддерждку записи в команду если это командный турнир
-        # signup = types.InlineKeyboardButton("Записаться в команду", callback_data=f"signup_{activity.id}")
-        markup.add(create)
+        else:
+            text = "Записаться"
+            create = types.InlineKeyboardButton(
+                text, callback_data=f"create_{activity.id}"
+            )
+            # todo сделать поддерждку записи в команду если это командный турнир
+            # signup = types.InlineKeyboardButton("Записаться в команду", callback_data=f"signup_{activity.id}")
+            markup.add(create)
 
-        await edit_with_ibuttons(call, f"{teams_text}", markup)
+            await edit_with_ibuttons(call, f"{teams_text}", markup)
     except UnknownError as ue:
         log_error(str(ue), call.message)
         await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
