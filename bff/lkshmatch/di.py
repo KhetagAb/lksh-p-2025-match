@@ -26,6 +26,7 @@ class CoreClientProvider(Provider):
         client = core_client.Client(base_url=self.url)
         yield client
 
+
 class MongoProvider(Provider):
 
     def __init__(self, uri: str, ping: bool = True):
