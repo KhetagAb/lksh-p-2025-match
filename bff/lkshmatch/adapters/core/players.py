@@ -11,7 +11,6 @@ from lkshmatch.core_client.api.players import get_core_player_by_tg, register_pl
 from lkshmatch.core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201, \
     GetCorePlayerByTgResponse400, GetCorePlayerByTgResponse200
 from lkshmatch.core_client.types import Unset, UNSET
-from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
 class CorePlayerAdapter(PlayerAdapter):
