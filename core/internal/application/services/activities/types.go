@@ -16,8 +16,6 @@ type (
 
 	PlayerService interface {
 		GetPlayerByID(ctx context.Context, tgId int64) (*dao.Player, error)
-		GetPlayerByTgID(ctx context.Context, tgId int64) (*dao.Player, error)
-		GetPlayerByTgUsername(ctx context.Context, tgUsername string) (*dao.Player, error)
 	}
 
 	TeamRepository interface {
