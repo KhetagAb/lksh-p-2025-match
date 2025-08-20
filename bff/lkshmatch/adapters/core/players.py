@@ -15,9 +15,8 @@ from lkshmatch.domain.repositories.student_repository import LKSHStudentsReposit
 
 
 class CorePlayerAdapter(PlayerAdapter):
-    def __init__(self, lksh_config: LKSHStudentsRepository, coreclient: core_client.Client):
+    def __init__(self, coreclient: core_client.Client):
         self.client = coreclient
-        self.lksh_config = lksh_config
 
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         response = await register_player.asyncio(
