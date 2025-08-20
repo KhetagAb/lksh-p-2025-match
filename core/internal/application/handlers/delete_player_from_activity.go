@@ -42,7 +42,7 @@ func (h *DeletePlayerFromActivityHandler) DeletePlayerFromActivity(ectx echo.Con
 		var invalidOpErr *services.InvalidOperationError
 		if errors.As(err, &invalidOpErr) {
 			infra.Warnf(ctx, "Player [id=%d] is not enrolled in activity [id=%d]: %v", requestBody.Id, activityId, err)
-			return ConflictErrorResponsef(ectx, "Player [id=%d] is not enrolled in activity [id=%d]: %v", requestBody.Id, activityId, err)
+			return NotFoundErrorResponsef(ectx, "Player [id=%d] is not enrolled in activity [id=%d]: %v", requestBody.Id, activityId, err)
 		}
 
 		infra.Errorf(ctx, "Internal server error while trying to delete player [id=%d] from activity [id=%d]: %v", requestBody.Id, activityId, err)
