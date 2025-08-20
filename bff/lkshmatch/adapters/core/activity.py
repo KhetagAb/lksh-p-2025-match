@@ -114,8 +114,7 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         return map_activity(activity)
 
     async def update_activity(self, requester: int, title: str, creator_id: int,
-                              description: str | None = None,
-                              enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
+                              description: str | None = None) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_update_by_id.asyncio(client=self.client,
                                                                  id=creator_id,
