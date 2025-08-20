@@ -18,6 +18,11 @@ type ServerInterface struct {
 	getPlayerByTg               *GetPlayerByTgHandler
 }
 
+func (s ServerInterface) PostCoreActivityIdLeave(ctx echo.Context, id int64) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context, params server.PostCoreActivityCreateParams) error {
 	return s.createActivity.CreateActivity(ctx, params)
 }
