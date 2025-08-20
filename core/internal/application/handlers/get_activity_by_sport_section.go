@@ -34,7 +34,7 @@ func (h *GetActivitiesBySportSectionIDHandler) GetActivitiesBySportSectionID(ect
 	activities, err := h.activityService.GetActivitiesBySportSectionID(ctx, id)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to find activity: %v", err)
-		return InternalErrorResponse(ectx, err.Error())
+		return InternalErrorResponsef(ectx, err.Error())
 	}
 
 	infra.Infof(ctx, "%d activities have been found and extracted succesfully", len(activities))

@@ -19,9 +19,8 @@ func MapActivityToAPI(activity dto.Activity) server.Activity {
 }
 
 func MapActivitiesToAPI(activities dto.Activities) []server.Activity {
-	var resultActivities []server.Activity
+	resultActivities := []server.Activity{}
 	for _, activity := range activities {
-
 		resultActivities = append(resultActivities, MapActivityToAPI(activity))
 	}
 	return resultActivities

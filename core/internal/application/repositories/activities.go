@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	_ "embed"
+	"fmt"
 	"match/internal/domain/dao"
 	"match/internal/domain/services"
 
@@ -17,6 +18,12 @@ var getActivityByIDQuery string
 
 //go:embed queries/activity/create-activity.sql
 var createActivity string
+
+//go:embed queries/activity/delete-activity.sql
+var deleteActivity string
+
+//go:embed queries/activity/update-activity.sql
+var updateActivity string
 
 type Activities struct {
 	pool *pgxpool.Pool
@@ -63,6 +70,53 @@ func (a *Activities) GetActivitiesBySportSectionID(ctx context.Context, sportSec
 func (a *Activities) GetActivityByID(ctx context.Context, id int64) (*dao.Activity, error) {
 	var activity dao.Activity
 	err := a.pool.QueryRow(ctx, getActivityByIDQuery, id).
+		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
+	if err != nil {
+		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
+	}
+
+	return &activity, nil
+}
+
+func (a *Activities) DeleteActivity(ctx context.Context, activityID int64) (*dao.Activity, error) {
+	var activity dao.Activity
+	err := a.pool.QueryRow(ctx, deleteActivity, activityID).
+		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
+	if err != nil {
+		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
+	}
+
+	return &activity, nil
+}
+
+func (a *Activities) UpdateActivity(ctx context.Context, activityID int64, title, description *string, sportSectionID, creatorID *int64) (*dao.Activity, error) {
+	currentActivity, err := a.GetActivityByID(ctx, activityID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot get activity by id=%d: %w", activityID, err)
+	}
+
+	finalTitle := currentActivity.Title
+	if title != nil {
+		finalTitle = *title
+	}
+
+	finalDescription := currentActivity.Description
+	if description != nil {
+		finalDescription = *description
+	}
+
+	finalSportSectionID := currentActivity.SportSectionID
+	if sportSectionID != nil {
+		finalSportSectionID = *sportSectionID
+	}
+
+	finalCreatorID := currentActivity.CreatorID
+	if creatorID != nil {
+		finalCreatorID = *creatorID
+	}
+
+	var activity dao.Activity
+	err = a.pool.QueryRow(ctx, updateActivity, activityID, finalTitle, finalDescription, finalSportSectionID, finalCreatorID).
 		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}

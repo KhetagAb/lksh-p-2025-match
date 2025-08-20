@@ -33,7 +33,7 @@ func (h *GetAllSportSectionHandler) GetAllSportSection(ectx echo.Context) error 
 	allSections, err := h.sportSectionService.GetAllSportSection(ctx)
 	if err != nil {
 		infra.Infof(ctx, "An error occupied during getting the list of all sports sections: %v", err)
-		return ectx.JSON(500, err)
+		return InternalErrorResponsef(ectx, err.Error())
 	}
 	infra.Infof(ctx, "The list of all sports sections has been succesfully received")
 	sportSections := mappers.MapSportSectionsToAPI(allSections)

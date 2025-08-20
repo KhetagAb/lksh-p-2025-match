@@ -6,41 +6,47 @@ import (
 	"match/internal/domain/dao"
 	"match/internal/domain/dto"
 	"match/internal/domain/services"
+	"match/internal/infra"
 )
 
-func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID, playerTgID int64) (*dto.Team, error) {
-	// Checking existence of given Activity
+func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID, playerID int64) (*dto.Team, error) {
+	infra.Infof(ctx, "Enrolling player with_id=%v in activity with id=%v", playerID, activityID)
+
+	infra.Infof(ctx, "Getting activity with id=%v", activityID)
 	_, err := s.activityRepository.GetActivityByID(ctx, activityID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get activity by id [activity_id=%d]: %w", activityID, err)
+		return nil, fmt.Errorf("cannot get activity by activity_id=%d: %w", activityID, err)
 	}
 
-	// Checking existence and getting info by tg_id
-	captain, err := s.playerRepository.GetPlayerByTgID(ctx, playerTgID)
+	infra.Infof(ctx, "Getting player with id=%v", playerID)
+	captain, err := s.playerService.GetPlayerByID(ctx, playerID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get player by tg_id [player_tg_id=%d]: %w", playerTgID, err)
+		return nil, fmt.Errorf("cannot get player by id=%v: %w", playerID, err)
 	}
 
+	infra.Infof(ctx, "Getting team by player and activity [player_id=%d] [activity_id=%d]", captain.ID, activityID)
 	existingTeam, err := s.teamRepository.GetTeamByPlayerAndActivity(ctx, captain.ID, activityID)
 	if err == nil && existingTeam != nil {
 		return nil, &services.InvalidOperationError{
 			Code:    services.InvalidOperation,
-			Message: fmt.Sprintf("player already enrolled in team for this activity [player_id=%d][activity_id=%d][team_id=%d]", captain.ID, activityID, existingTeam.ID),
+			Message: fmt.Sprintf("player already enrolled in team for this activity with player_id=%d, activity_id=%d, team_id=%d", captain.ID, activityID, existingTeam.ID),
 		}
 	}
 
-	// Creating team
+	infra.Infof(ctx, "Creating team [name=%s] [captain_id=%d] [activity_id=%d]", captain.Name, captain.ID, activityID)
 	teamID, err := s.teamRepository.CreateTeam(ctx, captain.Name, captain.ID, activityID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create team using given name, captain_id and activity_id [name=%s][captain_id=%d][activity_id=%d]", captain.Name, captain.ID, activityID)
+		return nil, fmt.Errorf("cannot create team with name=%s, captain_id=%d, activity_id=%d", captain.Name, captain.ID, activityID)
 	}
 
+	infra.Infof(ctx, "Adding player to team [player_id=%d] [team_id=%d]", captain.ID, *teamID)
 	err = s.teamRepository.AddPlayerToTeam(ctx, captain.ID, *teamID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot add captain to team [team_id=%d][team_name=%s][team_captain_id=%d][team_activity_id=%d]: %v", *teamID, captain.Name, captain.ID, activityID, err)
+		return nil, fmt.Errorf("cannot add captain to team with team_id=%d: %v", *teamID, err)
 	}
 
 	result := dto.Team{Team: dao.Team{ID: *teamID, CaptainID: captain.ID, Name: captain.Name, ActivityID: activityID}, Captain: *captain, Players: []dao.Player{*captain}}
 
+	infra.Infof(ctx, "Player enrolled in activity successfully [player_id=%d] [activity_id=%d]", captain.ID, activityID)
 	return &result, nil
 }
