@@ -9,17 +9,17 @@ from lkshmatch.adapters.base import (
 )
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 
-class test_student:
-    def __init__(self, tg_username: str, tg_id: int, name: str):
-        self.tg_username = tg_username
-        self.tg_id = tg_id
-        self.name = name
-
-class test_mongo:
-    def  __init__(self):
-        self.players = [test_student("@Xantsid", 1, "Ирина Григорьева"), test_student("@Admin", 2, "Имя Админа")]
-    async def get_students(self):
-        return self.players
+# class test_student:
+#     def __init__(self, tg_username: str, tg_id: int, name: str):
+#         self.tg_username = tg_username
+#         self.tg_id = tg_id
+#         self.name = name
+#
+# class test_mongo:
+#     def  __init__(self):
+#         self.players = [test_student("@Xantsid", 1, "Ирина Григорьева"), test_student("@Admin", 2, "Имя Админа")]
+#     async def get_students(self):
+#         return self.players
 
 @pytest.fixture(scope="module")
 def test_server():
@@ -30,7 +30,7 @@ def test_server():
 def player_adapter(test_server):
     base = test_mongo()
     client = core_client.Client(base_url=f"http://localhost:{test_server.port}")
-    yield CorePlayerAdapter(base, client)
+    yield CorePlayerAdapter(client)
 
 
 
