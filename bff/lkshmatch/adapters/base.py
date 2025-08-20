@@ -140,6 +140,10 @@ class ActivityAdapter(ABC):
     async def enroll_player_in_activity(self, activity_id: int, player_id: CoreID) -> Team:
         raise NotImplementedError
 
+    @abstractmethod
+    async def leave_player_by_activity(self, activity_id: int, player_id: CoreID) -> None:
+        raise NotImplementedError
+
 
 class TeamAdapter(ABC):
     @abstractmethod

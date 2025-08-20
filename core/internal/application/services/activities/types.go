@@ -16,14 +16,13 @@ type (
 
 	PlayerService interface {
 		GetPlayerByID(ctx context.Context, tgId int64) (*dao.Player, error)
-		GetPlayerByTgID(ctx context.Context, tgId int64) (*dao.Player, error)
-		GetPlayerByTgUsername(ctx context.Context, tgUsername string) (*dao.Player, error)
 	}
 
 	TeamRepository interface {
 		CreateTeam(ctx context.Context, name string, captainID, activityID int64) (*int64, error)
 		AddPlayerToTeam(ctx context.Context, teamID, playerID int64) error
 		GetTeamByPlayerAndActivity(ctx context.Context, playerID, activityID int64) (*dao.Team, error)
+		DeletePlayerFromTeamByActivity(ctx context.Context, playerId, teamId int64) error
 	}
 
 	SportRepository interface {
