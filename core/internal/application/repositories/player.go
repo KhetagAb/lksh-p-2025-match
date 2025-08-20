@@ -6,7 +6,7 @@ import (
 	"match/internal/domain/dao"
 	"match/internal/domain/services"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jmoiron/sqlx"
 )
 
 var (
@@ -30,18 +30,16 @@ var (
 )
 
 type Players struct {
-	pool *pgxpool.Pool
+	db *sqlx.DB
 }
 
-func NewPlayersRepository(
-	pool *pgxpool.Pool,
-) *Players {
-	return &Players{pool: pool}
+func NewPlayersRepository(db *sqlx.DB) *Players {
+	return &Players{db: db}
 }
 
 func (p *Players) CreatePlayer(ctx context.Context, name, username string, tgID int64) (*int64, error) {
 	var id int64
-	err := p.pool.QueryRow(ctx, createPlayerQuery, name, username, tgID).Scan(&id)
+	err := p.db.QueryRowxContext(ctx, createPlayerQuery, name, username, tgID).Scan(&id)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
@@ -50,51 +48,38 @@ func (p *Players) CreatePlayer(ctx context.Context, name, username string, tgID 
 }
 
 func (p *Players) GetPlayerByID(ctx context.Context, id int64) (*dao.Player, error) {
-	var tgID int64
-	var name string
-	var username string
-
-	err := p.pool.QueryRow(ctx, getByIDPlayerQuery, id).Scan(&id, &name, &username, &tgID)
+	var player dao.Player
+	err := p.db.GetContext(ctx, &player, getByIDPlayerQuery, id)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
 
-	return &dao.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
+	return &player, nil
 }
 
 func (p *Players) GetPlayerByTgID(ctx context.Context, tgID int64) (*dao.Player, error) {
-	var id int64
-	var name string
-	var username string
-
-	err := p.pool.QueryRow(ctx, getByTgIDPlayerQuery, tgID).Scan(&id, &name, &username, &tgID)
+	var player dao.Player
+	err := p.db.GetContext(ctx, &player, getByTgIDPlayerQuery, tgID)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
 
-	return &dao.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
+	return &player, nil
 }
 
 func (p *Players) GetPlayerByTgUsername(ctx context.Context, username string) (*dao.Player, error) {
-	var id int64
-	var name string
-	var tgID int64
-
-	err := p.pool.QueryRow(ctx, getByTgUsernamePlayerQuery, username).Scan(&id, &name, &username, &tgID)
+	var player dao.Player
+	err := p.db.GetContext(ctx, &player, getByTgUsernamePlayerQuery, username)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
 
-	return &dao.Player{ID: id, Name: name, TgUsername: username, TgID: tgID}, nil
+	return &player, nil
 }
 
-func (p *Players) GetPlayerExistenceByTgID(
-	ctx context.Context,
-	tgID int64,
-) (bool, error) {
-
+func (p *Players) GetPlayerExistenceByTgID(ctx context.Context, tgID int64) (bool, error) {
 	var exists bool
-	err := p.pool.QueryRow(ctx, existsByTgIDPlayerQuery, tgID).Scan(&exists)
+	err := p.db.QueryRowxContext(ctx, existsByTgIDPlayerQuery, tgID).Scan(&exists)
 	if err != nil {
 		return false, &services.InvalidOperationError{
 			Code:    services.InvalidOperation,
@@ -106,11 +91,17 @@ func (p *Players) GetPlayerExistenceByTgID(
 }
 
 func (p *Players) DeletePlayerByID(ctx context.Context, id int64) error {
-	commandTag, err := p.pool.Exec(ctx, deletePlayerQuery, id)
+	result, err := p.db.ExecContext(ctx, deletePlayerQuery, id)
 	if err != nil {
 		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
-	if commandTag.RowsAffected() != 1 {
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
+	}
+
+	if rowsAffected != 1 {
 		return &services.NotFoundError{Code: services.NotFound, Message: "player not found"}
 	}
 

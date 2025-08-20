@@ -1,5 +1,6 @@
 import datetime
 import logging
+import traceback
 from enum import Enum
 
 from telebot import types
@@ -84,13 +85,7 @@ token = get_required_param("TELEGRAM_TOKEN")
 support_chat_id = int(get_required_param("SUPPORT_CHAT_ID"))
 support_chat_thread_id = int(get_required_param("SUPPORT_CHAT_THREAD_ID"))
 
-try:
-    bot = AsyncTeleBot(token)
-    logging.info("Telegram bot started")
-except Exception as e:
-    logging.error(f"Telegram bot failed: {e}")
-    exit(1)
-
+bot = AsyncTeleBot(token)
 
 async def make_sports_buttons() -> types.InlineKeyboardMarkup:
     buttons: list[types.InlineKeyboardButton] = []
@@ -229,7 +224,6 @@ def log_warning(
 def log_error(text: str, mess: types.Message | types.InaccessibleMessage) -> None:
     logging.error(log_text(text, mess))
 
-
 @bot.message_handler(commands=["start"]) # type: ignore
 async def start(mess: types.Message) -> None:
     log_info("Called /start.", mess)
@@ -240,7 +234,6 @@ async def start(mess: types.Message) -> None:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         markup.add(types.KeyboardButton(Buttons.TECHNICAL_SUPPORT.text))
         await msg_with_buttons(mess, "Здравствуйте!", markup)
-        # TODO: What if user does not have username?
         user_name = await students_repository.get_name_by_username(username)
         await msg_with_ibuttons(
             mess=mess,
@@ -252,6 +245,7 @@ async def start(mess: types.Message) -> None:
         await msg_without_buttons(mess, Msg.REGISTRATION_USER_NOT_FOUND.value)
     except UnknownError as ue:
         log_error(f"Internal error: {ue}. Validate failed.", mess)
+        logging.error(f"Full stack trace for UnknownError:\n{traceback.format_exc()}")
         await msg_without_buttons(mess, Msg.INTERNAL_ERROR.value)
     log_info("Finished /start successfully.", mess)
 
@@ -300,6 +294,7 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
             )
         except UnknownError as ue:
             log_error(f"Internal error: {ue}. Validate failed.", call.message)
+            logging.error(f"Full stack trace for UnknownError:\n{traceback.format_exc()}")
             await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
     elif call.data == Buttons.REGISTRATION_CANCEL.callback_data:
         await edit_without_buttons(call, Msg.REGISTRATION_CANCELED.value)
@@ -352,7 +347,7 @@ async def select_sport(call: types.CallbackQuery) -> None:
 async def processing_select_activity(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
     activity_id = int(call.data.split("_")[1])  # type: ignore
-    activity = await get_activity_by_id(activity_id)
+    activity = await activity_adapter.get_activity_by_id(activity_id)
     if not activity:
         await edit_without_buttons(call, "Активность не найдена.")
         return
@@ -360,25 +355,11 @@ async def processing_select_activity(call: types.CallbackQuery) -> None:
     await select_activity(call, activity)
 
 
-async def get_activity_by_id(activity_id: int) -> Activity | None:
-    # TODO переделать на получение активности по id эффективнее
-    activity = None
-    for sport in await sport_adapter.get_sport_list():
-        activities = await activity_adapter.get_activities_by_sport_section(sport.id)
-        for act in activities:
-            if act.id == activity_id:
-                activity = act
-                break
-        if activity:
-            break
-    return activity
-
-
 async def select_activity(call: types.CallbackQuery, activity: Activity) -> None:
     try:
         list_of_all_teams = await activity_adapter.get_teams_by_activity_id(activity.id)
         description = f"ℹ️ Описание: {activity.description}\n\n" if activity.description else ""
-        # TODO: id -> name
+
         if list_of_all_teams:
             numbered_teams = [f"{i + 1}. {team.name}" for i, team in enumerate(list_of_all_teams)]
             # todo сделать поддерждку команда/участник
@@ -388,7 +369,6 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
 
         # TODO вынести
         markup = types.InlineKeyboardMarkup() # type: ignore
-
         logging.info(call.message.chat.id)
         if any(team.captain.tg_id == call.message.chat.id for team in list_of_all_teams):
             text = "Отписаться"
@@ -404,6 +384,7 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
             await edit_with_ibuttons(call, f"{teams_text}", markup)
     except UnknownError as ue:
         log_error(str(ue), call.message)
+        logging.error(f"Full stack trace for UnknownError:\n{traceback.format_exc()}")
         await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
 
 
@@ -445,19 +426,15 @@ async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
     activity_id = int(call.data.split("_")[1])  # type: ignore
 
     try:
-        log_info("begin", call.message)
         player = await player_adapter.get_player_by_tg(tg_id=call.from_user.id)
-        log_info("player", call.message)
         team = await activity_adapter.enroll_player_in_activity(activity_id, player.core_id)
-        log_info("team", call.message)
-        activity = await get_activity_by_id(activity_id)
-        log_info("activity", call.message)
+        activity = await activity_adapter.get_activity_by_id(activity_id)
         if activity is None:
             log_error(
-                "Couldn't find activity by activity id received from ActivityAdapter (activity_id: %i)",
-                activity_id, # type: ignore
+                f"Couldn't find activity by activity id received from ActivityAdapter (activity_id: {activity_id})",
+                call.message,
             )
-        await select_activity(call, activity) # type: ignore
+        await select_activity(call, activity)
 
         # todo вариант для создания команды
         await msg_without_buttons(
@@ -469,14 +446,15 @@ async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
         await msg_without_buttons(call.message, "⚠️ Вы уже записаны.")  # type: ignore
     except InsufficientRights:
         await edit_without_buttons(call, Msg.INSUFFICIENT_RIGHTS.value)
-    except UnknownError:
+    except UnknownError as ue:
+        log_error(f"UnknownError in enroll_player_in_activity: {ue}", call.message)
+        logging.error(f"Full stack trace for UnknownError:\n{traceback.format_exc()}")
         await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("signup_")) # type: ignore
 async def signup_to_activity(call: types.CallbackQuery) -> None:
     await bot.answer_callback_query(call.id)
-    # TODO:
     await edit_without_buttons(call, "🚧 Функция записи в существующую команду находится в разработке. ")
 
 
@@ -514,6 +492,3 @@ async def answer_to_buttons(mess: types.Message) -> None:
             await change_support_message(mess.reply_to_message, mess)
             return
     await msg_without_buttons(mess, "Я вас не понимаю. Используйте кнопки или команды.")
-
-
-# asyncio.run(bot.polling(non_stop=True, none_stop=True))

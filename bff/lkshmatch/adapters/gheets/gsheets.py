@@ -1,13 +1,12 @@
 from urllib.parse import urlparse, parse_qs
+
 import httplib2
 from googleapiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
 
 from lkshmatch.config import settings
 
-WEBSITE_CREDENTIALS_FILE: str | None = settings.get(
-    "WEBSITE_CREDENTIALS_FILE"
-)
+WEBSITE_CREDENTIALS_FILE: str | None = settings.get("WEBSITE_CREDENTIALS_FILE")
 WEBSITE_SERVICE_ACCOUNT_NAME: str | None = settings.get(
     "WEBSITE_SERVICE_ACCOUNT_NAME"
 )  # почта сервисного аккаунта
@@ -18,11 +17,15 @@ try:
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive",
     )
-    service = discovery.build("sheets", "v4", )
+    service = discovery.build(
+        "sheets",
+        "v4",
+    )
     httpAuth = credentials.authorize(httplib2.Http())
     service = discovery.build("sheets", "v4", http=httpAuth)
 except BaseException:
     print("Problems with gsheets")
+
 
 class GSheetDoesNotResponseError(Exception):
     def __init__(self) -> None:
@@ -30,6 +33,7 @@ class GSheetDoesNotResponseError(Exception):
 
     def __str__(self) -> str:
         return "GSheet does not response"
+
 
 class GSheetData:
     def __init__(self, spreadsheetId: str, sheetName: str):
@@ -49,7 +53,7 @@ def get_sheet_data_from_url(sheet_url: str) -> GSheetData:
         spreadsheet = service.spreadsheets().get(spreadsheetId=spreadsheetId).execute()
     except BaseException:
         raise GSheetDoesNotResponseError
-    
+
     sheetList = spreadsheet.get("sheets")
     sheetName = None
     for d in sheetList:
@@ -67,14 +71,19 @@ def get_data_gsheet(sheet_data: GSheetData, range: str, mod: str = "COLUMNS") ->
         raise GSheetDoesNotResponseError
 
     try:
-        results = service.spreadsheets().values().get(
+        results = (
+            service.spreadsheets()
+            .values()
+            .get(
                 spreadsheetId=sheet_data.spreadsheetId,
                 range=sheet_data.sheetName + "!" + range,
                 majorDimension=mod,
-            ).execute()
+            )
+            .execute()
+        )
     except BaseException:
         raise GSheetDoesNotResponseError
-    
+
     return results
 
 
@@ -83,7 +92,7 @@ def change_data_gsheet(
 ) -> list[list[str]]:
     if service is None:
         raise GSheetDoesNotResponseError
-    
+
     try:
         # mod shoud be "ROWS" or "COLUMNS"
         results = (
@@ -106,5 +115,5 @@ def change_data_gsheet(
         )
     except BaseException:
         raise GSheetDoesNotResponseError
-    
+
     return results
