@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import NewType
-
+import datetime
 from lkshmatch.core_client.types import Unset, UNSET
 
 PlayerId = NewType("PlayerId", int)
@@ -39,6 +39,10 @@ class InsufficientRights(Exception):
 
 
 class InvalidParameters(Exception):
+    pass
+
+
+class EnrollmentFinished(Exception):
     pass
 
 
@@ -114,7 +118,8 @@ class SportAdapter(ABC):
 class ActivityAdminAdapter(ABC):
     @abstractmethod
     async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int,
-                              description: str | Unset = UNSET) -> Activity:
+                              description: str | Unset = UNSET,
+                              enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
         raise NotImplementedError
 
     @abstractmethod
@@ -122,7 +127,8 @@ class ActivityAdminAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_activity(self, requester: int, title: str,creator_id: int, description: str | None = None) -> Activity:
+    async def update_activity(self, activity_id:int,requester: int, title: str, creator_id: int,
+                              description: str | None = None,enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
         raise NotImplementedError
 
 

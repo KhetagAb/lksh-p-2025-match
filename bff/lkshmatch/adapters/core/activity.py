@@ -1,3 +1,5 @@
+import datetime
+
 from lkshmatch import core_client
 from lkshmatch.adapters.base import (
     Activity,
@@ -5,6 +7,7 @@ from lkshmatch.adapters.base import (
     InvalidParameters,
     PlayerAlreadyInTeam,
     Team,
+    EnrollmentFinished,
     UnknownError, ActivityAdminAdapter, CoreID, )
 from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
 from lkshmatch.adapters.core.mappers.activity import map_team, map_activity
@@ -18,7 +21,8 @@ from lkshmatch.core_client.models import GetCoreActivitiesBySportSectionIdRespon
     PostCoreActivityIdEnrollResponse200, ActivityEnrollPlayerRequest, CreateActivityRequest, \
     PostCoreActivityCreateResponse400, PostCoreActivityCreateResponse200, PostCoreActivityDeleteByIdResponse400, \
     PostCoreActivityDeleteByIdResponse200, PostCoreActivityUpdateByIdResponse200, PostCoreActivityUpdateByIdResponse400, \
-    UpdateActivityRequest, ActivityLeavePlayerRequest, PostCoreActivityIdLeaveResponse404
+    UpdateActivityRequest, ActivityLeavePlayerRequest, PostCoreActivityIdLeaveResponse404, \
+    PostCoreActivityIdEnrollResponse403
 from lkshmatch.core_client.types import Unset, UNSET
 
 
@@ -58,12 +62,16 @@ class CoreActivityAdapter(ActivityAdapter):
         response = await post_core_activity_id_enroll.asyncio(
             client=self.client, id=activity_id, body=ActivityEnrollPlayerRequest(id=player_id)
         )
+
         if isinstance(response, PostCoreActivityIdEnrollResponse400):
             raise InvalidParameters(f"enroll player in activity returns 400 response: {response.message}")
+        if isinstance(response, PostCoreActivityIdEnrollResponse403):
+            raise EnrollmentFinished(f"enrollment is finish: {response.message}")
         if isinstance(response, PostCoreActivityIdEnrollResponse409):
             raise PlayerAlreadyInTeam(f"Player is already enrolled in a team for this activity: {response.message}")
         if not isinstance(response, PostCoreActivityIdEnrollResponse200):
             raise UnknownError("enroll player in activity  returns unknown response")
+
         team = response.team
         return map_team(team)
 
@@ -81,11 +89,13 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         self.privilege_checker = privilege_checker
 
     async def create_activity(self, requester: int, title: str, sport_section_id: int, creator_id: int,
-                              description: str | Unset = UNSET) -> Activity:
+                              description: str | Unset = UNSET,
+                              enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_create.asyncio(client=self.client,
                                                            body=CreateActivityRequest(title, sport_section_id,
-                                                                                      creator_id, description),
+                                                                                      creator_id, description,
+                                                                                      enroll_deadline),
                                                            privilege_token=admin_token)
         if isinstance(response, PostCoreActivityCreateResponse400):
             raise InvalidParameters(f"create activity return 400 response: {response.message}")
@@ -107,12 +117,13 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         activity = response.activity
         return map_activity(activity)
 
-    async def update_activity(self, requester: int, title: str, creator_id: int,
-                              description: str | None = None) -> Activity:
+    async def update_activity(self, activity_id:int,requester: int, title: str, creator_id: int,
+                              description: str | None = None,    enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_update_by_id.asyncio(client=self.client,
-                                                                 id=creator_id,
-                                                                 body=UpdateActivityRequest(title, description or ""),
+
+                                                                 id=activity_id,
+                                                                 body=UpdateActivityRequest(title, description or "",creator_id, enroll_deadline),
                                                                  privilege_token=admin_token)
         if isinstance(response, PostCoreActivityUpdateByIdResponse400):
             raise InvalidParameters(f"update activity return 400 response: {response.message}")
