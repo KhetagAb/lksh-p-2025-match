@@ -3,9 +3,10 @@ from collections.abc import Iterable
 from dishka import Container, Provider, Scope, make_container, provide
 from pymongo import MongoClient
 
-import core_client
-from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter
-from lkshmatch.adapters.core.activity import CoreActivityAdapter
+from lkshmatch import core_client
+from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter, SportAdapter, ActivityAdminAdapter
+from lkshmatch.adapters.core.activity import CoreActivityAdapter, CoreActivityAdminAdapter
+from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 from lkshmatch.adapters.core.sport_sections import CoreSportAdapter
 from lkshmatch.config import settings
@@ -51,8 +52,11 @@ class MongoRepositoryProvider(Provider):
 
 class RestAllAdapterProvider(Provider):
     scope = Scope.APP
+    privilege_checker = provide(PrivilegeChecker)
+
     core_player_adapter = provide(CorePlayerAdapter, provides=PlayerAdapter)
     core_activity_adapter = provide(CoreActivityAdapter, provides=ActivityAdapter)
+    core_admin_activity_adapter = provide(CoreActivityAdminAdapter, provides=ActivityAdminAdapter)
     core_sport_adapter = provide(CoreSportAdapter, provides=SportAdapter)
 
 
@@ -73,9 +77,9 @@ def all_providers() -> list[Provider]:
     )
     return [
         MongoProvider(mongo_uri),
+        CoreClientProvider(core_host, core_port),
         MongoRepositoryProvider(),
         RestAllAdapterProvider(),
-        CoreClientProvider(core_host, core_port),
     ]
 
 
