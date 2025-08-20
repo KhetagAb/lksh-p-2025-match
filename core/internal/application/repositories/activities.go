@@ -97,22 +97,22 @@ func (a *Activities) UpdateActivity(ctx context.Context, activity dto.Activity) 
 	}
 
 	finalTitle := currentActivity.Title
-	if &activity.Activity.Title != nil {
+	if activity.Activity.Title != "" {
 		finalTitle = activity.Activity.Title
 	}
 
 	finalDescription := currentActivity.Description
-	if &activity.Activity.Description != nil {
+	if activity.Activity.Description != "" {
 		finalDescription = activity.Activity.Description
 	}
 
 	finalSportSectionID := currentActivity.SportSectionID
-	if &activity.Activity.SportSectionID != nil {
+	if activity.Activity.SportSectionID != 0 {
 		finalSportSectionID = activity.Activity.SportSectionID
 	}
 
 	finalCreatorID := currentActivity.CreatorID
-	if &activity.Activity.CreatorID != nil {
+	if activity.Activity.CreatorID != 0 {
 		finalCreatorID = activity.Activity.CreatorID
 	}
 
