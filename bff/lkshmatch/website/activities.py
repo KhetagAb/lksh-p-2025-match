@@ -3,7 +3,7 @@ import logging
 from fastapi import APIRouter, Request
 from fastapi.responses import Response
 
-from lkshmatch.adapters.base import SportAdapter, ActivityAdapter
+from lkshmatch.adapters.base import SportAdapter, ActivityAdapter, ActivityAdminAdapter
 from lkshmatch.di import app_container
 
 from lkshmatch.website.auth.auth import get_user_id_from_token, COOKIE_NAME
@@ -80,15 +80,54 @@ async def get_teams_by_activity_id(
         context={"request": request, "list_of_activities": list_of_activities},
     )
 
+@activities_router.post("/sections/activities/delete")
+async def update_activity(
+    request: Request,
+    activity_id: int,
+) -> Response:
+    cookie_token = request.cookies.get(COOKIE_NAME)
+    user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
+    admin_activity_adapter = app_container.get(ActivityAdminAdapter)
+    try:
+        admin_activity_adapter.delete_activity(user_id, activity_id)
+    except BaseException as exc:
+        logging.warning(exc)    
+        return templates.TemplateResponse(
+            name="some_error.html", context={"request": request}
+        )
+
+@activities_router.post("/sections/activities/update")
+async def update_activity(
+    request: Request,
+    title: str,
+    description: str,
+    sport_section_id: int,
+) -> Response:
+    cookie_token = request.cookies.get(COOKIE_NAME)
+    user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
+    admin_activity_adapter = app_container.get(ActivityAdminAdapter)
+    try:
+        admin_activity_adapter.update_activity(user_id, title, sport_section_id, user_id, description)
+    except BaseException as exc:
+        logging.warning(exc)    
+        return templates.TemplateResponse(
+            name="some_error.html", context={"request": request}
+        )
+
 @activities_router.post("/sections/activities/create")
 async def create_activity(
     request: Request,
-    _title: str,
-    _description: str,
+    title: str,
+    description: str,
+    sport_section_id: int,
 ) -> Response:
     cookie_token = request.cookies.get(COOKIE_NAME)
-    _user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
-    # admin function 
-    return templates.TemplateResponse(
-        name="some_error.html", context={"request": request}
-    )
+    user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
+    admin_activity_adapter = app_container.get(ActivityAdminAdapter)
+    try:
+        admin_activity_adapter.create_activity(user_id, title, sport_section_id, user_id, description)
+    except BaseException as exc:
+        logging.warning(exc)    
+        return templates.TemplateResponse(
+            name="some_error.html", context={"request": request}
+        )

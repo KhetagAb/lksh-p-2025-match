@@ -7,7 +7,7 @@ from lkshmatch.di import app_container
 
 api_requests_router = APIRouter(prefix="/api")
 
-@api_requests_router.get("/get_sport_sections")
+@api_requests_router.get("/sport_sections")
 async def get_sport_sections(_request: Request) -> list | None:
     try:
         sport_adapter = app_container.get(SportAdapter)
@@ -17,7 +17,7 @@ async def get_sport_sections(_request: Request) -> list | None:
     return sport_sections
 
 
-@api_requests_router.get("/get_activities")
+@api_requests_router.get("/activities")
 async def get_activities_by_sport_section_id(
     _request: Request,
     sport_section_id: int
@@ -31,7 +31,7 @@ async def get_activities_by_sport_section_id(
     return activities
 
 
-@api_requests_router.get("/get_teams")
+@api_requests_router.get("/teams")
 async def get_teams_by_activity_id(
     _request: Request,
     activity_id: int

@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import Response
 
-from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter
+from lkshmatch.adapters.base import ActivityAdminAdapter, PlayerAdapter
 from lkshmatch.adapters.gheets.gsheets import (
     get_data_gsheet, change_data_gsheet,
     WEBSITE_SERVICE_ACCOUNT_NAME, get_sheet_data_from_url,
@@ -41,7 +41,7 @@ async def register_on_section_with_table_post(
     table_url: Annotated[str, Form()],
     activity_id: Annotated[int, Form()],
 ) -> Response:
-    _activity_adapter = app_container.get(ActivityAdapter)
+    _admin_activity_adapter = app_container.get(ActivityAdminAdapter)
     _player_adapter = app_container.get(PlayerAdapter)
     cookie_token = request.cookies.get(COOKIE_NAME)
     # TODO: what if cookie_token haven't provided
@@ -72,7 +72,7 @@ async def register_on_section_with_table_post(
         return_values = ["" for i in range(len(sheet_values))]
         for i in range(len(sheet_values)):
             try:
-                # await activity_adapter.enroll_player_in_activity(player_tg_id=user_id, activity_id=activity_id)
+                # await admin_activity_adapter.
                 return_values[i] = "Зарегестрирован"
             except BaseException:
                 return_values[i] = "ОШИБКА"
