@@ -1,5 +1,4 @@
 from lkshmatch import core_client
-import logging
 from lkshmatch.adapters.base import (
     CoreID,
     Player,
