@@ -41,7 +41,8 @@ class InsufficientRights(Exception):
 class InvalidParameters(Exception):
     pass
 
-class EnrollmentFinish(Exception):
+
+class EnrollmentFinished(Exception):
     pass
 
 
