@@ -1,6 +1,6 @@
 import pytest
 import pytest_httpserver
-from typing import Generator
+from collections.abc import Generator
 
 import core_client
 from lkshmatch.adapters.base import (
