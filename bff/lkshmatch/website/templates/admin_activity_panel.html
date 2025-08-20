@@ -74,7 +74,7 @@
 
 </div>
 
-<form id="gs_reg" method="post" action="/table/register_in_section">
+<form id="gs_reg" method="post" action="/">
 
 
 
@@ -106,12 +106,14 @@
         <div id="resact" style="display: none;"></div>
         <div id="resact1" style="display: none;"></div>
         <div id="action_id_submit" style="display: none;"></div>
+        <input type="text" id="action_id_submit1" style="display: none;" name="activity_id" value=""></input>
+
         <div id="info_action" style="display: none;"></div>
 
         <div id="section_name_submit" style="display: none;">NaN</div>
         <div id="action_name_submit" style="display: none;">NaN</div>
         <input name="submit_info" style="display: none" id="submit1001"></input>
-        <input id="section_name_submit1" style="display: none;" value="" name="section_id"></input>
+        <input id="section_name_submit1" style="display: none;" value="" name="sport_section_id"></input>
 
         <input style="display: none" type="text" id="sdfghj" name="description" autocomplete="off" value=""><br>
 
@@ -163,9 +165,9 @@
 
 
 
-            <script src="ckeditor.js"></script>
+            <script src="api/ckeditor.js"></script>
 
-            <script src="ru.js"></script>
+            <script src="api/ru.js"></script>
 
             <script>
 
@@ -428,7 +430,7 @@
     function bl4() {
         function reco1(callback) {
             const idsect = document.getElementById('action_id_submit').innerHTML;
-            var nexturl = '/table/get_teams_by_activity_id?activity_id=';
+            var nexturl = '/api/teams?activity_id=';
             nexturl += idsect;
 
             fetch(nexturl)
@@ -545,7 +547,7 @@
     function subm(){
         var lkj=confirm('Вы уверены, что хотите сохранить актвити '+document.getElementById('activityc_name').value+'?')
         if (lkj) {
-            document.getElementById('gs_reg').action = '/table/create_new_activity'
+            document.getElementById('gs_reg').action = '/sections/activities/create'
             document.getElementById('sdfghj').value = document.getElementById('res').innerHTML;
             document.getElementById('section_name_submit1').value=document.getElementById('view_act').value;
         }
@@ -593,7 +595,8 @@
             elm.style.display = "block";
             var str="<p>Вы действительно хотите удалить активити " + document.getElementById('action_name_submit').innerHTML+" в секции "+document.getElementById('section_name_submit').innerHTML+"? Данное действие будет занесено в журнал и отменить его будет нельзя</p>"
             str+="<button type='submit'>Да</button>";
-            document.getElementById('gs_reg').action='/table/delete_activity_by_activity_id?activity_id='+document.getElementById('action_id_submit').innerHTML;
+            document.getElementById('action_id_submit1').value=document.getElementById('action_id_submit').innerHTML;
+            document.getElementById('gs_reg').action='/sections/activities/delete';
             elm.innerHTML=str;
 
             document.getElementById("rasd3-a").style.display = "none";
@@ -651,7 +654,7 @@
 
     //тоду
     async function m3() {
-        const jst = await fetch("/table/get_sport_sections");
+        const jst = await fetch("/api/sport_sections");
         const jsts=await jst.json();
 
 
@@ -686,7 +689,7 @@
         function get_sect() {
             function reco(callback) {
                 const idsect = but.value;
-                var nexturl = '/table/get_activity_by_sport_section?activity_id=';
+                var nexturl = '/api/activities?sport_section_id=';
                 nexturl += idsect;
 
                 fetch(nexturl)

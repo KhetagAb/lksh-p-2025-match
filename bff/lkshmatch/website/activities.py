@@ -1,7 +1,9 @@
 import logging
 
-from fastapi import APIRouter, Request
-from fastapi.responses import Response
+from typing import Annotated
+
+from fastapi import APIRouter, Response, Request, Form
+from fastapi.responses import RedirectResponse
 
 from lkshmatch.adapters.base import SportAdapter, ActivityAdapter, ActivityAdminAdapter
 from lkshmatch.di import app_container
@@ -18,6 +20,12 @@ async def root(request: Request) -> Response:
         name="index.html", context={"request": request}
     )
 
+@activities_router.get("/admin")
+async def admin_panel(request: Request, error: str = ''):
+    return templates.TemplateResponse(
+        name="admin_activity_panel.html",
+        context={"request": request, "error": error}
+    )
 
 @activities_router.get("/sections")
 async def get_sport_sections(
@@ -83,51 +91,51 @@ async def get_teams_by_activity_id(
 @activities_router.post("/sections/activities/delete")
 async def update_activity(
     request: Request,
-    activity_id: int,
+    activity_id: Annotated[int, Form()],
 ) -> Response:
     cookie_token = request.cookies.get(COOKIE_NAME)
     user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
     admin_activity_adapter = app_container.get(ActivityAdminAdapter)
+    error = ''
     try:
         admin_activity_adapter.delete_activity(user_id, activity_id)
     except BaseException as exc:
-        logging.warning(exc)    
-        return templates.TemplateResponse(
-            name="some_error.html", context={"request": request}
-        )
+        logging.warning(exc)
+        error = "Какая-то ошибка"
+    return RedirectResponse('/admin?error=' + error)
 
 @activities_router.post("/sections/activities/update")
 async def update_activity(
     request: Request,
-    title: str,
-    description: str,
-    sport_section_id: int,
+    title: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    sport_section_id: Annotated[int, Form()],
 ) -> Response:
     cookie_token = request.cookies.get(COOKIE_NAME)
     user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
     admin_activity_adapter = app_container.get(ActivityAdminAdapter)
+    error = ''
     try:
         admin_activity_adapter.update_activity(user_id, title, sport_section_id, user_id, description)
     except BaseException as exc:
         logging.warning(exc)    
-        return templates.TemplateResponse(
-            name="some_error.html", context={"request": request}
-        )
+        error = "Какая-то ошибка"
+    return RedirectResponse('/admin?error=' + error)
 
 @activities_router.post("/sections/activities/create")
 async def create_activity(
     request: Request,
-    title: str,
-    description: str,
-    sport_section_id: int,
+    title: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    sport_section_id: Annotated[int, Form()],
 ) -> Response:
     cookie_token = request.cookies.get(COOKIE_NAME)
     user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
     admin_activity_adapter = app_container.get(ActivityAdminAdapter)
+    error = ''
     try:
         admin_activity_adapter.create_activity(user_id, title, sport_section_id, user_id, description)
     except BaseException as exc:
         logging.warning(exc)    
-        return templates.TemplateResponse(
-            name="some_error.html", context={"request": request}
-        )
+        error = "Какая-то ошибка"
+    return RedirectResponse('/admin?error=' + error)
