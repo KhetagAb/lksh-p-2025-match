@@ -3,7 +3,7 @@ import pytest_httpserver
 from collections.abc import Generator
 
 
-import core_client
+from lkshmatch import core_client
 from lkshmatch.adapters.base import (
     InvalidParameters,
     PlayerAlreadyInTeam,
