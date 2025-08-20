@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/labstack/echo/v4"
 	"match/internal/application/handlers/mappers"
+	"match/internal/domain/dao"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
 	"match/internal/infra"
@@ -11,7 +12,7 @@ import (
 
 type (
 	CreateActivityService interface {
-		CreateActivity(ctx context.Context, creatorID, sportSectionId int64, title, description string) (*dto.Activity, error)
+		CreateActivity(ctx context.Context, activity dto.Activity) (*dto.Activity, error)
 	}
 
 	CreateActivityHandler struct {
@@ -41,8 +42,18 @@ func (h *CreateActivityHandler) CreateActivity(ectx echo.Context, params server.
 		infra.Errorf(ctx, "Invalid request body: %v", err)
 		return BadRequestErrorResponsef(ectx, "Invalid request body: "+err.Error())
 	}
-
-	activity, err := h.createActivityService.CreateActivity(ctx, requestBody.CreatorId, requestBody.SportSectionId, requestBody.Title, *requestBody.Description)
+	activity, err := h.createActivityService.CreateActivity(ctx,
+		dto.Activity{
+			Activity: dao.Activity{
+				EnrollDeadline: *requestBody.EnrollDeadline,
+				SportSectionID: requestBody.SportSectionId,
+				Title:          requestBody.Title,
+				Description:    *requestBody.Description,
+				CreatorID:      requestBody.CreatorId,
+			},
+			Creator: dao.Player{
+				ID: requestBody.CreatorId,
+			}})
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to create activity: %v", err)
 		return InternalErrorResponsef(ectx, err.Error())

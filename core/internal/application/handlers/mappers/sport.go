@@ -14,7 +14,7 @@ func MapSportToAPI(section dao.SportSection) server.SportSection {
 }
 
 func MapSportSectionsToAPI(sections []dao.SportSection) []server.SportSection {
-	var sportSections []server.SportSection
+	sportSections := []server.SportSection{}
 	for _, section := range sections {
 		sportSections = append(sportSections, MapSportToAPI(section))
 	}

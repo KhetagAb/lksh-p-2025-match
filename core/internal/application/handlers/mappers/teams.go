@@ -15,7 +15,7 @@ func MapTeamToAPI(team dto.Team) server.Team {
 }
 
 func MapTeamsToAPI(teams dto.Teams) server.TeamList {
-	var resultTeams server.TeamList
+	resultTeams := server.TeamList{}
 	for _, team := range teams {
 		resultTeam := MapTeamToAPI(team)
 		resultTeams = append(resultTeams, resultTeam)
