@@ -1,17 +1,19 @@
+import asyncio
+import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import uvicorn
 import uvloop
-import os
 from fastapi import FastAPI
 
-from lkshmatch.tg_bot.bot import token, bot
-from lkshmatch.website.auth.auth import auth_router
-from lkshmatch.website.activities import activities_router
-from lkshmatch.website.auth.login_middleware import LoginWallMiddleware
-from lkshmatch.website.activities_gsheets import table_adapter_router
 from lkshmatch.config import settings
+from lkshmatch.tg_bot.bot import token, bot
+from lkshmatch.website.activities import activities_router
+from lkshmatch.website.activities_gsheets import table_adapter_router
+from lkshmatch.website.auth.auth import auth_router
+from lkshmatch.website.auth.login_middleware import LoginWallMiddleware
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[FastAPI]:
