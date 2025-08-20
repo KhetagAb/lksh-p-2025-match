@@ -327,6 +327,11 @@ components:
           type: integer
           format: int64
           description: Core-идентификатор создателя активности
+        enroll_deadline:
+          type: string
+          format: date-time
+          description: Время
+          example: "2025-08-20T23:20:50.52Z"
 
     UpdateActivityRequest:
       type: object
