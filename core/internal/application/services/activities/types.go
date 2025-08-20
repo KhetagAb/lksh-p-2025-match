@@ -24,6 +24,7 @@ type (
 		CreateTeam(ctx context.Context, name string, captainID, activityID int64) (*int64, error)
 		AddPlayerToTeam(ctx context.Context, teamID, playerID int64) error
 		GetTeamByPlayerAndActivity(ctx context.Context, playerID, activityID int64) (*dao.Team, error)
+		DeletePlayerFromTeamByActivity(ctx context.Context, playerId, teamId int64) error
 	}
 
 	SportRepository interface {
