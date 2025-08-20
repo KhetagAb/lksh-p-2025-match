@@ -31,6 +31,9 @@ var addPlayerToTeamQuery string
 //go:embed queries/team/get-team-by-player-and-activity.sql
 var getTeamByPlayerAndActivityQuery string
 
+//go:embed queries/team/delete-player-from-team-by-activity.sql
+var deletePlayerFromTeamByActivity string
+
 type Teams struct {
 	pool *pgxpool.Pool
 }
@@ -144,9 +147,9 @@ func (r *Teams) AddPlayerToTeam(ctx context.Context, playerID, teamID int64) err
 
 func (r *Teams) GetTeamByPlayerAndActivity(ctx context.Context, playerID, activityID int64) (*dao.Team, error) {
 	var (
-		id         int64
-		name       string
-		captainID  int64
+		id               int64
+		name             string
+		captainID        int64
 		activityIDResult int64
 	)
 
@@ -161,4 +164,12 @@ func (r *Teams) GetTeamByPlayerAndActivity(ctx context.Context, playerID, activi
 		CaptainID:  captainID,
 		ActivityID: activityIDResult,
 	}, nil
+}
+
+func (r *Teams) DeletePlayerFromTeamByActivity(ctx context.Context, playerId, teamId int64) error {
+	_, err := r.pool.Query(ctx, deletePlayerFromTeamByActivity, playerId, teamId)
+	if err != nil {
+		return &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
+	}
+	return nil
 }
