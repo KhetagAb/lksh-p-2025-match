@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"match/internal/domain/dao"
 	"match/internal/domain/services"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -33,10 +34,10 @@ func NewActivitiesRepository(pool *pgxpool.Pool) *Activities {
 	return &Activities{pool: pool}
 }
 
-func (a *Activities) CreateActivity(ctx context.Context, creatorID, sportSectionId int64, title, description string) (*dao.Activity, error) {
+func (a *Activities) CreateActivity(ctx context.Context, enrollDeadline time.Time, creatorID, sportSectionId int64, title, description string) (*dao.Activity, error) {
 	var activity dao.Activity
-	err := a.pool.QueryRow(ctx, createActivity, title, description, sportSectionId, creatorID).
-		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
+	err := a.pool.QueryRow(ctx, createActivity, enrollDeadline.String(), title, description, sportSectionId, creatorID).
+		Scan(&activity.ID, &activity.EnrollDeadline, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
@@ -89,7 +90,7 @@ func (a *Activities) DeleteActivity(ctx context.Context, activityID int64) (*dao
 	return &activity, nil
 }
 
-func (a *Activities) UpdateActivity(ctx context.Context, activityID int64, title, description *string, sportSectionID, creatorID *int64) (*dao.Activity, error) {
+func (a *Activities) UpdateActivity(ctx context.Context, activityID int64, title, description *string, sportSectionID, creatorID *int64, enrollDeadline time.Time) (*dao.Activity, error) {
 	currentActivity, err := a.GetActivityByID(ctx, activityID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get activity by id=%d: %w", activityID, err)
@@ -116,8 +117,8 @@ func (a *Activities) UpdateActivity(ctx context.Context, activityID int64, title
 	}
 
 	var activity dao.Activity
-	err = a.pool.QueryRow(ctx, updateActivity, activityID, finalTitle, finalDescription, finalSportSectionID, finalCreatorID).
-		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
+	err = a.pool.QueryRow(ctx, updateActivity, activityID, finalTitle, finalDescription, finalSportSectionID, finalCreatorID, enrollDeadline).
+		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID, &enrollDeadline)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
