@@ -117,7 +117,6 @@ class ActivityAdminAdapter(ABC):
                               description: str | Unset = UNSET) -> Activity:
         raise NotImplementedError
 
-    # TODO спросить про айди креатора
     @abstractmethod
     async def delete_activity(self, requester: int, core_id: CoreID) -> Activity:
         raise NotImplementedError
