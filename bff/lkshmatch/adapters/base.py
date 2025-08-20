@@ -127,8 +127,8 @@ class ActivityAdminAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_activity(self, requester: int, title: str, creator_id: int,
-                              description: str | None = None) -> Activity:
+    async def update_activity(self, activity_id:int,requester: int, title: str, creator_id: int,
+                              description: str | None = None,enroll_deadline: datetime.datetime | Unset = UNSET) -> Activity:
         raise NotImplementedError
 
 
