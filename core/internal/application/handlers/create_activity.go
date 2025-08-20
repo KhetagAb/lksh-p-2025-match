@@ -42,6 +42,7 @@ func (h *CreateActivityHandler) CreateActivity(ectx echo.Context, params server.
 		infra.Errorf(ctx, "Invalid request body: %v", err)
 		return BadRequestErrorResponsef(ectx, "Invalid request body: "+err.Error())
 	}
+
 	activity, err := h.createActivityService.CreateActivity(ctx,
 		dto.Activity{
 			Activity: dao.Activity{

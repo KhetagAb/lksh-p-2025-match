@@ -20,7 +20,7 @@ func (s *ActivityService) CreateActivity(ctx context.Context, activity dto.Activ
 		return nil, fmt.Errorf("cannot get sport section by id: %w", err)
 	}
 
-	infra.Infof(ctx, "Creating activity: [creatorId=%d][SportSectionID=%d][title=%s][description=%s]", activity.Creator.ID, activity.Activity.SportSectionID, activity.Activity.Title, activity.Activity.Description)
+	infra.Infof(ctx, "Creating activity: [creatorId=%d][sportSectionID=%d][title=%s][description=%s]", activity.Creator.ID, activity.Activity.SportSectionID, activity.Activity.Title, activity.Activity.Description)
 	resActivity, err := s.activityRepository.CreateActivity(ctx, activity.Activity.EnrollDeadline, activity.Creator.ID, activity.Activity.SportSectionID, activity.Activity.Title, activity.Activity.Description)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create activity with creatorId=%d, SportSectionID=%d, title=%s, description=%s: %w", activity.Creator.ID, activity.Activity.SportSectionID, activity.Activity.Title, activity.Activity.Description, err)
