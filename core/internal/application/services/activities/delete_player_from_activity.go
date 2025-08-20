@@ -27,7 +27,7 @@ func (s *ActivityService) DeletePlayerFromActivity(ctx context.Context, activity
 	if err != nil {
 		return &services.InvalidOperationError{
 			Code:    services.InvalidOperation,
-			Message: fmt.Sprintf("player isn't enrolled in team for this activity with player_id=%d, activity_id=%d", captain.ID, activityID),
+			Message: fmt.Sprintf("player isn't enrolled in team for this activity with player_id=%d, activity_id=%d: %v", captain.ID, activityID, err),
 		}
 	}
 
