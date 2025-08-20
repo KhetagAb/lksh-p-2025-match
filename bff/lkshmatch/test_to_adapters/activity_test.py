@@ -138,7 +138,7 @@ async def test_get_teams_by_activity_id_error400(activity_adapter, test_server, 
     with pytest.raises(InvalidParameters):
         test_server.expect_request(
             f"/core/teams/by_activity/{activity_id}"
-        ).respond_with_data(status=400)
+        ).respond_with_json({"message": "bulk"}, status=400)
 
         await activity_adapter.get_teams_by_activity_id(activity_id)
 
