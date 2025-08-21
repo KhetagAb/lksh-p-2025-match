@@ -1,0 +1,10 @@
+@for (button of buttons(); track button.id) {
+  <li
+    class="menu-item"
+    [class.active]="isActive(button.id)"
+    [routerLink]="'/' + button.id"
+  >
+    <div class="menu-icon">{{ button.icon }}</div>
+    <div class="menu-text">{{ button.text }}</div>
+  </li>
+}
