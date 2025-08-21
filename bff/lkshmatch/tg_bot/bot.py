@@ -558,6 +558,9 @@ async def back_to_sports(call: types.CallbackQuery) -> None:
 async def back_to_activities(call: types.CallbackQuery) -> None:
     log_info("Called back_to_activities.", call.message)
     await bot.answer_callback_query(call.id)
+    if call.data is None:
+        log_error("call.data is None in back_to_activities", call.message)
+        return
     sport_id = int(call.data.split("_")[3])
     activities = await activity_adapter.get_activities_by_sport_section(sport_id)
     markup = await make_activity_buttons(activities, sport_id)
