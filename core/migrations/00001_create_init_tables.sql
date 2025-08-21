@@ -20,7 +20,7 @@ create table activities
 (
     id               bigserial primary key,
     title            varchar(64) not null,
-    description text,
+    description      text,
     sport_section_id bigint      not null references sport_sections (id),
     creator_id       bigint      not null references players (id),
     enroll_deadline  timestamptz,
