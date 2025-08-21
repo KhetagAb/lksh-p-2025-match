@@ -156,14 +156,14 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
 
     async def create_activity(
             self,
-            requester: int,
+            requester_username: str,
             title: str,
             sport_section_id: int,
             creator_id: int,
             description: str | Unset = UNSET,
             enroll_deadline: datetime | Unset = UNSET,
     ) -> Activity:
-        admin_token = self.privilege_checker.get_admin_token(requester)
+        admin_token = self.privilege_checker.get_admin_token(requester_username)
         response = await post_core_activity_create.asyncio(
             client=self.client,
             body=CreateActivityRequest(
@@ -182,10 +182,10 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
 
     async def delete_activity(
             self,
-            requester: int,
+            requester_username: str,
             activity_id: int,
     ) -> Activity:
-        admin_token = self.privilege_checker.get_admin_token(requester)
+        admin_token = self.privilege_checker.get_admin_token(requester_username)
         response = await post_core_activity_delete_by_id.asyncio(
             client=self.client, id=activity_id, privilege_token=admin_token
         )
@@ -201,13 +201,13 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
     async def update_activity(
             self,
             activity_id: int,
-            requester: int,
+            requester_username: str,
             title: str,
             creator_id: int,
             description: str | Unset = UNSET,
             enroll_deadline: datetime | Unset = UNSET,
     ) -> Activity:
-        admin_token = self.privilege_checker.get_admin_token(requester)
+        admin_token = self.privilege_checker.get_admin_token(requester_username)
         response = await post_core_activity_update_by_id.asyncio(
             client=self.client,
             id=activity_id,

@@ -130,7 +130,7 @@ class ActivityAdminAdapter(ABC):
     @abstractmethod
     async def create_activity(
             self,
-            requester: int,
+            requester_username: str,
             title: str,
             sport_section_id: int,
             creator_id: int,
@@ -142,8 +142,9 @@ class ActivityAdminAdapter(ABC):
     @abstractmethod
     async def delete_activity(
             self,
-            requester: int,
+            requester_username: str,
             activity_id: int,
+
     ) -> Activity:
         raise NotImplementedError
 
@@ -151,7 +152,7 @@ class ActivityAdminAdapter(ABC):
     async def update_activity(
             self,
             activity_id: int,
-            requester: int,
+            requester_username: str,
             title: str,
             creator_id: int,
             description: str | Unset = UNSET,
