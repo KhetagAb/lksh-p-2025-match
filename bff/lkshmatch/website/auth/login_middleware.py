@@ -1,11 +1,12 @@
+from collections.abc import Callable
+
 from fastapi import Request, Response
 from jose import JWTError, jwt
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
-from collections.abc import Callable
 
-from lkshmatch.website.templating import templates
 from lkshmatch.website.auth.auth import ALGORITHM, COOKIE_NAME, JWT_SECRET_KEY
+from lkshmatch.website.templating import templates
 
 
 class LoginWallMiddleware(BaseHTTPMiddleware):
@@ -17,7 +18,9 @@ class LoginWallMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         token = request.cookies.get(COOKIE_NAME)
-        login_wall = templates.TemplateResponse("auth/login.html", context={"request": request})
+        login_wall = templates.TemplateResponse(
+            "auth/login.html", context={"request": request}
+        )
         if not token:
             return login_wall
 

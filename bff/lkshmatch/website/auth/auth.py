@@ -1,5 +1,5 @@
-import hmac
 import hashlib
+import hmac
 from typing import Annotated
 
 from fastapi import APIRouter, Query, Request
@@ -15,9 +15,11 @@ ALGORITHM = "HS256"
 
 auth_router = APIRouter(prefix="/auth")
 
+
 def get_user_id_from_token(token: str) -> int:
     token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
     return int(token_parts["user_id"])
+
 
 def get_username_from_token(token: str) -> str:
     token_parts = jwt.decode(token, JWT_SECRET_KEY, algorithms=ALGORITHM)
@@ -33,13 +35,23 @@ async def telegram_callback(
     query_hash: Annotated[str, Query(alias="hash")],
 ) -> Response:
     params = request.query_params.items()
-    data_check_string = "\n".join(sorted(f"{x}={y}" for x, y in params if x not in ("hash", "next")))
-    computed_hash = hmac.new(BOT_TOKEN_HASH.digest(), data_check_string.encode(), "sha256").hexdigest()
+    data_check_string = "\n".join(
+        sorted(f"{x}={y}" for x, y in params if x not in ("hash", "next"))
+    )
+    computed_hash = hmac.new(
+        BOT_TOKEN_HASH.digest(), data_check_string.encode(), "sha256"
+    ).hexdigest()
     is_correct = hmac.compare_digest(computed_hash, query_hash)
     if not is_correct:
-        return PlainTextResponse("Authorization failed. Please try again", status_code=401)
+        return PlainTextResponse(
+            "Authorization failed. Please try again", status_code=401
+        )
 
-    token = jwt.encode(claims={"user_id": user_id, "username": username}, key=JWT_SECRET_KEY, algorithm=ALGORITHM)
+    token = jwt.encode(
+        claims={"user_id": user_id, "username": username},
+        key=JWT_SECRET_KEY,
+        algorithm=ALGORITHM,
+    )
     response = RedirectResponse("/")
     response.set_cookie(key=COOKIE_NAME, value=token)
     return response
