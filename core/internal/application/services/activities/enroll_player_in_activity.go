@@ -7,17 +7,25 @@ import (
 	"match/internal/domain/dto"
 	"match/internal/domain/services"
 	"match/internal/infra"
+	"time"
 )
 
 func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID, playerID int64) (*dto.Team, error) {
 	infra.Infof(ctx, "Enrolling player with_id=%v in activity with id=%v", playerID, activityID)
 
 	infra.Infof(ctx, "Getting activity with id=%v", activityID)
-	_, err := s.activityRepository.GetActivityByID(ctx, activityID)
+	activity, err := s.activityRepository.GetActivityByID(ctx, activityID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get activity by activity_id=%d: %w", activityID, err)
 	}
 
+	if time.Now().UTC().After(*activity.EnrollDeadline) {
+		infra.Infof(ctx, "Cannot create team because the enroll deadline has expired [activity_id=%v] [enroll_deadline=%v] [current time=%v]", activityID, activity.EnrollDeadline, time.Now().UTC())
+		return nil, &services.ForbiddenOperationError{
+			Code:    services.ForbiddenOperation,
+			Message: fmt.Sprintf("cannot create team because the enroll deadline has expired [activity_id=%v] [enroll_deadline=%v] [current time=%v]: %w", activityID, activity.EnrollDeadline, time.Now().UTC()),
+		}
+	}
 	infra.Infof(ctx, "Getting player with id=%v", playerID)
 	captain, err := s.playerService.GetPlayerByID(ctx, playerID)
 	if err != nil {
