@@ -41,9 +41,14 @@ func (h *EnrollPlayerInActivityHandler) EnrollPlayerInActivity(ectx echo.Context
 	team, err := h.activityService.EnrollPlayerInActivity(ctx, id, requestBody.Id)
 	if err != nil {
 		var invalidOpErr *services.InvalidOperationError
+		var forbiddenOpErr *services.ForbiddenOperationError
 		if errors.As(err, &invalidOpErr) {
 			infra.Warnf(ctx, "Player already enrolled in activity: %v", err)
 			return ConflictErrorResponsef(ectx, "Player is already enrolled in a team for this activity")
+		}
+		if errors.As(err, &forbiddenOpErr) {
+			infra.Warnf(ctx, "Deadline to enroll in activity has expired: %v", err)
+			return ForbiddenErrorResponsef(ectx, "Deadline to enroll in activity has expired")
 		}
 
 		infra.Errorf(ctx, "Internal server error while trying to create team: %v", err)
