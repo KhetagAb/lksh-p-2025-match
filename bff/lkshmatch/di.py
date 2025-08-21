@@ -26,6 +26,7 @@ class CoreClientProvider(Provider):
         client = core_client.Client(base_url=self.url)
         yield client
 
+
 class MongoProvider(Provider):
 
     def __init__(self, uri: str, ping: bool = True):
@@ -53,7 +54,6 @@ class MongoRepositoryProvider(Provider):
 class RestAllAdapterProvider(Provider):
     scope = Scope.APP
     privilege_checker = provide(PrivilegeChecker)
-
     core_player_adapter = provide(CorePlayerAdapter, provides=PlayerAdapter)
     core_activity_adapter = provide(CoreActivityAdapter, provides=ActivityAdapter)
     core_admin_activity_adapter = provide(CoreActivityAdminAdapter, provides=ActivityAdminAdapter)

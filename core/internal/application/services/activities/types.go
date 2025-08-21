@@ -3,16 +3,15 @@ package activities
 import (
 	"context"
 	"match/internal/domain/dao"
-	"time"
 )
 
 type (
 	ActivityRepository interface {
 		GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]dao.Activity, error)
 		GetActivityByID(ctx context.Context, id int64) (*dao.Activity, error)
-		CreateActivity(ctx context.Context, enrollDeadline time.Time, creatorID, sportSectionId int64, title, description string) (*dao.Activity, error)
+		CreateActivity(ctx context.Context, activity dao.Activity) (*dao.Activity, error)
 		DeleteActivity(ctx context.Context, activityID int64) (*dao.Activity, error)
-		UpdateActivity(ctx context.Context, activityID int64, title, description *string, sportSectionID, creatorID *int64, enrollDeadline time.Time) (*dao.Activity, error)
+		UpdateActivity(ctx context.Context, activity dao.Activity) (*dao.Activity, error)
 	}
 
 	PlayerService interface {

@@ -1,20 +1,28 @@
 package mappers
 
 import (
+	"match/internal/domain/dao"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
 )
 
-func MapActivityToAPI(activity dto.Activity) server.Activity {
-	description := &activity.Activity.Description
-	if *description == "" {
-		description = nil
+func MapActivityFromAPI(activity server.PostCoreActivityCreateJSONRequestBody) dao.Activity {
+	return dao.Activity{
+		Title:          activity.Title,
+		Description:    activity.Description,
+		SportSectionID: activity.SportSectionId,
+		CreatorID:      activity.CreatorId,
+		EnrollDeadline: activity.EnrollDeadline,
 	}
+}
+
+func MapActivityToAPI(activity dto.Activity) server.Activity {
 	return server.Activity{
-		Id:          activity.Activity.ID,
-		Creator:     MapPlayerToAPI(activity.Creator),
-		Title:       activity.Activity.Title,
-		Description: description,
+		Id:             activity.Activity.ID,
+		Creator:        MapPlayerToAPI(activity.Creator),
+		Title:          activity.Activity.Title,
+		Description:    activity.Activity.Description,
+		SportSectionId: activity.Activity.SportSectionID,
 	}
 }
 

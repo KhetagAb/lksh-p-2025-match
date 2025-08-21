@@ -3,12 +3,10 @@ package repositories
 import (
 	"context"
 	_ "embed"
-	"fmt"
 	"match/internal/domain/dao"
 	"match/internal/domain/services"
-	"time"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jmoiron/sqlx"
 )
 
 //go:embed queries/activity/get-by-sport-section-id.sql
@@ -27,42 +25,40 @@ var deleteActivity string
 var updateActivity string
 
 type Activities struct {
-	pool *pgxpool.Pool
+	db *sqlx.DB
 }
 
-func NewActivitiesRepository(pool *pgxpool.Pool) *Activities {
-	return &Activities{pool: pool}
+func NewActivitiesRepository(db *sqlx.DB) *Activities {
+	return &Activities{db: db}
 }
 
-func (a *Activities) CreateActivity(ctx context.Context, enrollDeadline time.Time, creatorID, sportSectionId int64, title, description string) (*dao.Activity, error) {
-	var activity dao.Activity
-	err := a.pool.QueryRow(ctx, createActivity, enrollDeadline.String(), title, description, sportSectionId, creatorID).
-		Scan(&activity.ID, &activity.EnrollDeadline, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
+func (a *Activities) CreateActivity(ctx context.Context, activity dao.Activity) (*dao.Activity, error) {
+	var createdActivity dao.Activity
+
+	var enrollDeadlineStr *string
+	if activity.EnrollDeadline != nil {
+		str := activity.EnrollDeadline.String()
+		enrollDeadlineStr = &str
+	}
+
+	err := a.db.QueryRowxContext(ctx, createActivity,
+		enrollDeadlineStr,
+		activity.Title,
+		activity.Description,
+		activity.SportSectionID,
+		activity.CreatorID).StructScan(&createdActivity)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
-	return &activity, nil
+	return &createdActivity, nil
 }
 
 func (a *Activities) GetActivitiesBySportSectionID(ctx context.Context, sportSectionID int64) ([]dao.Activity, error) {
-	rows, err := a.pool.Query(ctx, getActivitiesBySportSectionIDQuery, sportSectionID)
+	var activities []dao.Activity
+
+	err := a.db.SelectContext(ctx, &activities, getActivitiesBySportSectionIDQuery, sportSectionID)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
-	}
-	defer rows.Close()
-
-	activities := make([]dao.Activity, 0)
-
-	for rows.Next() {
-		var activity dao.Activity
-		if scanErr := rows.Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID); scanErr != nil {
-			return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: scanErr.Error()}
-		}
-		activities = append(activities, activity)
-	}
-
-	if rows.Err() != nil {
-		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: rows.Err().Error()}
 	}
 
 	return activities, nil
@@ -70,8 +66,7 @@ func (a *Activities) GetActivitiesBySportSectionID(ctx context.Context, sportSec
 
 func (a *Activities) GetActivityByID(ctx context.Context, id int64) (*dao.Activity, error) {
 	var activity dao.Activity
-	err := a.pool.QueryRow(ctx, getActivityByIDQuery, id).
-		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
+	err := a.db.GetContext(ctx, &activity, getActivityByIDQuery, id)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
@@ -81,8 +76,7 @@ func (a *Activities) GetActivityByID(ctx context.Context, id int64) (*dao.Activi
 
 func (a *Activities) DeleteActivity(ctx context.Context, activityID int64) (*dao.Activity, error) {
 	var activity dao.Activity
-	err := a.pool.QueryRow(ctx, deleteActivity, activityID).
-		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID)
+	err := a.db.QueryRowxContext(ctx, deleteActivity, activityID).StructScan(&activity)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
@@ -90,38 +84,25 @@ func (a *Activities) DeleteActivity(ctx context.Context, activityID int64) (*dao
 	return &activity, nil
 }
 
-func (a *Activities) UpdateActivity(ctx context.Context, activityID int64, title, description *string, sportSectionID, creatorID *int64, enrollDeadline time.Time) (*dao.Activity, error) {
-	currentActivity, err := a.GetActivityByID(ctx, activityID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot get activity by id=%d: %w", activityID, err)
+func (a *Activities) UpdateActivity(ctx context.Context, activity dao.Activity) (*dao.Activity, error) {
+	var updatedActivity dao.Activity
+
+	var enrollDeadlineStr *string
+	if activity.EnrollDeadline != nil {
+		str := activity.EnrollDeadline.String()
+		enrollDeadlineStr = &str
 	}
 
-	finalTitle := currentActivity.Title
-	if title != nil {
-		finalTitle = *title
-	}
-
-	finalDescription := currentActivity.Description
-	if description != nil {
-		finalDescription = *description
-	}
-
-	finalSportSectionID := currentActivity.SportSectionID
-	if sportSectionID != nil {
-		finalSportSectionID = *sportSectionID
-	}
-
-	finalCreatorID := currentActivity.CreatorID
-	if creatorID != nil {
-		finalCreatorID = *creatorID
-	}
-
-	var activity dao.Activity
-	err = a.pool.QueryRow(ctx, updateActivity, activityID, finalTitle, finalDescription, finalSportSectionID, finalCreatorID, enrollDeadline).
-		Scan(&activity.ID, &activity.Title, &activity.Description, &activity.SportSectionID, &activity.CreatorID, &enrollDeadline)
+	err := a.db.QueryRowxContext(ctx, updateActivity,
+		activity.ID,
+		activity.Title,
+		activity.Description,
+		activity.SportSectionID,
+		activity.CreatorID,
+		enrollDeadlineStr).StructScan(&updatedActivity)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
 
-	return &activity, nil
+	return &updatedActivity, nil
 }

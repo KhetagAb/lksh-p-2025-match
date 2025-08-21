@@ -3,27 +3,28 @@ package activities
 import (
 	"context"
 	"fmt"
+	"match/internal/domain/dao"
 	"match/internal/domain/dto"
 	"match/internal/infra"
 )
 
-func (s *ActivityService) CreateActivity(ctx context.Context, activity dto.Activity) (*dto.Activity, error) {
-	infra.Infof(ctx, "Getting creator player with id=%v", activity.Creator.ID)
-	creator, err := s.playerService.GetPlayerByID(ctx, activity.Creator.ID)
+func (s *ActivityService) CreateActivity(ctx context.Context, activity dao.Activity) (*dto.Activity, error) {
+	infra.Infof(ctx, "Getting creator player with id=%v", activity.CreatorID)
+	creator, err := s.playerService.GetPlayerByID(ctx, activity.CreatorID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get player by tg_id [player_tg_id=%d]: %w", activity.Creator.ID, err)
+		return nil, fmt.Errorf("cannot get player by id [player_id=%d]: %w", activity.CreatorID, err)
 	}
 
-	infra.Infof(ctx, "Getting sport sections with id=%v", activity.Activity.SportSectionID)
-	_, err = s.sportRepository.GetSportSectionByID(ctx, activity.Activity.SportSectionID)
+	infra.Infof(ctx, "Getting sport sections with id=%v", activity.SportSectionID)
+	_, err = s.sportRepository.GetSportSectionByID(ctx, activity.SportSectionID)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get sport section by id: %w", err)
 	}
 
-	infra.Infof(ctx, "Creating activity: [creatorId=%d][sportSectionID=%d][title=%s][description=%s]", activity.Creator.ID, activity.Activity.SportSectionID, activity.Activity.Title, activity.Activity.Description)
-	resActivity, err := s.activityRepository.CreateActivity(ctx, activity.Activity.EnrollDeadline, activity.Creator.ID, activity.Activity.SportSectionID, activity.Activity.Title, activity.Activity.Description)
+	infra.Infof(ctx, "Creating activity: [creatorId=%d][sportSectionId=%d][title=%s][description=%v]", activity.CreatorID, activity.SportSectionID, activity.Title, activity.Description)
+	resActivity, err := s.activityRepository.CreateActivity(ctx, activity)
 	if err != nil {
-		return nil, fmt.Errorf("cannot create activity with creatorId=%d, SportSectionID=%d, title=%s, description=%s: %w", activity.Creator.ID, activity.Activity.SportSectionID, activity.Activity.Title, activity.Activity.Description, err)
+		return nil, fmt.Errorf("cannot create activity with creatorId=%d, SportSectionID=%d, title=%s, description=%v: %w", activity.CreatorID, activity.SportSectionID, activity.Title, activity.Description, err)
 	}
 
 	infra.Infof(ctx, "Activity created: [activity=%v]", activity)
