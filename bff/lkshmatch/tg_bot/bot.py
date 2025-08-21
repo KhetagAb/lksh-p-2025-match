@@ -366,7 +366,7 @@ async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
     log_info("Called handle_sport_register_callback.", call.message)
     await bot.answer_callback_query(call.id)
     markup = await make_sports_buttons()
-    await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)  # type: ignore
+    await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)
     log_info("Finished handle_sport_register_callback successfully.", call.message)
 
 
@@ -558,7 +558,7 @@ async def back_to_sports(call: types.CallbackQuery) -> None:
 async def back_to_activities(call: types.CallbackQuery) -> None:
     log_info("Called back_to_activities.", call.message)
     await bot.answer_callback_query(call.id)
-    sport_id = int(call.data.split("_")[3])  # back_to_activities_{sport_id}
+    sport_id = int(call.data.split("_")[3])
     activities = await activity_adapter.get_activities_by_sport_section(sport_id)
     markup = await make_activity_buttons(activities, sport_id)
     await edit_with_ibuttons(call, "Для выбора события, нажмите кнопку.", markup)
