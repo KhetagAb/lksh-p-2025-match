@@ -52,17 +52,7 @@ func TournamentAlreadyExistsError(msg string, args ...interface{}) error {
 	}
 }
 
-type ForbiddenOperationError struct {
-	Code    string
-	Message string
-}
-
-func (e *ForbiddenOperationError) Error() string {
-	return fmt.Sprintf("Error code %s: %s", e.Code, e.Message)
-}
-
 const (
-	NotFound           = "NOT_FOUND"
-	InvalidOperation   = "INVALID_OPERATION"
-	ForbiddenOperation = "FORBIDDEN_OPERATION"
+	NotFound         = "NOT_FOUND"
+	InvalidOperation = "INVALID_OPERATION"
 )

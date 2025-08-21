@@ -41,9 +41,3 @@ func NotFoundErrorResponsef(ectx echo.Context, message string, a ...any) error {
 		Message: fmt.Sprintf(message, a...),
 	})
 }
-
-func ForbiddenErrorResponsef(ectx echo.Context, message string, a ...any) error {
-	return ectx.JSON(403, &server.ErrorResponse{
-		Message: fmt.Sprintf(message, a...),
-	})
-}

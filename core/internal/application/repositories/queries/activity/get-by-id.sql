@@ -3,7 +3,6 @@ SELECT
     title,
     description,
     sport_section_id,
-    creator_id,
-    enroll_deadline
+    creator_id
 FROM activities
 WHERE id = $1;
