@@ -9,5 +9,6 @@ class MongoAdminRepository(AdminRepository):
     def __init__(self, mongo_client: MongoClient):
         self.client: MongoClient = mongo_client
 
-    def get_admins(self) -> list[Admin]:
-        return list(self.client[DATABASE_NAME]["students"].find({'paraller' : 'admin'}))
+    def get_admins(self) -> list[dict]:
+        return list(self.client[DATABASE_NAME]["students"].find({'parallel' : 'admin'}))
+
