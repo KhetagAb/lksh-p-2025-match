@@ -20,13 +20,11 @@ from lkshmatch.core_client.models import (
     RegisterPlayerResponse201,
 )
 from lkshmatch.core_client.types import Unset, UNSET
-from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
 class CorePlayerAdapter(PlayerAdapter):
     def __init__(self, coreclient: core_client.Client):
         self.client = coreclient
-
 
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         response = await register_player.asyncio(
@@ -34,8 +32,6 @@ class CorePlayerAdapter(PlayerAdapter):
             body=map_player_to_register_request(user),
         )
 
-        if response is None:
-            raise UnknownError("message") # todo: fixme
         if isinstance(response, RegisterPlayerResponse200):
             raise PlayerAlreadyRegistered("player already register")
         elif isinstance(response, RegisterPlayerResponse201):
