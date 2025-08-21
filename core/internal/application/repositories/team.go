@@ -10,29 +10,31 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-//go:embed queries/team/create.sql
-var createTeamQuery string
+var (
+	//go:embed queries/team/create.sql
+	createTeamQuery string
 
-//go:embed queries/team/get-by-id.sql
-var getTeamByIDQuery string
+	//go:embed queries/team/get-by-id.sql
+	getTeamByIDQuery string
 
-//go:embed queries/team/delete.sql
-var deleteTeamQuery string
+	//go:embed queries/team/delete.sql
+	deleteTeamByID string
 
-//go:embed queries/team/get-by-activity-id.sql
-var getTeamsByActivityIDQuery string
+	//go:embed queries/team/get-by-activity-id.sql
+	getTeamsByActivityIDQuery string
 
-//go:embed queries/team/get-players-by-team-id.sql
-var getTeamPlayersByIDQuery string
+	//go:embed queries/team/get-players-by-team-id.sql
+	getTeamPlayersByIDQuery string
 
-//go:embed queries/team/add-player-to-team.sql
-var addPlayerToTeamQuery string
+	//go:embed queries/team/add-player-to-team.sql
+	addPlayerToTeamQuery string
 
-//go:embed queries/team/get-team-by-player-and-activity.sql
-var getTeamByPlayerAndActivityQuery string
+	//go:embed queries/team/get-team-by-player-and-activity.sql
+	getTeamByPlayerAndActivityQuery string
 
-//go:embed queries/team/delete-player-from-team-by-activity.sql
-var deletePlayerFromTeamByActivity string
+	//go:embed queries/team/delete-player-from-team-by-activity.sql
+	deletePlayerFromTeamByActivity string
+)
 
 type Teams struct {
 	db *sqlx.DB
@@ -81,23 +83,6 @@ func (r *Teams) GetTeamPlayersByID(ctx context.Context, teamID int64) ([]dao.Pla
 	return players, nil
 }
 
-func (r *Teams) DeleteTeamByID(ctx context.Context, id int64) error {
-	result, err := r.db.ExecContext(ctx, deleteTeamQuery, id)
-	if err != nil {
-		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
-	}
-
-	if rowsAffected != 1 {
-		return &services.NotFoundError{Code: services.NotFound, Message: "team not found"}
-	}
-	return nil
-}
-
 func (r *Teams) AddPlayerToTeam(ctx context.Context, playerID, teamID int64) error {
 	_, err := r.db.ExecContext(ctx, addPlayerToTeamQuery, playerID, teamID)
 	if err != nil {
@@ -123,6 +108,14 @@ func (r *Teams) DeletePlayerFromTeamByActivity(ctx context.Context, playerId, te
 	_, err := r.db.ExecContext(ctx, deletePlayerFromTeamByActivity, playerId, teamId)
 	if err != nil {
 		return &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
+	}
+	return nil
+}
+
+func (r *Teams) DeleteTeamByID(ctx context.Context, teamID int64) error {
+	_, err := r.db.ExecContext(ctx, deleteTeamByID, teamID)
+	if err != nil {
+		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
 	return nil
 }

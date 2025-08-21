@@ -31,6 +31,17 @@ func (s *ActivityService) DeletePlayerFromActivity(ctx context.Context, activity
 		}
 	}
 
+	isCaptain := existingTeam.CaptainID == playerID
+	if isCaptain {
+		err = s.teamRepository.DeleteTeamByID(ctx, existingTeam.ID)
+		if err != nil {
+			return &services.InvalidOperationError{
+				Code:    services.InvalidOperation,
+				Message: fmt.Sprintf("player isn't enrolled in team for this activity with player_id=%d, activity_id=%d: %v", captain.ID, activityID, err),
+			}
+		}
+	}
+
 	infra.Infof(ctx, "Deleting player [id=%d] from activity [id=%d]", playerID, activityID)
 	err = s.teamRepository.DeletePlayerFromTeamByActivity(ctx, playerID, existingTeam.ID)
 	if err != nil {
