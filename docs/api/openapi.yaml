@@ -204,8 +204,60 @@ paths:
         "404":
           $ref: '#/components/responses/ErrorResponse'
 
+  /core/notifications/current:
+    get:
+      tags:
+        - "Notification"
+      summary: "Returns notifications scheduled for now"
+      responses:
+        "200":
+          description: Succesfully returned
+          $ref: '#/components/responses/CurrentNotificationsResponse'
+
+  /core/notifications:
+    get:
+      tags:
+        - "Notifications"
+      summary: "returns a list of executed notifications"
+      parameters:
+        - name: meeting_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Succesfully returned
+          $ref: '#/components/responses/ExecutedNotificationsResponse'
+
+    post:
+      tags:
+        - "Notifications"
+      summary: "schedules new notification"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNotificationRequest'
+      responses:
+        "201":
+          description: notification scheduled
+        "409":
+          $ref: '#/components/responses/ErrorResponse'
+
 components:
   schemas:
+    CreateNotificationRequest:
+      type: object
+      properties:
+        time:
+          type: string
+        meeting_id:
+          type: integer
+          format: int64
+
     Player:
       description: "Структура описывающая пользователя"
       type: object
@@ -363,6 +415,15 @@ components:
           type: integer
           format: int64
 
+    Notification:
+      type: object
+      properties:
+        telegram_id:
+          type: integer
+          format: int64
+        meeting_title:
+          type: string
+
   parameters:
     PrivilegeToken:
       name: Privilege-Token
@@ -372,6 +433,36 @@ components:
       required: true
 
   responses:
+    CurrentNotificationsResponse:
+      description: "list of notifications scheduled for now"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - Notification
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+            additionalProperties: false
+
+    ExecutedNotificationsResponse:
+      description: "list of executed notifications"
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - Notification
+            properties:
+              items:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+            additionalProperties: false
+
     AllSportSections:
       description: "Массив, в котором содержатся названия всех существующих видов спорта"
       content:
