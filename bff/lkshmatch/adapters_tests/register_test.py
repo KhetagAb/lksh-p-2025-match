@@ -10,18 +10,6 @@ from lkshmatch.adapters.base import (
 )
 from lkshmatch.adapters.core.players import CorePlayerAdapter
 
-# class test_student:
-#     def __init__(self, tg_username: str, tg_id: int, name: str):
-#         self.tg_username = tg_username
-#         self.tg_id = tg_id
-#         self.name = name
-#
-# class test_mongo:
-#     def  __init__(self):
-#         self.players = [test_student("@Xantsid", 1, "Ирина Григорьева"), test_student("@Admin", 2, "Имя Админа")]
-#     async def get_students(self):
-#         return self.players
-
 @pytest.fixture(scope="module")
 def test_server() -> Generator[pytest_httpserver.HTTPServer]:
     with pytest_httpserver.HTTPServer() as httpserver:
@@ -32,18 +20,6 @@ def player_adapter(test_server: pytest_httpserver.HTTPServer) -> Generator[CoreP
     client = core_client.client.Client(base_url=f"http://localhost:{test_server.port}")
     yield CorePlayerAdapter(client)
 
-
-
-# @pytest.mark.parametrize("user, name", [(Player("@Xantsid", 1),"Ирина Григорьева"), (Playe("@Admin", 2), "Имя Админа")],
-#                          ids=["Ирина Григорьева", "Имя Админа"])
-# async def test_validate_register_user(player_adapter, user: Player, name: str):
-#     test_resoult = await player_adapter.get_player_by_tg(user)
-#     assert test_resoult.tg_username == user.tg_username and test_resoult.tg_id == user.tg_id and test_resoult.name == name
-#
-# @pytest.mark.parametrize("user", [Player("@NotExistsUser", 3), PlayerToRegister("@Xantsid_withwrongtgid", 4)])
-# async def test_validate_register_user_not_found(player_adapter, user: Player):
-#     with pytest.raises(PlayerNotFound):
-#         await player_adapter.get_player_by_tg(user)
 
 @pytest.mark.parametrize("user, id_reg", [(PlayerToRegister(tg_username="@Xantsid", tg_id=1, name="Ирина Григорьева"), 1), 
                                           (PlayerToRegister(tg_username="@Admin", tg_id=2, name="Имя Админа"), 2)])

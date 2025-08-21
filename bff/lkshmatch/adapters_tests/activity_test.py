@@ -34,14 +34,15 @@ async def test_get_activities_by_sport_section(activity_adapter: CoreActivityAda
         f"/core/activities/by_sport_section/{sport_id}"
     ).respond_with_json({"activities": list_activity}, status=200)
 
-    test_resoult = await activity_adapter.get_activities_by_sport_section(sport_id)
+    test_result = await activity_adapter.get_activities_by_sport_section(sport_id)
     for i in range(2):
-        assert (len(test_resoult) == 2 and test_resoult[i].id == list_activity[i]["id"] and test_resoult[i].title ==
-                list_activity[i]["title"]
-                and test_resoult[i].creator.core_id == list_activity[i]["creator"]["core_id"]
-                and test_resoult[i].creator.name == list_activity[i]["creator"]["name"]
-                and test_resoult[i].creator.tg_username == list_activity[i]["creator"]["tg_username"]
-                and test_resoult[i].creator.tg_id == list_activity[i]["creator"]["tg_id"]
+        assert all([len(test_result) == 2,
+                    test_result[i].id == list_activity[i]["id"],
+                    test_result[i].title == list_activity[i]["title"],
+                    test_result[i].creator.core_id == list_activity[i]["creator"]["core_id"],
+                    test_result[i].creator.name == list_activity[i]["creator"]["name"],
+                    test_result[i].creator.tg_username == list_activity[i]["creator"]["tg_username"],
+                    test_result[i].creator.tg_id == list_activity[i]["creator"]["tg_id"]]
                 )
 
 
@@ -78,13 +79,14 @@ async def test_enroll_player_in_activity(activity_adapter: CoreActivityAdapter, 
         f"/core/activity/{sport_id}/enroll", json={"id": user_tg_id}
     ).respond_with_json({"team": team}, status=200)
 
-    test_resoult = await activity_adapter.enroll_player_in_activity(sport_id, user_tg_id)
-    assert (test_resoult.id == team["id"] and test_resoult.name == team["name"]
-            and test_resoult.captain.core_id == team["captain"]["core_id"]
-            and test_resoult.captain.name == team["captain"]["name"]
-            and test_resoult.captain.tg_username == team["captain"]["tg_username"]
-            and test_resoult.captain.tg_id == team["captain"]["tg_id"]
-            and len(test_resoult.members) == 1 and test_resoult.captain == test_resoult.members[0]
+    test_result = await activity_adapter.enroll_player_in_activity(sport_id, user_tg_id)
+    assert all([test_result.id == team["id"],
+                test_result.name == team["name"],
+                test_result.captain.core_id == team["captain"]["core_id"],
+                test_result.captain.name == team["captain"]["name"],
+                test_result.captain.tg_username == team["captain"]["tg_username"],
+                test_result.captain.tg_id == team["captain"]["tg_id"],
+                len(test_result.members) == 1 and test_result.captain == test_result.members[0]]
             )
 
 
@@ -127,14 +129,15 @@ async def test_get_teams_by_activity_id(activity_adapter: CoreActivityAdapter, t
         f"/core/teams/by_activity/{activity_id}"
     ).respond_with_json({"teams": teams}, status=200)
 
-    test_resoult = await activity_adapter.get_teams_by_activity_id(activity_id)
+    test_result = await activity_adapter.get_teams_by_activity_id(activity_id)
     for i in range(2):
-        assert (test_resoult[i].id == teams[i]["id"] and test_resoult[i].name == teams[i]["name"]
-                and test_resoult[i].captain.core_id == teams[i]["captain"]["core_id"]
-                and test_resoult[i].captain.name == teams[i]["captain"]["name"]
-                and test_resoult[i].captain.tg_username == teams[i]["captain"]["tg_username"]
-                and test_resoult[i].captain.tg_id == teams[i]["captain"]["tg_id"]
-                and len(test_resoult[i].members) == 1 and test_resoult[i].captain == test_resoult[i].members[0]
+        assert all([test_result[i].id == teams[i]["id"],
+                     test_result[i].name == teams[i]["name"],
+                     test_result[i].captain.core_id == teams[i]["captain"]["core_id"],
+                     test_result[i].captain.name == teams[i]["captain"]["name"],
+                     test_result[i].captain.tg_username == teams[i]["captain"]["tg_username"],
+                     test_result[i].captain.tg_id == teams[i]["captain"]["tg_id"],
+                     len(test_result[i].members) == 1,test_result[i].captain == test_result[i].members[0]]
                 )
 
 

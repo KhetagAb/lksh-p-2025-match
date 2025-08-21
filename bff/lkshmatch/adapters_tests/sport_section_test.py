@@ -23,10 +23,13 @@ async def test_get_sport_list(activity_adapter: CoreSportAdapter, test_server: p
         "/core/sport/list"
     ).respond_with_json({"sports_sections": list_sport}, status=200)
 
-    test_resoult = await activity_adapter.get_sport_list()
+    test_result = await activity_adapter.get_sport_list()
     for i in range(2):
-        assert (len(test_resoult) == 2 and test_resoult[i].id == list_sport[i]["id"]
-                and test_resoult[i].name == list_sport[i]["name"] and test_resoult[i].ru_name == list_sport[i]["ru_name"])
+        assert all([len(test_result) == 2,
+                    test_result[i].id == list_sport[i]["id"],
+                    test_result[i].name == list_sport[i]["name"],
+                    test_result[i].ru_name == list_sport[i]["ru_name"]]
+                    )
 
     test_server.clear()
 

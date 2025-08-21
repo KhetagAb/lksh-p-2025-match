@@ -20,11 +20,13 @@ from lkshmatch.core_client.models import (
     RegisterPlayerResponse201,
 )
 from lkshmatch.core_client.types import Unset, UNSET
+from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
 class CorePlayerAdapter(PlayerAdapter):
     def __init__(self, coreclient: core_client.Client):
         self.client = coreclient
+
 
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         response = await register_player.asyncio(
