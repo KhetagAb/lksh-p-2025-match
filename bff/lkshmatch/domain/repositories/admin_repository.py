@@ -4,10 +4,10 @@ from dataclasses import dataclass
 
 @dataclass
 class Admin:
-    core_id: int
+    requester_username: str
 
 
 class AdminRepository(ABC):
     @abstractmethod
-    def get_admins(self) -> list[Admin]:
+    def get_admins(self) -> list[dict]:
         raise NotImplementedError
