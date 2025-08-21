@@ -5,15 +5,15 @@ from fastapi.responses import Response
 
 from lkshmatch.adapters.base import ActivityAdminAdapter, PlayerAdapter
 from lkshmatch.adapters.gheets.gsheets import (
-    get_data_gsheet, change_data_gsheet,
-    WEBSITE_SERVICE_ACCOUNT_NAME, get_sheet_data_from_url,
-    GSheetDoesNotResponseError
+    WEBSITE_SERVICE_ACCOUNT_NAME,
+    GSheetDoesNotResponseError,
+    change_data_gsheet,
+    get_data_gsheet,
+    get_sheet_data_from_url,
 )
-
 from lkshmatch.di import app_container
-
+from lkshmatch.website.auth.auth import COOKIE_NAME, get_user_id_from_token
 from lkshmatch.website.templating import templates
-from lkshmatch.website.auth.auth import get_user_id_from_token, COOKIE_NAME
 
 
 class TableIsEmptyError(Exception):
@@ -30,7 +30,11 @@ table_adapter_router = APIRouter(prefix="/table")
 @table_adapter_router.get("/register_in_section")
 async def register_on_section_with_table_get(request: Request) -> Response:
     return templates.TemplateResponse(
-        context={"request": request, "error": "", "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME},
+        context={
+            "request": request,
+            "error": "",
+            "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME,
+        },
         name="table/register_in_section.html",
     )
 
@@ -79,11 +83,16 @@ async def register_on_section_with_table_post(
                 error = "Возникли ошибки при регистрации"
 
         try:
-            change_data_gsheet(sheet_data, "B1:B1000", [return_values]) # pyright: ignore[reportPossiblyUnboundVariable]
+            change_data_gsheet(sheet_data, "B1:B1000", [return_values])  # pyright: ignore[reportPossiblyUnboundVariable]
         except GSheetDoesNotResponseError:
             error = "Возникли проблемы со связью с google-sheets"
 
     return templates.TemplateResponse(
-        context={"request": request, "error": error, "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME, "username": "UU"},
+        context={
+            "request": request,
+            "error": error,
+            "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME,
+            "username": "UU",
+        },
         name="table/register_in_section.html",
     )
