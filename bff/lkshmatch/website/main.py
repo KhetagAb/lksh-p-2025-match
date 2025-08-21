@@ -1,12 +1,13 @@
-from fastapi import FastAPI
-import uvicorn
 import logging
 
+import uvicorn
+from fastapi import FastAPI
+
+from lkshmatch.website.activities import activities_router
+from lkshmatch.website.activities_gsheets import table_adapter_router
 from lkshmatch.website.api_requests import api_requests_router
 from lkshmatch.website.auth.auth import auth_router
-from lkshmatch.website.activities import activities_router
 from lkshmatch.website.auth.login_middleware import LoginWallMiddleware
-from lkshmatch.website.activities_gsheets import table_adapter_router
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,6 +27,6 @@ app.add_middleware(LoginWallMiddleware)
 uvicorn.run(
     app=app,
     host="0.0.0.0",
-    port=8000,
+    port=80,
     env_file="../.env",
 )
