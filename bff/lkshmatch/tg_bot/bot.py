@@ -1,5 +1,6 @@
 import datetime
 import logging
+import traceback
 from enum import Enum
 
 from telebot import types
@@ -39,7 +40,7 @@ class Msg(Enum):
         "Извините, что-то пошло не так. Обратитесь в 4-ый комповник к команде P."
     )
 
-    TECHNICAL_SUPPORT = "Опишите свою проблему в ответном сообщении, мы постараемся оперативно ответить."
+    TECHNICAL_SUPPORT = "Опишите свою проблему в ОТВЕТНОМ сообщении, мы постараемся оперативно ответить."
 
 
 class Buttons(Enum):
@@ -47,6 +48,8 @@ class Buttons(Enum):
     REGISTRATION_CANCEL = ("❌ Отмена регистрации", "reg_cancel")
     SPORTS_REGISTER_ON = ("Записаться на активность", "sports_register")
     TECHNICAL_SUPPORT = ("Написать в техподдержку.", "tech_sup")
+    BACK_TO_SPORTS = ("⬅️ К выбору спорта", "back_to_sports")
+    BACK_TO_ACTIVITIES = ("⬅️ К выбору активности", "back_to_activities")
 
     def __init__(self, text: str, callback_data: str):
         self.text = text
@@ -84,15 +87,10 @@ token = get_required_param("TELEGRAM_TOKEN")
 support_chat_id = int(get_required_param("SUPPORT_CHAT_ID"))
 support_chat_thread_id = int(get_required_param("SUPPORT_CHAT_THREAD_ID"))
 
-try:
-    bot = AsyncTeleBot(token)
-    logging.info("Telegram bot started")
-except Exception as e:
-    logging.error(f"Telegram bot failed: {e}")
-    exit(1)
+bot = AsyncTeleBot(token)
 
 
-async def make_sports_buttons() -> types.InlineKeyboardMarkup:
+async def make_sports_buttons(with_back: bool = False) -> types.InlineKeyboardMarkup:
     buttons: list[types.InlineKeyboardButton] = []
     for sport in await sport_adapter.get_sport_list():
         button = types.InlineKeyboardButton(
@@ -100,7 +98,12 @@ async def make_sports_buttons() -> types.InlineKeyboardMarkup:
         )
         buttons.append(button)
     markup: types.InlineKeyboardMarkup = types.InlineKeyboardMarkup() # type: ignore
-    return markup.add(*buttons, row_width=3)
+    markup.add(*buttons, row_width=3)
+
+    if with_back:
+        markup.add(Buttons.SPORTS_REGISTER_ON.inline())
+
+    return markup
 
 
 async def make_sports_buttons_except_one(
@@ -119,6 +122,7 @@ async def make_sports_buttons_except_one(
 
 async def make_activity_buttons(
     activities: list[Activity],
+        sport_id: int | None = None,
 ) -> types.InlineKeyboardMarkup:
     markup = types.InlineKeyboardMarkup() # type: ignore
     for activity in activities:
@@ -126,6 +130,11 @@ async def make_activity_buttons(
             text=activity.title, callback_data=f"activity_{activity.id}"
         )
         markup.add(button)
+
+    if sport_id is not None:
+        back_button = Buttons.BACK_TO_SPORTS.inline()
+        markup.add(back_button)
+    
     return markup
 
 
@@ -134,6 +143,39 @@ async def make_choose_registration_buttons() -> types.InlineKeyboardMarkup:
     confirm_btn = Buttons.REGISTRATION_CONFIRM.inline()
     cancel_btn = Buttons.REGISTRATION_CANCEL.inline()
     markup.add(confirm_btn, cancel_btn)
+    return markup
+
+
+async def make_activity_detail_buttons(
+        activity: Activity,
+        list_of_all_teams: list,
+        chat_id: int,
+        sport_id: int | None = None
+) -> types.InlineKeyboardMarkup:
+    markup = types.InlineKeyboardMarkup()  # type: ignore
+
+    if any(team.captain.tg_id == chat_id for team in list_of_all_teams):
+        leave_button = types.InlineKeyboardButton(
+            "❌ Отписаться", callback_data=f"leave_{activity.id}"
+        )
+        markup.add(leave_button)
+    else:
+        create_button = types.InlineKeyboardButton(
+            "✅ Записаться", callback_data=f"create_{activity.id}"
+        )
+        markup.add(create_button)
+
+    if sport_id is not None:
+        activities = await activity_adapter.get_activities_by_sport_section(sport_id)
+        if len(activities) > 1:
+            back_button = types.InlineKeyboardButton(
+                "⬅️ К выбору активности",
+                callback_data=f"back_to_activities_{sport_id}"
+            )
+        else:
+            back_button = Buttons.BACK_TO_SPORTS.inline()
+        markup.add(back_button)
+
     return markup
 
 
@@ -229,7 +271,6 @@ def log_warning(
 def log_error(text: str, mess: types.Message | types.InaccessibleMessage) -> None:
     logging.error(log_text(text, mess))
 
-
 @bot.message_handler(commands=["start"]) # type: ignore
 async def start(mess: types.Message) -> None:
     log_info("Called /start.", mess)
@@ -240,7 +281,6 @@ async def start(mess: types.Message) -> None:
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         markup.add(types.KeyboardButton(Buttons.TECHNICAL_SUPPORT.text))
         await msg_with_buttons(mess, "Здравствуйте!", markup)
-        # TODO: What if user does not have username?
         user_name = await students_repository.get_name_by_username(username)
         await msg_with_ibuttons(
             mess=mess,
@@ -252,6 +292,7 @@ async def start(mess: types.Message) -> None:
         await msg_without_buttons(mess, Msg.REGISTRATION_USER_NOT_FOUND.value)
     except UnknownError as ue:
         log_error(f"Internal error: {ue}. Validate failed.", mess)
+        logging.error(f"Full stack trace for UnknownError:\n{traceback.format_exc()}")
         await msg_without_buttons(mess, Msg.INTERNAL_ERROR.value)
     log_info("Finished /start successfully.", mess)
 
@@ -300,6 +341,7 @@ async def processing_of_registration(call: types.CallbackQuery) -> None:
             )
         except UnknownError as ue:
             log_error(f"Internal error: {ue}. Validate failed.", call.message)
+            logging.error(f"Full stack trace for UnknownError:\n{traceback.format_exc()}")
             await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
     elif call.data == Buttons.REGISTRATION_CANCEL.callback_data:
         await edit_without_buttons(call, Msg.REGISTRATION_CANCELED.value)
@@ -321,13 +363,16 @@ async def register_on_sport(mess: types.Message) -> None:
     func=lambda call: call.data == Buttons.SPORTS_REGISTER_ON.callback_data
 )  # type: ignore
 async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
+    log_info("Called handle_sport_register_callback.", call.message)
     await bot.answer_callback_query(call.id)
     markup = await make_sports_buttons()
-    await msg_with_ibuttons(call.message, "Выберите спортивную секцию:", markup) #type: ignore
+    await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)
+    log_info("Finished handle_sport_register_callback successfully.", call.message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("sport_")) # type: ignore
 async def select_sport(call: types.CallbackQuery) -> None:
+    log_info("Called select_sport.", call.message)
     await bot.answer_callback_query(call.id)
     sport_id = int(call.data.split("_")[1])  # type: ignore
     for s in await sport_adapter.get_sport_list():
@@ -337,67 +382,59 @@ async def select_sport(call: types.CallbackQuery) -> None:
             if len(activities) == 0:
                 markup = await make_sports_buttons_except_one(sport_id, "💤 ПУСТО")
                 await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)
+                log_info("Finished select_sport (no activities).", call.message)
                 return
             if len(activities) == 1:
-                await select_activity(call, activities[0])
+                await select_activity(call, activities[0], sport_id)
+                log_info("Finished select_sport (single activity).", call.message)
                 return
 
-            markup = await make_activity_buttons(activities)
+            markup = await make_activity_buttons(activities, sport_id)
             await edit_with_ibuttons(call, "Для выбора события, нажмите кнопку.", markup)
+            log_info("Finished select_sport (multiple activities).", call.message)
             return
+    log_warning("Sport section not found.", call.message)
     await edit_without_buttons(call, "Спортивная секция не найдена.")
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("activity_")) # type: ignore
 async def processing_select_activity(call: types.CallbackQuery) -> None:
+    log_info("Called processing_select_activity.", call.message)
     await bot.answer_callback_query(call.id)
     activity_id = int(call.data.split("_")[1])  # type: ignore
-    activity = await get_activity_by_id(activity_id)
+    activity = await activity_adapter.get_activity_by_id(activity_id)
     if not activity:
+        log_warning("Activity not found.", call.message)
         await edit_without_buttons(call, "Активность не найдена.")
         return
 
-    await select_activity(call, activity)
+    await select_activity(call, activity, activity.sport_section_id)
+    log_info("Finished processing_select_activity successfully.", call.message)
 
 
-async def get_activity_by_id(activity_id: int) -> Activity | None:
-    # TODO переделать на получение активности по id эффективнее
-    activity = None
-    for sport in await sport_adapter.get_sport_list():
-        activities = await activity_adapter.get_activities_by_sport_section(sport.id)
-        for act in activities:
-            if act.id == activity_id:
-                activity = act
-                break
-        if activity:
-            break
-    return activity
-
-
-async def select_activity(call: types.CallbackQuery, activity: Activity) -> None:
+async def select_activity(call: types.CallbackQuery, activity: Activity, sport_id: int | None = None) -> None:
     try:
         list_of_all_teams = await activity_adapter.get_teams_by_activity_id(activity.id)
         description = f"ℹ️ Описание: {activity.description}\n\n" if activity.description else ""
-        # TODO: id -> name
+
         if list_of_all_teams:
             numbered_teams = [f"{i + 1}. {team.name}" for i, team in enumerate(list_of_all_teams)]
-            # todo сделать поддерждку команда/участник
+            # todo сделать поддержку команда/участник
             teams_text = f"🏆 {activity.title}\n\n{description}📋 Список участников:\n\n" + "\n".join(numbered_teams)
         else:
-            teams_text = f"🏆 {activity.title}\n\n📋 Пока нет участников."
+            teams_text = f"🏆 {activity.title}\n\n{description}📋 Пока нет участников."
 
-        # TODO вынести
-        markup = types.InlineKeyboardMarkup() # type: ignore
-        create = types.InlineKeyboardButton(
-            "Записаться", callback_data=f"create_{activity.id}"
+        markup = await make_activity_detail_buttons(
+            activity=activity,
+            list_of_all_teams=list_of_all_teams,
+            chat_id=call.message.chat.id,
+            sport_id=sport_id
         )
-        # todo сделать поддерждку записи в команду если это командный турнир
-        # signup = types.InlineKeyboardButton("Записаться в команду", callback_data=f"signup_{activity.id}")
-        markup.add(create)
 
         await edit_with_ibuttons(call, f"{teams_text}", markup)
     except UnknownError as ue:
-        print(ue)
+        log_error(str(ue), call.message)
+        logging.error(f"Full stack trace for UnknownError:\n{traceback.format_exc()}")
         await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
 
 
@@ -435,39 +472,100 @@ async def select_activity(call: types.CallbackQuery, activity: Activity) -> None
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("create_")) # type: ignore
 async def enroll_player_in_activity(call: types.CallbackQuery) -> None:
+    log_info("Called enroll_player_in_activity.", call.message)
     await bot.answer_callback_query(call.id)
     activity_id = int(call.data.split("_")[1])  # type: ignore
 
     try:
-        player = await app_container.get(PlayerAdapter).get_player_by_tg(tg_id=call.from_user.id)
+        player = await player_adapter.get_player_by_tg(tg_id=call.from_user.id)
         team = await activity_adapter.enroll_player_in_activity(activity_id, player.core_id)
-        activity = await get_activity_by_id(activity_id)
+        activity = await activity_adapter.get_activity_by_id(activity_id)
         if activity is None:
             log_error(
-                "Couldn't find activity by activity id received from ActivityAdapter (activity_id: %i)",
-                activity_id, # type: ignore
+                f"Couldn't find activity by activity id received from ActivityAdapter (activity_id: {activity_id})",
+                call.message,
             )
-        await select_activity(call, activity) # type: ignore
+        await select_activity(call, activity, activity.sport_section_id)
 
         # todo вариант для создания команды
         await msg_without_buttons(
             # TODO: fix types
             call.message, # type: ignore
-            f"✅ Вы записались как {team.name}\n\n.",
+            f"✅ Вы записались как {team.name}.",
         )
+        log_info("Finished enroll_player_in_activity successfully.", call.message)
     except PlayerAlreadyInTeam:
+        log_warning("Player already in team.", call.message)
         await msg_without_buttons(call.message, "⚠️ Вы уже записаны.")  # type: ignore
     except InsufficientRights:
+        log_warning("Insufficient rights for enrollment.", call.message)
         await edit_without_buttons(call, Msg.INSUFFICIENT_RIGHTS.value)
-    except UnknownError:
+    except UnknownError as ue:
+        log_error(f"UnknownError in enroll_player_in_activity: {ue}", call.message)
+        logging.error(f"Full stack trace for UnknownError:\n{traceback.format_exc()}")
+        await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("leave_"))  # type: ignore
+async def leave_player_from_activity(call: types.CallbackQuery) -> None:
+    log_info("Called leave_player_from_activity.", call.message)
+    await bot.answer_callback_query(call.id)
+    activity_id = int(call.data.split("_")[1])  # type: ignore
+
+    try:
+        player = await player_adapter.get_player_by_tg(tg_id=call.from_user.id)
+        await activity_adapter.leave_player_by_activity(activity_id, player.core_id)
+        activity = await activity_adapter.get_activity_by_id(activity_id)
+        if activity is None:
+            log_error(
+                f"Couldn't find activity by activity id received from ActivityAdapter (activity_id: {activity_id})",
+                call.message,
+            )
+        await select_activity(call, activity, activity.sport_section_id)
+
+        await msg_without_buttons(
+            call.message,  # type: ignore
+            "✅ Вы успешно отписались от активности.",
+        )
+        log_info("Finished leave_player_from_activity successfully.", call.message)
+    except InsufficientRights:
+        log_warning("Insufficient rights for leaving activity.", call.message)
+        await edit_without_buttons(call, Msg.INSUFFICIENT_RIGHTS.value)
+    except UnknownError as ue:
+        log_error(f"UnknownError in leave_player_from_activity: {ue}", call.message)
+        logging.error(f"Full stack trace for UnknownError:\n{traceback.format_exc()}")
         await edit_without_buttons(call, Msg.INTERNAL_ERROR.value)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.startswith("signup_")) # type: ignore
 async def signup_to_activity(call: types.CallbackQuery) -> None:
+    log_info("Called signup_to_activity.", call.message)
     await bot.answer_callback_query(call.id)
-    # TODO:
     await edit_without_buttons(call, "🚧 Функция записи в существующую команду находится в разработке. ")
+    log_info("Finished signup_to_activity (feature in development).", call.message)
+
+
+@bot.callback_query_handler(func=lambda call: call.data == Buttons.BACK_TO_SPORTS.callback_data)  # type: ignore
+async def back_to_sports(call: types.CallbackQuery) -> None:
+    log_info("Called back_to_sports.", call.message)
+    await bot.answer_callback_query(call.id)
+    markup = await make_sports_buttons()
+    await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)
+    log_info("Finished back_to_sports successfully.", call.message)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("back_to_activities_"))  # type: ignore
+async def back_to_activities(call: types.CallbackQuery) -> None:
+    log_info("Called back_to_activities.", call.message)
+    await bot.answer_callback_query(call.id)
+    if call.data is None:
+        log_error("call.data is None in back_to_activities", call.message)
+        return
+    sport_id = int(call.data.split("_")[3])
+    activities = await activity_adapter.get_activities_by_sport_section(sport_id)
+    markup = await make_activity_buttons(activities, sport_id)
+    await edit_with_ibuttons(call, "Для выбора события, нажмите кнопку.", markup)
+    log_info("Finished back_to_activities successfully.", call.message)
 
 
 def get_id_from_support_message(msg: str) -> int:
@@ -504,6 +602,3 @@ async def answer_to_buttons(mess: types.Message) -> None:
             await change_support_message(mess.reply_to_message, mess)
             return
     await msg_without_buttons(mess, "Я вас не понимаю. Используйте кнопки или команды.")
-
-
-# asyncio.run(bot.polling(non_stop=True, none_stop=True))

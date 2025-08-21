@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from lkshmatch import core_client
 from lkshmatch.adapters.base import (
@@ -13,10 +13,15 @@ from lkshmatch.adapters.base import (
     UnknownError,
 )
 from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
-from lkshmatch.adapters.core.mappers.activity import map_activity, map_team
-from lkshmatch.adapters.core.mappers.player import map_player_from_api
+from lkshmatch.adapters.core.mappers.activity import (
+    map_activity,
+    map_activity_list,
+    map_team,
+    map_team_list,
+)
 from lkshmatch.core_client.api.activities import (
     get_core_activities_by_sport_section_id,
+    get_core_activity_id,
     get_core_teams_by_activity_id,
     post_core_activity_create,
     post_core_activity_delete_by_id,
@@ -30,6 +35,8 @@ from lkshmatch.core_client.models import (
     CreateActivityRequest,
     GetCoreActivitiesBySportSectionIdResponse200,
     GetCoreActivitiesBySportSectionIdResponse400,
+    GetCoreActivityIdResponse200,
+    GetCoreActivityIdResponse404,
     GetCoreTeamsByActivityIdResponse200,
     GetCoreTeamsByActivityIdResponse400,
     PostCoreActivityCreateResponse200,
@@ -53,30 +60,35 @@ class CoreActivityAdapter(ActivityAdapter):
         self.client = coreclient
 
     async def get_activities_by_sport_section(
-        self, sport_section_id: int
+        self,
+        sport_section_id: int,
     ) -> list[Activity]:
         response = await get_core_activities_by_sport_section_id.asyncio(
             client=self.client, id=sport_section_id
         )
         if isinstance(response, GetCoreActivitiesBySportSectionIdResponse400):
             raise InvalidParameters(
-                f"get activity by sport section id returns 400 response: {response.message}"
+                f"get activities by sport section id returns 400 response: {response.message}"
             )
         if not isinstance(response, GetCoreActivitiesBySportSectionIdResponse200):
             raise UnknownError(
-                "get activity by sport section id returns unknown response"
+                f"get activities by sport section id returns unknown response: {response}"
             )
-        activities: list[Activity] = []
-        for activity in response.activities:
-            activities.append(
-                Activity(
-                    id=activity.id,
-                    title=activity.title,
-                    creator=map_player_from_api(activity.creator),
-                    description=activity.description if activity.description else "",
-                )
+        return map_activity_list(response.activities)
+
+    async def get_activity_by_id(self, activity_id: int) -> Activity:
+        response = await get_core_activity_id.asyncio(
+            client=self.client, id=activity_id
+        )
+        if isinstance(response, GetCoreActivityIdResponse404):
+            raise InvalidParameters(
+                f"get activity by id returns 404 response: {response.message}"
             )
-        return activities
+        if not isinstance(response, GetCoreActivityIdResponse200):
+            raise UnknownError(
+                f"get activity by id returns unknown response: {response}"
+            )
+        return map_activity(response.activity)
 
     # TODO перенести в TeamsAdapter
     async def get_teams_by_activity_id(self, activity_id: int) -> list[Team]:
@@ -88,21 +100,21 @@ class CoreActivityAdapter(ActivityAdapter):
                 f"get teams by activity id returns 400 response: {response.message}"
             )
         if not isinstance(response, GetCoreTeamsByActivityIdResponse200):
-            raise UnknownError("get teams by activity id returns unknown response")
-        teams = []
-        for team in response.teams:
-            teams.append(map_team(team))
-        return teams
+            raise UnknownError(
+                f"get teams by activity id returns unknown response: {response}"
+            )
+        return map_team_list(response.teams)
 
     async def enroll_player_in_activity(
-        self, activity_id: int, player_id: CoreID
+        self,
+        activity_id: int,
+        player_id: CoreID,
     ) -> Team:
         response = await post_core_activity_id_enroll.asyncio(
             client=self.client,
             id=activity_id,
             body=ActivityEnrollPlayerRequest(id=player_id),
         )
-
         if isinstance(response, PostCoreActivityIdEnrollResponse400):
             raise InvalidParameters(
                 f"enroll player in activity returns 400 response: {response.message}"
@@ -114,13 +126,15 @@ class CoreActivityAdapter(ActivityAdapter):
                 f"Player is already enrolled in a team for this activity: {response.message}"
             )
         if not isinstance(response, PostCoreActivityIdEnrollResponse200):
-            raise UnknownError("enroll player in activity  returns unknown response")
-
-        team = response.team
-        return map_team(team)
+            raise UnknownError(
+                f"enroll player in activity returns unknown response: {response}"
+            )
+        return map_team(response.team)
 
     async def leave_player_by_activity(
-        self, activity_id: int, player_id: CoreID
+        self,
+        activity_id: int,
+        player_id: CoreID,
     ) -> None:
         response = await post_core_activity_id_leave.asyncio(
             client=self.client,
@@ -147,7 +161,7 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         sport_section_id: int,
         creator_id: int,
         description: str | Unset = UNSET,
-        enroll_deadline: datetime.datetime | Unset = UNSET,
+        enroll_deadline: datetime | Unset = UNSET,
     ) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_create.asyncio(
@@ -162,12 +176,15 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
                 f"create activity return 400 response: {response.message}"
             )
         if not isinstance(response, PostCoreActivityCreateResponse200):
-            raise UnknownError("create activity return unknown response")
+            raise UnknownError(f"create activity returns unknown response: {response}")
 
-        activity = response.activity
-        return map_activity(activity)
+        return map_activity(response.activity)
 
-    async def delete_activity(self, requester: str, creator_id: int) -> Activity:
+    async def delete_activity(
+        self,
+        requester: str,
+        creator_id: int,
+    ) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_delete_by_id.asyncio(
             client=self.client, id=creator_id, privilege_token=admin_token
@@ -177,10 +194,9 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
                 f"delete activity return 400 response: {response.message}"
             )
         if not isinstance(response, PostCoreActivityDeleteByIdResponse200):
-            raise UnknownError("delete activity return unknown response")
+            raise UnknownError(f"delete activity returns unknown response: {response}")
 
-        activity = response.activity
-        return map_activity(activity)
+        return map_activity(response.activity)
 
     async def update_activity(
         self,
@@ -188,15 +204,18 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         requester: str,
         title: str,
         creator_id: int,
-        description: str | None = None,
-        enroll_deadline: datetime.datetime | Unset = UNSET,
+        description: str | Unset = UNSET,
+        enroll_deadline: datetime | Unset = UNSET,
     ) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_update_by_id.asyncio(
             client=self.client,
             id=activity_id,
             body=UpdateActivityRequest(
-                title, description or "", creator_id, enroll_deadline
+                title=title,
+                description=description,
+                creator_id=creator_id,
+                enroll_deadline=enroll_deadline,
             ),
             privilege_token=admin_token,
         )
@@ -205,7 +224,6 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
                 f"update activity return 400 response: {response.message}"
             )
         if not isinstance(response, PostCoreActivityUpdateByIdResponse200):
-            raise UnknownError("update activity return unknown response")
+            raise UnknownError(f"update activity returns unknown response: {response}")
 
-        activity = response.activity
-        return map_activity(activity)
+        return map_activity(response.activity)

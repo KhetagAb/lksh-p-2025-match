@@ -11,12 +11,17 @@ type ServerInterface struct {
 	getSportList                *GetAllSportSectionHandler
 	getTeamsByIDActivity        *GetTeamsByActivityIDHandler
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler
+	getActivityByID             *GetActivityByIDHandler
 	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
 	createActivity              *CreateActivityHandler
 	deleteActivity              *DeleteActivityHandler
 	updateActivity              *UpdateActivityHandler
 	getPlayerByTg               *GetPlayerByTgHandler
 	deletePlayerFromActivity    *DeletePlayerFromActivityHandler
+}
+
+func (s ServerInterface) GetCoreActivityId(ctx echo.Context, id int64) error {
+	return s.getActivityByID.GetActivityByID(ctx, id)
 }
 
 func (s ServerInterface) PostCoreActivityIdLeave(ctx echo.Context, id int64) error {
@@ -66,6 +71,7 @@ func NewServerInterface(
 	getSportList *GetAllSportSectionHandler,
 	getTeamsByIDActivity *GetTeamsByActivityIDHandler,
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler,
+	getActivityByID *GetActivityByIDHandler,
 	enrollPlayerInActivity *EnrollPlayerInActivityHandler,
 	createActivity *CreateActivityHandler,
 	deleteActivity *DeleteActivityHandler,
@@ -78,6 +84,7 @@ func NewServerInterface(
 		registerPlayer:              registerPlayer,
 		getTeamsByIDActivity:        getTeamsByIDActivity,
 		getActivityBySportSectionID: getActivityBySportSectionID,
+		getActivityByID:             getActivityByID,
 		enrollPlayerInActivity:      enrollPlayerInActivity,
 		createActivity:              createActivity,
 		deleteActivity:              deleteActivity,
