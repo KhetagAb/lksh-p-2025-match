@@ -23,7 +23,7 @@ func (s *ActivityService) EnrollPlayerInActivity(ctx context.Context, activityID
 		infra.Infof(ctx, "Cannot create team because the enroll deadline has expired [activity_id=%v] [enroll_deadline=%v] [current time=%v]", activityID, activity.EnrollDeadline, time.Now().UTC())
 		return nil, &services.ForbiddenOperationError{
 			Code:    services.ForbiddenOperation,
-			Message: fmt.Sprintf("cannot create team because the enroll deadline has expired [activity_id=%v] [enroll_deadline=%v] [current time=%v]: %w", activityID, activity.EnrollDeadline, time.Now().UTC()),
+			Message: fmt.Sprintf("cannot create team because the enroll deadline has expired [activity_id=%v] [enroll_deadline=%v] [current time=%v]", activityID, activity.EnrollDeadline, time.Now().UTC()),
 		}
 	}
 	infra.Infof(ctx, "Getting player with id=%v", playerID)
