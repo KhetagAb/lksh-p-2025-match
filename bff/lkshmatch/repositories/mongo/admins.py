@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 
-from lkshmatch.domain.repositories.admin_repository import Admin, AdminRepository
+from lkshmatch.domain.repositories.admin_repository import AdminRepository
 
 DATABASE_NAME = "match"
 
