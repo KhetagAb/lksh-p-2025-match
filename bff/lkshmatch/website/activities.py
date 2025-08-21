@@ -4,7 +4,12 @@ from typing import Annotated
 from fastapi import APIRouter, Form, Request, Response
 from fastapi.responses import RedirectResponse
 
-from lkshmatch.adapters.base import ActivityAdapter, ActivityAdminAdapter, SportAdapter
+from lkshmatch.adapters.base import (
+    ActivityAdapter,
+    ActivityAdminAdapter,
+    PlayerAdapter,
+    SportAdapter,
+)
 from lkshmatch.di import app_container
 from lkshmatch.website.auth.auth import (
     COOKIE_NAME,
@@ -136,11 +141,13 @@ async def create_activity(
     cookie_token = request.cookies.get(COOKIE_NAME)
     user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
     username = get_username_from_token(cookie_token if cookie_token is not None else "")
+    player_adapter = app_container.get(PlayerAdapter)
     admin_activity_adapter = app_container.get(ActivityAdminAdapter)
+    player = await player_adapter.get_player_by_tg(tg_id=user_id)
     error = ""
     try:
         await admin_activity_adapter.create_activity(
-            username, title, sport_section_id, user_id, description
+            username, title, sport_section_id, player.core_id, description
         )
     except BaseException as exc:
         logging.warning(exc)
