@@ -18,10 +18,11 @@ func MapActivityFromAPI(activity server.PostCoreActivityCreateJSONRequestBody) d
 
 func MapActivityToAPI(activity dto.Activity) server.Activity {
 	return server.Activity{
-		Id:          activity.Activity.ID,
-		Creator:     MapPlayerToAPI(activity.Creator),
-		Title:       activity.Activity.Title,
-		Description: activity.Activity.Description,
+		Id:             activity.Activity.ID,
+		Creator:        MapPlayerToAPI(activity.Creator),
+		Title:          activity.Activity.Title,
+		Description:    activity.Activity.Description,
+		SportSectionId: activity.Activity.SportSectionID,
 	}
 }
 

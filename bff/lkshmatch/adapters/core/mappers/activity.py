@@ -12,6 +12,7 @@ def map_activity(activity: activity_api.Activity) -> domain.Activity:
         description=as_none(activity.description),
         enroll_deadline=as_none(activity.enroll_deadline),
         creator=map_player_from_api(activity.creator),
+        sport_section_id=activity.sport_section_id,
     )
 
 

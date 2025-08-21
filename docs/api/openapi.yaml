@@ -299,6 +299,7 @@ components:
         - id
         - title
         - creator
+        - sport_section_id
       properties:
         id:
           type: integer
@@ -310,6 +311,10 @@ components:
           type: string
         creator:
           $ref: "#/components/schemas/Player"
+        sport_section_id:
+          type: integer
+          format: int64
+          description: Идентификатор спортивной секции
         enroll_deadline:
           format: date-time
 

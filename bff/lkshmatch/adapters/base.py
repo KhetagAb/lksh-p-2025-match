@@ -84,6 +84,7 @@ class Activity:
     creator: Player
     description: str | None
     enroll_deadline: datetime | None
+    sport_section_id: int
 
 
 @dataclass

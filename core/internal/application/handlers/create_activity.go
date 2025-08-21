@@ -44,13 +44,9 @@ func (h *CreateActivityHandler) CreateActivity(ectx echo.Context, params server.
 		return BadRequestErrorResponsef(ectx, "Invalid request body: "+err.Error())
 	}
 
-	activity, err := h.createActivityService.CreateActivity(ctx, dao.Activity{
-		EnrollDeadline: requestBody.EnrollDeadline,
-		SportSectionID: requestBody.SportSectionId,
-		Title:          requestBody.Title,
-		Description:    requestBody.Description,
-		CreatorID:      requestBody.CreatorId,
-	})
+	activity, err := h.createActivityService.CreateActivity(ctx,
+		mappers.MapActivityFromAPI(requestBody),
+	)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to create activity: %v", err)
 		return InternalErrorResponsef(ectx, err.Error())
