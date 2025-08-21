@@ -183,11 +183,11 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
     async def delete_activity(
             self,
             requester: int,
-            creator_id: int,
+            activity_id: int,
     ) -> Activity:
         admin_token = self.privilege_checker.get_admin_token(requester)
         response = await post_core_activity_delete_by_id.asyncio(
-            client=self.client, id=creator_id, privilege_token=admin_token
+            client=self.client, id=activity_id, privilege_token=admin_token
         )
         if isinstance(response, PostCoreActivityDeleteByIdResponse400):
             raise InvalidParameters(

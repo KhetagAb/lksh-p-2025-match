@@ -143,7 +143,7 @@ class ActivityAdminAdapter(ABC):
     async def delete_activity(
             self,
             requester: int,
-            core_id: CoreID,
+            activity_id: int,
     ) -> Activity:
         raise NotImplementedError
 
