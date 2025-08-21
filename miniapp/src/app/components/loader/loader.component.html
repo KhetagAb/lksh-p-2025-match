@@ -1,0 +1,19 @@
+<div class="loader-wrapper" [class.with-pulse]="showPulse">
+  <svg 
+    class="circular-loader" 
+    viewBox="25 25 50 50"
+    [style.width]="loaderSize"
+    [style.height]="loaderSize"
+  >
+    <circle
+      class="loader-path"
+      cx="50"
+      cy="50"
+      r="20"
+      fill="none"
+      [attr.stroke-width]="strokeWidth"
+      [style.stroke]="loaderColor"
+      stroke-miterlimit="10"
+    />
+  </svg>
+</div>
