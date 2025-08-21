@@ -3,17 +3,17 @@ from typing import Annotated
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import Response
 
-from lkshmatch.adapters.base import ActivityAdapter, PlayerAdapter
+from lkshmatch.adapters.base import ActivityAdminAdapter, PlayerAdapter
 from lkshmatch.adapters.gheets.gsheets import (
-    get_data_gsheet, change_data_gsheet,
-    WEBSITE_SERVICE_ACCOUNT_NAME, get_sheet_data_from_url,
-    GSheetDoesNotResponseError
+    WEBSITE_SERVICE_ACCOUNT_NAME,
+    GSheetDoesNotResponseError,
+    change_data_gsheet,
+    get_data_gsheet,
+    get_sheet_data_from_url,
 )
-
 from lkshmatch.di import app_container
-
+from lkshmatch.website.auth.auth import COOKIE_NAME, get_user_id_from_token
 from lkshmatch.website.templating import templates
-from lkshmatch.website.auth.auth import get_user_id_from_token, COOKIE_NAME
 
 
 class TableIsEmptyError(Exception):
@@ -30,7 +30,11 @@ table_adapter_router = APIRouter(prefix="/table")
 @table_adapter_router.get("/register_in_section")
 async def register_on_section_with_table_get(request: Request) -> Response:
     return templates.TemplateResponse(
-        context={"request": request, "error": "", "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME},
+        context={
+            "request": request,
+            "error": "",
+            "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME,
+        },
         name="table/register_in_section.html",
     )
 
@@ -41,7 +45,7 @@ async def register_on_section_with_table_post(
     table_url: Annotated[str, Form()],
     activity_id: Annotated[int, Form()],
 ) -> Response:
-    _activity_adapter = app_container.get(ActivityAdapter)
+    _admin_activity_adapter = app_container.get(ActivityAdminAdapter)
     _player_adapter = app_container.get(PlayerAdapter)
     cookie_token = request.cookies.get(COOKIE_NAME)
     # TODO: what if cookie_token haven't provided
@@ -72,18 +76,23 @@ async def register_on_section_with_table_post(
         return_values = ["" for i in range(len(sheet_values))]
         for i in range(len(sheet_values)):
             try:
-                # await activity_adapter.enroll_player_in_activity(player_tg_id=user_id, activity_id=activity_id)
+                # await admin_activity_adapter.
                 return_values[i] = "Зарегестрирован"
             except BaseException:
                 return_values[i] = "ОШИБКА"
                 error = "Возникли ошибки при регистрации"
 
         try:
-            change_data_gsheet(sheet_data, "B1:B1000", [return_values]) # pyright: ignore[reportPossiblyUnboundVariable]
+            change_data_gsheet(sheet_data, "B1:B1000", [return_values])  # pyright: ignore[reportPossiblyUnboundVariable]
         except GSheetDoesNotResponseError:
             error = "Возникли проблемы со связью с google-sheets"
 
     return templates.TemplateResponse(
-        context={"request": request, "error": error, "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME, "username": "UU"},
+        context={
+            "request": request,
+            "error": error,
+            "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME,
+            "username": "UU",
+        },
         name="table/register_in_section.html",
     )

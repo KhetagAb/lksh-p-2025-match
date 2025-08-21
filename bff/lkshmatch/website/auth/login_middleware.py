@@ -26,7 +26,7 @@ class LoginWallMiddleware(BaseHTTPMiddleware):
         except JWTError:
             return login_wall
 
-        if "user_id" not in token_parts:
+        if "user_id" not in token_parts or "username" not in token_parts:
             return login_wall
 
         return await call_next(request)

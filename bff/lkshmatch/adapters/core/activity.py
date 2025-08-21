@@ -14,9 +14,9 @@ from lkshmatch.adapters.base import (
 )
 from lkshmatch.adapters.core.admin.admin_privilege import PrivilegeChecker
 from lkshmatch.adapters.core.mappers.activity import (
-    map_team,
     map_activity,
     map_activity_list,
+    map_team,
     map_team_list,
 )
 from lkshmatch.core_client.api.activities import (
@@ -52,7 +52,7 @@ from lkshmatch.core_client.models import (
     PostCoreActivityUpdateByIdResponse400,
     UpdateActivityRequest,
 )
-from lkshmatch.core_client.types import Unset, UNSET
+from lkshmatch.core_client.types import UNSET, Unset
 
 
 class CoreActivityAdapter(ActivityAdapter):
@@ -60,8 +60,8 @@ class CoreActivityAdapter(ActivityAdapter):
         self.client = coreclient
 
     async def get_activities_by_sport_section(
-            self,
-            sport_section_id: int,
+        self,
+        sport_section_id: int,
     ) -> list[Activity]:
         response = await get_core_activities_by_sport_section_id.asyncio(
             client=self.client, id=sport_section_id
@@ -106,9 +106,9 @@ class CoreActivityAdapter(ActivityAdapter):
         return map_team_list(response.teams)
 
     async def enroll_player_in_activity(
-            self,
-            activity_id: int,
-            player_id: CoreID,
+        self,
+        activity_id: int,
+        player_id: CoreID,
     ) -> Team:
         response = await post_core_activity_id_enroll.asyncio(
             client=self.client,
@@ -132,9 +132,9 @@ class CoreActivityAdapter(ActivityAdapter):
         return map_team(response.team)
 
     async def leave_player_by_activity(
-            self,
-            activity_id: int,
-            player_id: CoreID,
+        self,
+        activity_id: int,
+        player_id: CoreID,
     ) -> None:
         response = await post_core_activity_id_leave.asyncio(
             client=self.client,
@@ -149,21 +149,21 @@ class CoreActivityAdapter(ActivityAdapter):
 
 class CoreActivityAdminAdapter(ActivityAdminAdapter):
     def __init__(
-            self, coreclient: core_client.Client, privilege_checker: PrivilegeChecker
+        self, coreclient: core_client.Client, privilege_checker: PrivilegeChecker
     ):
         self.client = coreclient
         self.privilege_checker = privilege_checker
 
     async def create_activity(
-            self,
-            requester: int,
-            title: str,
-            sport_section_id: int,
-            creator_id: int,
-            description: str | Unset = UNSET,
-            enroll_deadline: datetime | Unset = UNSET,
+        self,
+        requester_username: str,
+        title: str,
+        sport_section_id: int,
+        creator_id: int,
+        description: str | Unset = UNSET,
+        enroll_deadline: datetime | Unset = UNSET,
     ) -> Activity:
-        admin_token = self.privilege_checker.get_admin_token(requester)
+        admin_token = self.privilege_checker.get_admin_token(requester_username)
         response = await post_core_activity_create.asyncio(
             client=self.client,
             body=CreateActivityRequest(
@@ -181,13 +181,13 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         return map_activity(response.activity)
 
     async def delete_activity(
-            self,
-            requester: int,
-            creator_id: int,
+        self,
+        requester_username: str,
+        activity_id: int,
     ) -> Activity:
-        admin_token = self.privilege_checker.get_admin_token(requester)
+        admin_token = self.privilege_checker.get_admin_token(requester_username)
         response = await post_core_activity_delete_by_id.asyncio(
-            client=self.client, id=creator_id, privilege_token=admin_token
+            client=self.client, id=activity_id, privilege_token=admin_token
         )
         if isinstance(response, PostCoreActivityDeleteByIdResponse400):
             raise InvalidParameters(
@@ -199,15 +199,15 @@ class CoreActivityAdminAdapter(ActivityAdminAdapter):
         return map_activity(response.activity)
 
     async def update_activity(
-            self,
-            activity_id: int,
-            requester: int,
-            title: str,
-            creator_id: int,
-            description: str | Unset = UNSET,
-            enroll_deadline: datetime | Unset = UNSET,
+        self,
+        activity_id: int,
+        requester_username: str,
+        title: str,
+        creator_id: int,
+        description: str | Unset = UNSET,
+        enroll_deadline: datetime | Unset = UNSET,
     ) -> Activity:
-        admin_token = self.privilege_checker.get_admin_token(requester)
+        admin_token = self.privilege_checker.get_admin_token(requester_username)
         response = await post_core_activity_update_by_id.asyncio(
             client=self.client,
             id=activity_id,
