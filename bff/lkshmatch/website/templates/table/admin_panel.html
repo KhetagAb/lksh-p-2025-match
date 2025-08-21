@@ -1,0 +1,1436 @@
+
+{% block content %}
+
+<h2>Администраторская панель секций</h2>
+<p>
+    {{ error }}
+</p>
+
+
+
+
+
+
+
+
+<style>
+    input.tableurl {
+        width:  600px;
+    }
+    input.cact {
+        width:  1000px;
+    }
+    input.find_section {
+        width:  400px;
+    }
+    input.find_activity {
+        width:  800px;
+    }
+    .button-container {
+        display: inline-block;
+    }
+    .button-container .buttonel1{
+        margin-right: 10px;
+        display: inline;
+    }
+    .button-container .buttonel2{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel3-1{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel3-2{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel3-3{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel4{
+        margin-right: 10px;
+        display: none;
+    }
+    .button-container .buttonel5{
+        margin-right: 10px;
+        display: none;
+
+    }
+    .button-container .buttonel6{
+        margin-right: 10px;
+        display: none;
+
+    }
+    .button-container .buttonel7{
+        margin-right: 10px;
+        display: none;
+
+    }
+
+
+
+</style>
+<div class="button-container">
+    <button  id="b1" class="buttonel1" onclick="bl1()">Раздел 1: выбор секции</button>
+    <button  id="b2" class="buttonel2" onclick="bl2()">Раздел 2: выбор активити (удаление, просмотр, создание)</button>
+    <button id="b3-1"  class="buttonel3-1" onclick="bl3_1()">Раздел 3: просмотр активити</button>
+    <button id="b3-2"  class="buttonel3-2" onclick="bl3_2()">Раздел 3: удаление активити</button>
+    <button id="b3-3"  class="buttonel3-3" onclick="bl3_3()">Раздел 3: создание активити</button>
+    <button id="b6"  class="buttonel6" onclick="bl6()">Раздел 3: изменение параметров активити</button>
+    <button id="b7"  onclick="save_submit()" class="buttonel7" form="gs_reg">Сохранить изменения!</button>
+
+    <button id="b4"  class="buttonel4" onclick="bl4()">Раздел 4: просмотр участников активити</button>
+    <button id="b5"  onclick="subm()" class="buttonel5" form="gs_reg">Создать активность!</button>
+
+</div>
+
+<form id="gs_reg" method="post" action="/table/register_in_section">
+
+
+
+    <div id="rasd1">
+        <label for="section_name">Введите название секции</label><br>
+        <input type="text" id="section_name" name="section_name" autocomplete="off" placeholder="Начните вводить название секции для её поиска" class="find_section"><br>
+        <div id="sections_f" class="sections_f"></div>
+
+        <div id="chooseSection">Пока Вы не выбрали секцию</div>
+
+
+        <button type="button" value="NaN" id="view_act" style="display: none;" onclick="get_sect()">Посмотреть все активности данной секции</button>
+    </div>
+
+
+    <div id="rasd2">
+        <label for="activity_name" style="display: none;" id="activity_namel">Название активити</label>
+        <input type="text" id="activity_name" name="activity_name" autocomplete="off" placeholder="Начните вводить название активити для данной секции для её поиска или создания" class="find_activity" style="display: none;">
+        <div id="activity_f" class="sections_f" style="display: none;"></div>
+        <div id="chooseActivity" style="display: none;">Пока Вы не выбрали активити</div>
+
+        <div id="tos" style="display: none">
+
+        </div>
+        <div id="chooseActivity1" style="display: none;"></div>
+
+        <input type="text" id="r1" name="table_url" style="display: none;"></input>
+        <input type="text" id="r2" name="activity_id" style="display: none;"></input>
+        <div id="resact" style="display: none;"></div>
+        <div id="resact1" style="display: none;"></div>
+        <div id="action_id_submit" style="display: none;"></div>
+        <div id="info_action" style="display: none;"></div>
+
+        <div id="section_name_submit" style="display: none;">NaN</div>
+        <div id="action_name_submit" style="display: none;">NaN</div>
+        <input name="submit_info" style="display: none" id="submit1001"></input>
+        <input id="section_name_submit1" style="display: none;" value="" name="section_id"></input>
+
+        <input style="display: none" type="text" id="sdfghj" name="description" autocomplete="off" value=""><br>
+
+    </div>
+    <div id="privet1001" style="display: none"></div>
+    <div id="rasd3-r" style="display: none">
+
+
+    </div>
+    <div id="rasd3-a" style="display: none">
+        <br></br>
+        <label for="activityc_name" style="background: #B5B8B1; padding: 5px;">Введите название активити</label><br>
+        <input class="cact"   type="text" id="activityc_name" name="title" autocomplete="off" placeholder="Введите название  активити" value=""><br>
+        <p><kbd style="background: #B5B8B1; padding: 5px;">ALT</kbd> + <kbd style="background: #B5B8B1; padding: 5px;">0</kbd> чтобы получить помощь по работе с редактором описания активити. Обязательно ставьте перенос строки перед переходом на новую строку,  иначе текст будет единой строкой</p>
+        <style>
+            #container {
+                width: 1600px;
+                margin: 20px auto;
+            }
+            .res {
+                width: 1583px;
+                margin: 20px auto;
+            }
+
+
+            .ck-editor__editable[role="textbox"] {
+                /* Editing area */
+                min-height: 200px;
+            }
+            .ck-content .image {
+                /* Block images */
+                max-width: 80%;
+                margin: 20px auto;
+            }
+        </style>
+        <div id="rasd3-a1">
+
+
+            <div id="container">
+                <div id="editor" contenteditable="true">
+                </div>
+            </div>
+            <div id="not" style="background: #B5B8B1; padding: 5px;">Превью описания активити</div>
+
+            <div class="ck-content">
+                <div id="res" class="res"></div>
+            </div>
+
+
+
+
+            <script src="ckeditor.js"></script>
+
+            <script src="ru.js"></script>
+
+            <script>
+
+                var editorInstance;
+
+                // This sample still does not showcase all CKEditor 5 features (!)
+                // Visit https://ckeditor.com/docs/ckeditor5/latest/features/index.html to browse all the features.
+                CKEDITOR.ClassicEditor.create(document.getElementById("editor"), {
+                    // https://ckeditor.com/docs/ckeditor5/latest/getting-started/setup/toolbar/toolbar.html#extended-toolbar-configuration-format
+                    toolbar: {
+                        items: [
+                            //   'exportPDF','exportWord', '|',
+                            'findAndReplace', 'selectAll', '|',
+                            'heading', '|',
+                            'bold', 'italic', 'strikethrough', 'underline', 'code', 'subscript', 'superscript', 'removeFormat', '|',
+                            'bulletedList', 'numberedList', 'todoList', '|',
+                            'outdent', 'indent', '|',
+                            'undo', 'redo',
+                            '-',
+                            'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', '|',
+                            'alignment', '|',
+                            'link', 'uploadImage', 'blockQuote', 'insertTable', 'mediaEmbed', 'codeBlock', 'htmlEmbed', '|',
+                            'specialCharacters', 'horizontalLine', 'pageBreak', '|',
+                            //  'textPartLanguage', '|',
+                            'sourceEditing'
+                        ],
+                        shouldNotGroupWhenFull: true
+                    },
+                    // Changing the language of the interface requires loading the language file using the <script> tag.
+                    language: 'ru',
+                    list: {
+                        properties: {
+                            styles: true,
+                            startIndex: true,
+                            reversed: true
+                        }
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/headings.html#configuration
+                    heading: {
+                        options: [
+                            { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                            { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                            { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                            { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
+                            { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
+                            { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
+                            { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
+                        ]
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/editor-placeholder.html#using-the-editor-configuration
+                    placeholder: 'Введите описание вашего активити',
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/font.html#configuring-the-font-family-feature
+                    fontFamily: {
+                        options: [
+                            'default',
+                            'Arial, Helvetica, sans-serif',
+                            'Courier New, Courier, monospace',
+                            'Georgia, serif',
+                            'Lucida Sans Unicode, Lucida Grande, sans-serif',
+                            'Tahoma, Geneva, sans-serif',
+                            'Times New Roman, Times, serif',
+                            'Trebuchet MS, Helvetica, sans-serif',
+                            'Verdana, Geneva, sans-serif'
+                        ],
+                        supportAllValues: true
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/font.html#configuring-the-font-size-feature
+                    fontSize: {
+                        options: [ 10, 12, 14, 'default', 18, 20, 22 ],
+                        supportAllValues: true
+                    },
+                    // Be careful with the setting below. It instructs CKEditor to accept ALL HTML markup.
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/general-html-support.html#enabling-all-html-features
+                    htmlSupport: {
+                        allow: [
+                            {
+                                name: /.*/,
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            }
+                        ]
+                    },
+                    // Be careful with enabling previews
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/html-embed.html#content-previews
+                    htmlEmbed: {
+                        showPreviews: false
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/link.html#custom-link-attributes-decorators
+                    link: {
+                        decorators: {
+                            addTargetToExternalLinks: true,
+                            defaultProtocol: 'https://',
+                            toggleDownloadable: {
+                                mode: 'manual',
+                                label: 'Downloadable',
+                                attributes: {
+                                    download: 'file'
+                                }
+                            }
+                        }
+                    },
+                    // https://ckeditor.com/docs/ckeditor5/latest/features/mentions.html#configuration
+                    mention: {
+                        feeds: [
+                            {
+                                marker: '@',
+                                feed: [
+                                    '@apple', '@bears', '@brownie', '@cake', '@cake', '@candy', '@canes', '@chocolate', '@cookie', '@cotton', '@cream',
+                                    '@cupcake', '@danish', '@donut', '@dragée', '@fruitcake', '@gingerbread', '@gummi', '@ice', '@jelly-o',
+                                    '@liquorice', '@macaroon', '@marzipan', '@oat', '@pie', '@plum', '@pudding', '@sesame', '@snaps', '@soufflé',
+                                    '@sugar', '@sweet', '@topping', '@wafer'
+                                ],
+                                minimumCharacters: 1
+                            }
+                        ]
+                    },
+                    // The "superbuild" contains more premium features that require additional configuration, disable them below.
+                    // Do not turn them on unless you read the documentation and know how to configure them and setup the editor.
+                    removePlugins: [
+                        // These two are commercial, but you can try them out without registering to a trial.
+                        // 'ExportPdf',
+                        // 'ExportWord',
+                        'AIAssistant',
+                        'CKBox',
+                        'CKFinder',
+                        'EasyImage',
+                        // This sample uses the Base64UploadAdapter to handle image uploads as it requires no configuration.
+                        // https://ckeditor.com/docs/ckeditor5/latest/features/images/image-upload/base64-upload-adapter.html
+                        // Storing images as Base64 is usually a very bad idea.
+                        // Replace it on production website with other solutions:
+                        // https://ckeditor.com/docs/ckeditor5/latest/features/images/image-upload/image-upload.html
+                        // 'Base64UploadAdapter',
+                        'MultiLevelList',
+                        'RealTimeCollaborativeComments',
+                        'RealTimeCollaborativeTrackChanges',
+                        'RealTimeCollaborativeRevisionHistory',
+                        'PresenceList',
+                        'Comments',
+                        'TrackChanges',
+                        'TrackChangesData',
+                        'RevisionHistory',
+                        'Pagination',
+                        'WProofreader',
+                        // Careful, with the Mathtype plugin CKEditor will not load when loading this sample
+                        // from a local file system (file://) - load this site via HTTP server if you enable MathType.
+                        'MathType',
+                        // The following features require additional license.
+                        'SlashCommand',
+                        'Template',
+                        'DocumentOutline',
+                        'FormatPainter',
+                        'TableOfContents',
+                        'PasteFromOfficeEnhanced',
+                        'CaseChange'
+                    ]
+                }).then(editor => {
+                    editorInstance = editor; // Сохраняем экземпляр редактора
+                    editor.model.document.on('change:data', () => {
+                        document.getElementById('res').innerHTML=editor.getData();
+                    });
+                });
+
+
+
+            </script>
+
+        </div>
+    </div>
+    <input type="text" id="hashed-radio" value="<div id='radio11'><input type='radio' id='radio1' autocomplete='off' name='radioGroup' value='f-radio' onchange='radioChangeHandler(this)'><label for='radio1'>Отобразить таблицей (по командам), с сcылкой для связи</label><br></div><input type='radio' id='radio2' autocomplete='off' name='radioGroup' value='s-radio' onchange='radioChangeHandler(this)'><label for='radio2'>Отобразить списком (все участники с именами и фамилиями), без ссылки для связи</label><br><input type='radio' id='radio3' autocomplete='off' name='radioGroup' value='t-radio' onchange='radioChangeHandler(this)'><label for='radio3'>Отобразить таблицей (все участники с именами и фамилиями), с ссылкой для связи</label><br><div id='f-radio' style='display: none;'></div><div id='s-radio' style='display: none;'></div><div id='t-radio' style='display: none;'></div>" style="display: none"></input>
+
+    <input type="text" value="" id="cashedd" style="display: none">
+    <input type="text" value='' id="cashedhtml1" style="display: none">
+    <div id="rasd3-d" style="display: none">
+
+
+    </div>
+    <div id="rasd4" style="display: none">
+
+    </div>
+
+
+
+</form>
+<script>
+    function bl4() {
+        function reco1(callback) {
+            const idsect = document.getElementById('action_id_submit').innerHTML;
+            var nexturl = '/table/get_teams_by_activity_id?activity_id=';
+            nexturl += idsect;
+
+            fetch(nexturl)
+                .then(response => response.json())
+                .then(data => callback(null, data))
+                .catch(error => callback(error));
+        }
+
+        function bl41(callback) {
+            reco1(function (error, result) {
+                if (error) {
+                    callback(error);
+                } else {
+                    callback(null, result);
+                }
+            });
+        }
+
+        bl41(function (error, response_a) {
+
+            document.getElementById('rasd1').style.display = 'none';
+            document.getElementById('rasd2').style.display = 'none';
+            document.getElementById('rasd3-r').style.display = 'none';
+            document.getElementById('rasd3-a').style.display = 'none';
+            document.getElementById('rasd3-d').style.display = 'none';
+
+            const kz = document.getElementById("privet" + document.getElementById("action_id_submit").innerHTML);
+            if (kz)
+                kz.style.display = "none";
+
+
+            const elk = document.getElementById('rasd4');
+            elk.innerHTML=document.getElementById('hashed-radio').value;
+            var flagl=false;
+            for (var i=0;i<response_a.length;i++){
+                if (response_a[i]["members"].length>1){
+                    flagl=true;
+                    break;
+                }
+            }
+            if (flagl){
+                var sdft="<table border=\"1\"><tr><th>Номер команды</th><th>Название команды</th><th>Участники</th><th>Ссылка для связи</th></tr>";
+
+                document.getElementById('radio11').style.display='block';
+                for (var i=0;i<response_a.length;i++){
+                    sdft+=("<tr><td>"+(i+1).toString()+"</td><td>"+response_a[i]["name"]+"</td>");
+                    for (var j=0;j<response_a[i]["members"].length;j++){
+                        if (j===0){
+                            sdft+=("<td>"+response_a[i]["members"][j]["name"]);
+                        }
+                        else{
+                            sdft+=("<br>"+response_a[i]["members"][j]["name"]);
+                        }
+                    }
+                    sdft+="</td><td>";
+                    sdft+=("<a href=\""+"https://t.me/lksh_match_bot?start=notificate_by_coreId="+response_a[i]["captain"]["core_id"]+"\">"+response_a[i]["captain"]["name"]+" (капитан)</a>"+"<br>"+"<a href=\""+"https://t.me/lksh_match_bot?start=notificate_by_teamId="+response_a[i]["id"]+"\">"+"Уведомить всю команду</a>"              +"</td></tr>");
+
+                }
+                sdft+="</table>";
+                document.getElementById("f-radio").innerHTML=sdft;
+
+
+                sdft='';
+                var sdft1='<table border="1"><tr><th>Номер</th><th>Участник</th><th>Ссылка для связи</th></tr>';
+                var ch=1;
+
+                for (var i=0;i<response_a.length;i++){
+                    for (var j=0;j<response_a[i]["members"].length;j++){
+                        if (i===0 && j===0){
+                            sdft+=(ch.toString()+". "+response_a[i]["members"][j]["name"]);
+
+                        }
+                        else{
+                            sdft+=("<br>"+ch.toString()+". "+response_a[i]["members"][j]["name"]);
+
+                        }
+                        sdft1+='<tr><td>'+ch.toString()+'</td><td>'+response_a[i]["members"][j]["name"]+'</td>'+'<td>'+"<a href=\""+"https://t.me/lksh_match_bot?start=notificate_by_coreId="+response_a[i]["members"][j]["core_id"]+"\">"+"Ссылка для связи"+"</a>"+'</td></tr>';
+                        ch+=1;
+
+                    }
+                }
+                sdft1+='</table>'
+                document.getElementById("s-radio").innerHTML=sdft;
+                document.getElementById('t-radio').innerHTML=sdft1;
+
+
+            }
+            else {
+                document.getElementById("radio11").style.display='none';
+                sdft='';
+                var sdft1='<table border="1"><tr><th>Номер</th><th>Участник</th><th>Ссылка для связи</th></tr>';
+                var ch=1;
+
+                for (var i=0;i<response_a.length;i++){
+                    for (var j=0;j<response_a[i]["members"].length;j++){
+                        if (i===0 && j===0){
+                            sdft+=(ch.toString()+". "+response_a[i]["members"][j]["name"]);
+
+                        }
+                        else{
+                            sdft+=("<br>"+ch.toString()+". "+response_a[i]["members"][j]["name"]);
+
+                        }
+                        sdft1+='<tr><td>'+ch.toString()+'</td><td>'+response_a[i]["members"][j]["name"]+'</td>'+'<td>'+"<a href=\""+"https://t.me/lksh_match_bot?start=notificate_by_coreId="+response_a[i]["members"][j]["core_id"]+"\">"+"Ссылка для связи"+"</a>"+'</td></tr>';
+                        ch+=1;
+                    }
+                }
+                sdft1+='</table>'
+                document.getElementById("s-radio").innerHTML=sdft;
+                document.getElementById('t-radio').innerHTML=sdft1;
+            }
+            document.getElementById('rasd4').style.display = 'block';
+
+        })
+    }
+
+
+</script>
+<script>function radioChangeHandler(radio) { document.getElementById("f-radio").style.display = "none";document.getElementById("s-radio").style.display = "none";document.getElementById("t-radio").style.display = "none";document.getElementById(radio.value).style.display = "block";}</script>
+<button id="submit_form" style="display: none" onclick="submitf()"></button>
+<script>
+    function bl1(){
+        document.getElementById('rasd2').style.display='none';
+        document.getElementById('rasd3-r').style.display='none';
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="none";
+        document.getElementById('rasd4').style.display='none';
+
+        const fr=document.getElementById('f-radio');
+        if (fr)
+            fr.style.display = 'none';
+        const sr=document.getElementById('s-radio')
+        if (sr)
+            sr.style.display = 'none';
+        const tr=document.getElementById('t-radio');
+        if (tr)
+            tr.style.display = 'none';
+
+        document.getElementById('rasd3-a').style.display='none';
+        document.getElementById('rasd3-d').style.display='none';
+
+        document.getElementById('rasd1').style.display='block';
+
+    }
+    function bl2(){
+        document.getElementById('rasd1').style.display='none';
+        document.getElementById('rasd3-r').style.display='none';
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="none";
+        document.getElementById('rasd4').style.display='none';
+
+        const fr=document.getElementById('f-radio');
+        if (fr)
+            fr.style.display = 'none';
+        const sr=document.getElementById('s-radio')
+        if (sr)
+            sr.style.display = 'none';
+        const tr=document.getElementById('t-radio');
+        if (tr)
+            tr.style.display = 'none';
+        document.getElementById('rasd3-a').style.display='none';
+        document.getElementById('rasd3-d').style.display='none';
+
+        document.getElementById('rasd2').style.display='block';
+    }
+    function bl3_1 (){
+        document.getElementById('rasd1').style.display='none';
+        document.getElementById('rasd2').style.display='none';
+        document.getElementById('rasd3-d').style.display='none';
+        document.getElementById('rasd3-a').style.display='none';
+        document.getElementById('rasd3-r').style.display='block';
+        document.getElementById('rasd4').style.display='none';
+
+        const fr=document.getElementById('f-radio');
+        if (fr)
+            fr.style.display = 'none';
+        const sr=document.getElementById('s-radio')
+        if (sr)
+            sr.style.display = 'none';
+        const tr=document.getElementById('t-radio');
+        if (tr)
+            tr.style.display = 'none';
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="block";
+    }
+    function bl3_2 (){
+        document.getElementById('rasd1').style.display='none';
+        document.getElementById('rasd2').style.display='none';
+        document.getElementById('rasd3-d').style.display='block';
+        document.getElementById('rasd3-a').style.display='none';
+        document.getElementById('rasd3-r').style.display='none';
+        document.getElementById('rasd4').style.display='none';
+
+        const fr=document.getElementById('f-radio');
+        if (fr)
+            fr.style.display = 'none';
+        const sr=document.getElementById('s-radio')
+        if (sr)
+            sr.style.display = 'none';
+        const tr=document.getElementById('t-radio');
+        if (tr)
+            tr.style.display = 'none';
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="none";
+    }
+    function bl3_3 (){
+        document.getElementById('rasd1').style.display='none';
+        document.getElementById('rasd2').style.display='none';
+        document.getElementById('rasd3-r').style.display='none';
+        document.getElementById('rasd3-a').style.display='block';
+        document.getElementById('rasd3-d').style.display='none';
+        document.getElementById('rasd4').style.display='none';
+
+        const fr=document.getElementById('f-radio');
+        if (fr)
+            fr.style.display = 'none';
+        const sr=document.getElementById('s-radio')
+        if (sr)
+            sr.style.display = 'none';
+        const tr=document.getElementById('t-radio');
+        if (tr)
+            tr.style.display = 'none';
+
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="none";
+    }
+    function bl6 (){
+        document.getElementById('rasd1').style.display='none';
+        document.getElementById('rasd2').style.display='none';
+        document.getElementById('rasd3-r').style.display='none';
+        document.getElementById('rasd3-a').style.display='none';
+        document.getElementById('rasd3-d').style.display='none';
+        document.getElementById('rasd4').style.display='none';
+
+        const fr=document.getElementById('f-radio');
+        if (fr)
+            fr.style.display = 'none';
+        const sr=document.getElementById('s-radio')
+        if (sr)
+            sr.style.display = 'none';
+        const tr=document.getElementById('t-radio');
+        if (tr)
+            tr.style.display = 'none';
+
+        const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+        if (kz)
+            kz.style.display="none";
+
+
+
+
+
+
+
+
+
+
+        document.getElementById('rasd3-a').style.display='block';
+
+    }
+
+</script>
+<script>
+
+    const but_a = document.getElementById('submit_form');
+    const chel = document.getElementById("resact1");
+    const chel_a = document.getElementById("resact");
+    function subm(){
+        var lkj=confirm('Вы уверены, что хотите сохранить актвити '+document.getElementById('activityc_name').value+'?')
+        if (lkj) {
+            document.getElementById('gs_reg').action = '/table/create_new_activity'
+            document.getElementById('sdfghj').value = document.getElementById('res').innerHTML;
+            document.getElementById('section_name_submit1').value=document.getElementById('view_act').value;
+        }
+        else{
+            event.preventDefault();
+        }
+    }
+
+    function cra(){
+
+        if (document.getElementById('activityc_name').value!=="")
+            var tew = confirm("У вас есть несохраненные изменения в редакторе для  активити " + document.getElementById('activityc_name').value + ". Не сохранять их?");
+        else
+            tew=true;
+        if (tew) {
+            document.getElementById('activityc_name').value=""
+            if(document.getElementById('nbv'))
+                document.getElementById('nbv').value="NaN";
+            document.getElementById('chooseActivity1').innerHTML="Вы выбрали секциию "+document.getElementById('section_name_submit').innerHTML+", чтобы создать в ней новое активити"
+
+            document.getElementById('activityc_name').value='';
+            editorInstance.setData('');
+
+            // document.getElementById('container').innerHTML='<div id="editor" contenteditable="true">\n' +
+            // '                </div>'
+            // const htmlp1=document.getElementById('cashedhtml1').value;
+            // const htmlp2=document.getElementById('cashedhtml2').value;
+            // document.getElementById('rasd3-a1').innerHTML=htmlp1+htmlp2;
+            bl3_2();
+            document.getElementById('button_create_activity').style.display = 'none';
+            document.getElementById('b3-3').style.display = "inline";
+            document.getElementById('rasd3-a').style.display = "block";
+            document.getElementById('b3-1').style.display = 'none';
+            document.getElementById('b3-2').style.display = 'none';
+            document.getElementById('b4').style.display = 'none';
+            document.getElementById('activityc_name').value = document.getElementById('activity_name').value;
+            document.getElementById('b5').style.display = 'inline';
+            document.getElementById('b6').style.display = 'none';
+            document.getElementById('b7').style.display = 'none';
+
+
+            document.getElementById('rasd1').style.display = 'none'
+            document.getElementById('rasd2').style.display = 'none'
+            document.getElementById('rasd3-r').style.display = 'none'
+            document.getElementById('rasd3-d').style.display = 'none'
+            document.getElementById('rasd4').style.display = 'none'
+            const fr=document.getElementById('f-radio');
+            if (fr)
+                fr.style.display = 'none';
+            const sr=document.getElementById('s-radio')
+            if (sr)
+                sr.style.display = 'none';
+            const tr=document.getElementById('t-radio');
+            if (tr)
+                tr.style.display = 'none';
+
+        }
+
+    }
+    function save_submit() {
+        var lkj=confirm('Вы уверены, что хотите сохранить изменения для активити '+document.getElementById('activityc_name').value+'?')
+        if (lkj) {
+            document.getElementById('gs_reg').action = '/table/edit_activity_by_activity_id?activity_id=' + document.getElementById('action_id_submit').innerHTML;
+            document.getElementById('sdfghj').value = document.getElementById('res').innerHTML;
+            document.getElementById('section_name_submit1').value=document.getElementById('view_act').value;
+            document.getElementById('gs_reg').submit();
+        } else {
+            event.preventDefault();
+        }
+    }
+
+    function submitf(p) {
+        if (document.getElementById('button_create_activity'))
+            document.getElementById('button_create_activity').style.display="block"
+        if (p==="3"){
+
+            if (document.getElementById('button_create_activity'))
+                document.getElementById('button_create_activity').style.display="block"
+
+            var actid = document.getElementById('action_id_submit').innerHTML;
+            if (window.act) {
+                for (var i = 0; i < window.act.length; i++) {
+                    if (window.act[i].id == actid) {
+                        editorInstance.setData(window.act[i].description);
+                        break;
+                    }
+                }
+            }
+
+
+            document.getElementById('b6').style.display='inline';
+            document.getElementById('b7').style.display='inline';
+
+            document.getElementById('b6').style.display='inline';
+
+            document.getElementById('b7').style.display='inline';
+            document.getElementById('rasd1').style.display='none';
+            document.getElementById('rasd2').style.display='none';
+            document.getElementById('rasd3-r').style.display='none';
+            document.getElementById('rasd3-a').style.display='none';
+            document.getElementById('rasd3-d').style.display='none';
+            document.getElementById('rasd4').style.display='none';
+
+            const fr=document.getElementById('f-radio');
+            if (fr)
+                fr.style.display = 'none';
+            const sr=document.getElementById('s-radio')
+            if (sr)
+                sr.style.display = 'none';
+            const tr=document.getElementById('t-radio');
+            if (tr)
+                tr.style.display = 'none';
+
+            const kz=document.getElementById("privet"+document.getElementById("action_id_submit").innerHTML);
+            if (kz)
+                kz.style.display="none";
+            document.getElementById('rasd3-a').style.display='block';
+
+            document.getElementById('b3-1').style.display='none';
+            document.getElementById('b3-2').style.display='none';
+            document.getElementById('b3-3').style.display='none';
+            document.getElementById('b4').style.display='none';
+            document.getElementById('b5').style.display='none';
+
+
+
+
+
+
+
+        }
+        else {
+
+            if (p === "2") {
+                const elm = document.getElementById("rasd3-d");
+                var str = "<p>Вы действительно хотите удалить активити " + document.getElementById('action_name_submit').innerHTML + " в секции " + document.getElementById('section_name_submit').innerHTML + "? Данное действие будет занесено в журнал и отменить его будет нельзя</p>"
+                str += "<button type='submit'>Да</button>";
+                document.getElementById('gs_reg').action = '/table/delete_activity_by_activity_id?activity_id=' + document.getElementById('action_id_submit').innerHTML;
+                elm.innerHTML = str;
+
+                document.getElementById("rasd3-a").style.display = "none";
+                document.getElementById("rasd3-r").style.display = "none";
+                const kz = document.getElementById("privet" + document.getElementById("action_id_submit").innerHTML);
+                if (kz)
+                    kz.style.display = "none";
+                document.getElementById("b4").style.display = "none"
+                document.getElementById("rasd2").style.display = "none";
+                document.getElementById("rasd1").style.display = "none";
+                document.getElementById("rasd4").style.display = "none";
+
+                const fr = document.getElementById('f-radio');
+                if (fr)
+                    fr.style.display = 'none';
+                const sr = document.getElementById('s-radio')
+                if (sr)
+                    sr.style.display = 'none';
+                const tr = document.getElementById('t-radio');
+                if (tr)
+                    tr.style.display = 'none';
+                elm.style.display = "block";
+
+            }
+            if (p === "1") {
+
+
+
+
+                document.getElementById("rasd4").style.display = "none";
+
+                const fr = document.getElementById('f-radio');
+                if (fr)
+                    fr.style.display = 'none';
+                const sr = document.getElementById('s-radio')
+                if (sr)
+                    sr.style.display = 'none';
+                const tr = document.getElementById('t-radio');
+                if (tr)
+                    tr.style.display = 'none';
+                document.getElementById("rasd3-a").style.display = "none";
+                document.getElementById("rasd3-d").style.display = "none";
+                document.getElementById("rasd2").style.display = "none";
+                document.getElementById("rasd1").style.display = "none";
+                const kz = document.getElementById("privet" + document.getElementById("action_id_submit").innerHTML);
+                var actid = document.getElementById('action_id_submit').innerHTML;
+
+
+                var s12345='';
+                for (var i = 0; i < window.act.length; i++) {
+                    if (window.act[i].id == actid) {
+                        s12345='<p style="background: #B5B8B1; padding: 5px;">Полная информация о активити ' + window.act[i]["title"] + ' в секции ' + document.getElementById('section_name_submit').innerHTML + '</p>' +
+                            '<p style="background: #B5B8B1; padding: 5px;">Создано:</p>' +
+                            window.act[i]["creator"]["name"] +
+                            '<p style="background: #B5B8B1; padding: 5px;">Описание:</p>' +
+                            '<div class=\"ck-content\">\n' + window.act[i]["description"] + '</div>'
+
+                        break;
+                    }
+                }
+
+                kz.innerHTML=s12345;
+                kz.style.display = "block";
+                document.getElementById('b4').style.display = "inline";
+                document.getElementById("rasd3-r").style.display = "block";
+
+            }
+
+
+            document.getElementById("b3-1").style.display = "none";
+            document.getElementById("b3-2").style.display = "none";
+            document.getElementById("b3-3").style.display = "none";
+            document.getElementById("b5").style.display = "none";
+            document.getElementById("b7").style.display = "none";
+            document.getElementById("b6").style.display = "none";
+
+            document.getElementById("b3" + "-" + p).style.display = "inline";
+
+        }
+    }
+
+
+
+</script>
+</form>
+
+<script>
+
+
+
+
+
+    //тоду
+    async function m3() {
+        const jst = await fetch("/table/get_sport_sections");
+        const jsts=await jst.json();
+
+
+        return JSON.stringify(jsts);
+    }
+
+    async function main_get() {
+
+        document.getElementById('cashedhtml1').value=document.getElementById('rasd3-a1').innerHTML;
+        const response = await m3();
+
+
+        const sect = document.getElementById('sections_f');
+        const outel = document.getElementById('chooseSection');
+        const but = document.getElementById('view_act');
+        var chel;
+        var chel_a;
+        const sep = '{@#(&!&)@}';
+
+        const responseParse = JSON.parse(response);
+
+        const sectionName = document.getElementById('section_name');
+        const result = document.getElementById('res');
+        const but_a = document.getElementById('submit_form');
+        const hre = document.getElementById("table_url");
+
+
+
+
+
+        //старт
+        function get_sect() {
+            function reco(callback) {
+                const idsect = but.value;
+                var nexturl = '/table/get_activity_by_sport_section?activity_id=';
+                nexturl += idsect;
+
+                fetch(nexturl)
+                    .then(response => response.json())
+                    .then(data => callback(null, data))
+                    .catch(error => callback(error));
+            }
+
+            function main1(callback) {
+                reco(function (error, result) {
+                    if (error) {
+                        callback(error);
+                    } else {
+                        callback(null, result);
+                    }
+                });
+            }
+
+            main1(function (error, response_a) {
+
+                window.act = response_a;
+                var hsl={};
+
+                document.getElementById('rasd2').style.display='block';
+                b2=document.getElementById('b2');
+
+                b2.style.display="inline";
+                rasd1=document.getElementById('rasd1')
+                rasd1.style.display="none";
+                document.getElementById('chooseActivity1').style.display='none';
+
+                var nbv;
+                const responseParse_a = response_a;
+                //туду
+                var ch=0;
+                var stra="";
+                for (var i=0;i<responseParse_a.length;i++){
+                    stra += '<div id=\"privet' + responseParse_a[i]["id"] + '\" style="display: none"> ' +'</div>';
+
+                }
+
+                document.getElementById("rasd3-r").innerHTML=stra;
+                const sect_a = document.getElementById('activity_f');
+                const outel_a = document.getElementById('chooseActivity');
+                outel_a.style.display="block";
+                outel_a.innerText = "Пока Вы не выбрали ни одной активити";
+
+                const activityName = document.getElementById('activity_name');
+                activityName.value = "";
+                const activityNamel = document.getElementById('activity_namel');
+
+                sect_a.style.display = "block";
+                activityName.style.display = "block";
+                activityNamel.style.display = "block";
+                document.getElementById('tos').style.display='none';
+                document.getElementById('b3-1').style.display='none';
+                document.getElementById('b3-2').style.display='none';
+                document.getElementById('b3-3').style.display='none';
+                document.getElementById('b5').style.display='none';
+                document.getElementById('b6').style.display='none';
+                document.getElementById('b7').style.display='none';
+
+                document.getElementById('b4').style.display='none';
+
+                function per_a(stringen_a,siz) {
+                    const stren_a = stringen_a.toLowerCase();
+                    var mas_b=['ё', 'ё', 'х', 'х', 'ъ', 'ъ', 'э', 'э', 'ж', 'ж', 'ю', 'ю', 'б', 'б', 'ф', 'и', 'с', 'в', 'у', 'а', 'п', 'р', 'ш', 'о', 'л', 'д', 'ь', 'т', 'щ', 'з', 'й', 'к', 'ы', 'е', 'г', 'м', 'ц', 'ч', 'н', 'я'];
+                    var mas_a = ['`', '~', '{', '[', '}', ']', '"', "'", ';', ":", ">", ".", "<", ",", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+                    var alph_a = {
+                        '`': "ё",
+                        '~': "ё",
+                        '{': "х",
+                        '[': "х",
+                        '}': "ъ",
+                        ']': "ъ",
+                        '"': "э",
+                        "'": "э",
+                        ';': "ж",
+                        ":": "ж",
+                        ">": "ю",
+                        ".": "ю",
+                        "<": "б",
+                        ",": "б",
+                        'a': 'ф',
+                        'b': "и",
+                        'c': "с",
+                        'd': "в",
+                        'e': "у",
+                        'f': "а",
+                        'g': "п",
+                        'h': "р",
+                        'i': "ш",
+                        'j': "о",
+                        'k': "л",
+                        'l': "д", 'm': "ь",
+                        'n': "т",
+                        'o': "щ",
+                        'p': "з",
+                        'q': "й",
+                        'r': "к",
+                        's': "ы",
+                        't': "е",
+                        'u': "г",
+                        'v': "м",
+                        'w': "ц",
+                        'x': "ч",
+                        'y': "н",
+                        'z': "я"
+                    };
+                    var alph_b={'ё': '~', 'х': '[', 'ъ': ']', 'э': "'", 'ж': ':', 'ю': '.', 'б': ',', 'ф': 'a', 'и': 'b', 'с': 'c', 'в': 'd', 'у': 'e', 'а': 'f', 'п': 'g', 'р': 'h', 'ш': 'i', 'о': 'j', 'л': 'k', 'д': 'l', 'ь': 'm', 'т': 'n', 'щ': 'o', 'з': 'p', 'й': 'q', 'к': 'r', 'ы': 's', 'е': 't', 'г': 'u', 'м': 'v', 'ц': 'w', 'ч': 'x', 'н': 'y', 'я': 'z'};
+
+                    var mas1_a = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '@', '№', '#', '$', '%', '^', '&', '?', '*', '(', ')', '-', '_', '+', '=', ' '];
+                    var chr_a = stren_a.split('');
+                    var chr_b = siz.split('');
+                    var restr_a = '';
+                    var cvz=Math.min(chr_a.length,chr_b.length);
+                    for (var i = 0; i < cvz; i++) {
+                        if (mas_a.includes(chr_a[i]) && !mas_a.includes(chr_b[i]) && ((i===cvz-1) || (!mas_a.includes(chr_b[i+1]))))
+                            restr_a += alph_a[chr_a[i]];
+                        else {
+                            if (mas_b.includes(chr_a[i]) && !mas_b.includes(chr_b[i]) && ((i===cvz-1) || (!mas_b.includes(chr_b[i+1]))))
+                                restr_a += alph_b[chr_a[i]];
+                            else
+                            if (mas1_a.includes(chr_a[i]))
+                                continue;
+                            else {
+                                if (mas_a.includes(chr_a[i])){
+                                    restr_a+=chr_a[i]
+
+                                }
+                                else{
+                                    if (mas_b.includes(chr_a[i])){
+                                        restr_a+=chr_a[i]
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+                    if (chr_b-chr_a>1){
+                        restr_a+="xyz".repeat(5);
+                    }
+                    return restr_a;
+                }
+
+                function check_a(sa_a, sb_a) {
+                    if (sa_a.length === 0)
+                        return true;
+                    const tobr_a = 2;
+                    const s1_a = sa_a;
+                    const s2_a = sb_a;
+                    var chi_a = 0;
+                    for (var i = 0; i < s1_a.length; i++) {
+                        if (chi_a >= tobr_a)
+                            return false;
+                        if (i >= s2_a.length) {
+                            chi_a += s1_a.length - s2_a.length;
+                            break;
+                        }
+                        if ((s1_a[i] !== s2_a[i]))
+                            chi_a++;
+                    }
+                    return chi_a < tobr_a;
+                }
+
+                function findr_a(se_a) {
+                    var mas_a = [];
+
+                    for (var i = 0; i < responseParse_a.length; i++) {
+                        const eli_a = responseParse_a[i];
+                        const eli_a2 = eli_a["title"]
+                        const eli_a1=eli_a2.toLowerCase();
+                        const sk_a = per_a(se_a,eli_a1);
+                        if (check_a(sk_a, per_a(eli_a1,eli_a1)))
+                            mas_a.push([eli_a["id"], eli_a2]);
+                    }
+
+                    var iver = document.getElementById('activity_name').value;
+                    var ssb = (iver!==" ".repeat(iver.length));
+                    if (mas_a.length === 0) {
+                        outel_a.innerText = "Ни одной активити с введеным названием не найдено. Вы можете создать активити с заданным именем или попробовать найти активити еще раз!";
+
+                        if (ssb) {
+
+                            sect_a.innerHTML = "<div id='qworer' style=\"display: flex; align-items: center;\">\n" +
+                                "  <input type='button' id=\"button_create_activity\" onclick=\"cra()\" value='Создать новую активность" +
+                                " с названием " + iver + "'></input></div>";
+                        } else {
+                            sect_a.innerHTML = "";
+                        }
+                        document.getElementById('nbv').style.display='none';
+
+                    } else {
+                        if (document.getElementById('nbv'))
+                            document.getElementById('nbv').style.display='block';
+
+                        if (!chel_a){
+                            outel_a.innerText = "Пока Вы не выбрали активити";
+                        }
+                        var htmlc_a = '<div id="qworer" style="display: flex; align-items: center;"><select style="margin-right: 10px;" id="activityList" class="activityList"><option value="NaN" selected disabled>---</option>';
+                        for (var i = 0; i < mas_a.length; i++) {
+                            htmlc_a += '<option id="' + mas_a[i][0] + '" value="' + mas_a[i][1] + '">' + mas_a[i][1] + '</option>';
+                        }
+                        htmlc_a += '</select>  ';
+
+                        if (ssb) {
+
+                            htmlc_a += "<input type=\"button\" id=\"button_create_activity\" onclick=\"cra()\" value=\"Создать новую активность" +
+                                " с названием " + iver + "\"></input>";
+                        }
+                        htmlc_a += "</div>";
+
+                        sect_a.innerHTML = htmlc_a;
+
+                        var cua = document.getElementById('action_name_submit').innerHTML;
+                        var acs = document.getElementById('activityList');
+                        if (cua !== 'NaN' && acs) {
+                            for (var i = 0; i < acs.options.length; i++) {
+                                if (acs.options[i].value === cua) {
+                                    acs.selectedIndex = i;
+                                    break;
+                                }
+                            }
+                        }
+
+
+
+
+                        chel_a = document.getElementById('activityList');
+
+                        if (document.getElementById('activity_name').value!==" ".repeat(document.getElementById('activity_name').value.length))
+
+                            if (document.getElementById('activityc_name')===null)
+                                sect_a.innerHTML += "<div style=\"display: flex; align-items: center;\">\n" +
+                                    "  \n" +
+                                    "  <input type='button' id=\"button_create_activity\" onclick=\"cra()\" value='Создать новую активность" + " с названием " + document.getElementById('activity_name').value+"'></input></div>"
+
+
+                        if (chel_a) {
+                            chel_a.addEventListener('change', function (event) {
+                                if (document.getElementById('activityc_name').value !== ""){
+
+                                    var tew = confirm("У вас есть несохраненные изменения в редакторе для активити " + document.getElementById('activityc_name').value + ". Не сохранять их?");
+                                    if (!tew){
+                                        chel_a.value=document.getElementById('action_name_submit').innerHTML;
+
+                                        event.preventDefault()
+                                    }
+                                    if (tew){
+                                        document.getElementById('activityc_name').value='';
+
+                                    }
+                                }
+                                else
+                                    var tew=true;
+
+                                if (tew){
+
+                                    const outel_a = document.getElementById('chooseActivity');
+                                    if (document.getElementById('activity_name').value!==" ".repeat(document.getElementById('activity_name').value.length))
+                                        if (!(document.getElementById('button_create_activity')))
+                                            sect_a.innerHTML += "<div style=\"display: flex; align-items: center;\">\n" +
+                                                "  \n" +
+                                                "  <input type='button' id=\"button_create_activity\" onclick=\"cra()\" value='Создать новую активность" + " с названием " + document.getElementById('activity_name').value+"'></input></div>"
+
+                                    outel_a.style.display = 'none';
+                                    const but_a = document.getElementById('submit_form');
+                                    const zna = this.options[this.selectedIndex].id;
+                                    const sv_a = this.value;
+
+                                    document.getElementById("resact").value = sv_a;
+                                    const z11 = document.getElementById('chooseActivity1');
+                                    z11.style.display = 'block';
+                                    z11.textContent = "Пока вы не выбрали действие с активностью " + sv_a + " в секции " + chel.value;
+                                    document.getElementById('privet1001').innerHTML="1";
+                                    outel_a.textContent = 'Вы выбрали активность: ' + sv_a + ' в секции ' + chel.value;
+                                    document.getElementById("action_name_submit").innerHTML = sv_a;
+                                    document.getElementById("section_name_submit").innerHTML = chel.value;
+                                    document.getElementById("action_id_submit").innerHTML = zna;
+                                    but_a.value = zna;
+                                    document.getElementById('tos').style.display = 'none';
+                                    document.getElementById('b3-1').style.display = 'none';
+                                    document.getElementById('b3-2').style.display = 'none';
+                                    document.getElementById('b3-3').style.display = 'none';
+                                    document.getElementById('b5').style.display = 'none';
+                                    document.getElementById('b6').style.display = 'none';
+                                    document.getElementById('b7').style.display = 'none';
+
+                                    document.getElementById('b4').style.display='none';
+
+                                    document.getElementById('tos').innerHTML = "<select id=\"nbv\" autoComplete=\"off\">\n" +
+                                        "                                <option value=\"NaN\" selected disabled>---</option>\n" +
+                                        "                                <option value=\"1\">Посмотреть информацию о активити</option>\n" +
+                                        "                                <option value=\"3\">Изменить информацию о активити</option>\n" +
+                                        "                                <option value=\"2\">Удалить активити</option>\n" +
+                                        "                            </select>";
+                                    document.getElementById('tos').style.display = 'block';
+                                    nbv = document.getElementById('nbv');
+
+                                    if (nbv) {
+
+                                        nbv.addEventListener('change', function (event1) {
+                                            if (document.getElementById('activityc_name').value !== ""){
+
+                                                var tew = confirm("У вас есть несохраненные изменения в редакторе для активити " + document.getElementById('activityc_name').value + ". Не сохранять их?");
+                                                if (!tew){
+                                                    this.value="NaN";
+
+                                                    event1.preventDefault()
+                                                }
+                                                if (tew){
+                                                    document.getElementById('activityc_name').value="";
+
+                                                }
+                                            }
+                                            else
+                                                var tew=true;
+
+                                            if (tew) {
+
+                                                const z1 = document.getElementById('chooseActivity1');
+                                                z1.style.display = 'block';
+                                                document.getElementById('chooseActivity').style.display = 'none';
+                                                but_a.textContent = z1.value;
+                                                var vib;
+                                                if (nbv.value === "1")
+                                                    vib = "посмотреть информацию об активити";
+                                                else
+                                                if (nbv.value==="2")
+                                                    vib = "удалить активити";
+                                                else
+                                                if (nbv.value==="3")
+                                                    vib="изменить информацию об активити"
+                                                document.getElementById('privet1001').innerHTML = "0";
+                                                z1.innerText = outel_a.textContent + ", чтобы " + vib;
+                                                submitf(nbv.value);
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+
+                function main_a() {
+                    const se_a = activityName.value;
+                    findr_a(se_a);
+                }
+
+
+                activityName.addEventListener('input', main_a);
+                main_a();
+
+            });
+        }
+
+
+        //конец
+
+
+        function per(stringen) {
+            const stren = stringen.toLowerCase();
+            var mas = ['`', '~', '{', '[', '}', ']', '"', "'", ';', ":", ">", ".", "<", ",", 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+            var alph = {
+                '`': "ё",
+                '~': "ё",
+                '{': "х",
+                '[': "х",
+                '}': "ъ",
+                ']': "ъ",
+                '"': "э",
+                "'": "э",
+                ';': "ж",
+                ":": "ж",
+                ">": "ю",
+                ".": "ю",
+                "<": "б",
+                ",": "б",
+                'a': 'ф',
+                'b': "и",
+                'c': "с",
+                'd': "в",
+                'e': "у",
+                'f': "а",
+                'g': "п",
+                'h': "р",
+                'i': "ш",
+                'j': "о",
+                'k': "л",
+                'l': "д",
+                'm': "ь",
+                'n': "т",
+                'o': "щ",
+                'p': "з",
+                'q': "й",
+                'r': "к",
+                's': "ы",
+                't': "е",
+                'u': "г",
+                'v': "м",
+                'w': "ц",
+                'x': "ч",
+                'y': "н",
+                'z': "я"
+            };
+            var mas1 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '@', '№', '#', '$', '%', '^', '&', '?', '*', '(', ')', '-', '_', '+', '=', ' '];
+            var chr = stren.split('');
+            var restr = '';
+            for (var i = 0; i < chr.length; i++) {
+                if (mas.includes(chr[i]))
+                    restr += alph[chr[i]];
+                else {
+                    if (mas1.includes(chr[i]))
+                        continue;
+                    else {
+                        restr += chr[i];
+                    }
+                }
+            }
+            return restr;
+        }
+
+        function check(sa, sb) {
+            if (sa.length === 0)
+                return true;
+            const tobr = 4;
+            const s1 = sa;
+            const s2 = sb;
+            var chi = 0;
+            for (var i = 0; i < s1.length; i++) {
+                if (chi >= tobr)
+                    return false;
+                if (i >= s2.length) {
+                    chi += s1.length - s2.length;
+                    break;
+                }
+                if (s1[i] !== s2[i])
+                    chi++;
+            }
+            return chi < tobr;
+        }
+
+        function findr(se) {
+            const sk = per(se);
+            var mas = [];
+            for (var i = 0; i < responseParse.length; i++) {
+                const eli = responseParse[i];
+                const enname1 = eli["name"]
+                const enname=enname1.toLowerCase();
+                if (check(sk, enname) || check(se,enname))
+                    mas.push([eli["id"], enname1]);
+            }
+
+            var htmlc = '<select id="sectionsList" class="sectionsList"><option value="NaN" selected disabled>---</option>';
+            for (var i = 0; i < mas.length; i++) {
+                htmlc += `<option id="${mas[i][0]}" value="${mas[i][1]}">${mas[i][1]}</option>`;
+            }
+            htmlc += "</select>";
+            sect.innerHTML = htmlc;
+            chel = document.querySelector('.sections_f .sectionsList');
+
+            var crs = document.getElementById('section_name_submit').innerHTML;
+            if (crs !== 'NaN' && chel) {
+                for (var i = 0; i < chel.options.length; i++) {
+                    if (chel.options[i].value === crs) {
+                        chel.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            chel = document.querySelector('.sections_f .sectionsList');
+            if (chel) {
+                chel.addEventListener('change', function (event) {
+                    if (document.getElementById('activityc_name').value !== "") {
+
+
+                        var tew = confirm("У вас есть несохраненные изменения в редакторе для активити " + document.getElementById('activityc_name').value + ". Не сохранять их?");
+                        if (!tew) {
+                            chel.value = document.getElementById('section_name_submit').innerHTML;
+                            event.preventDefault();
+                        }
+                        if (tew){
+                            document.getElementById('activityc_name').value="";
+                        }
+                    }
+                    else {
+                        var tew=true;
+                    }
+                    if (tew) {
+                        const sv = this.value;
+                        outel.textContent = 'Вы выбрали секцию: ' + sv;
+                        document.getElementById("resact1").value = sv;
+                        but.value = this.options[this.selectedIndex].id;
+                        document.getElementById('section_name_submit').value=this.value;
+                        document.getElementById('action_name_submit').innerHTML="NaN"
+                        document.getElementById('section_name_submit').innerHTML = sv;
+                        get_sect();
+                    }
+                });
+            }
+        }
+
+        function main() {
+            const se = sectionName.value;
+            findr(se);
+        }
+
+        sectionName.addEventListener('input', main);
+        main();
+
+
+
+
+    }
+    main_get();
+
+
+</script>
+<a href="/">Main page</a>
+
+{% endblock %}
