@@ -338,7 +338,7 @@
                         'CaseChange'
                     ]
                 }).then(editor => {
-                    editorInstance = editor; // Сохраняем экземпляр редактора
+                    editorInstance = editor;
                     editor.model.document.on('change:data', () => {
                         document.getElementById('res').innerHTML=editor.getData();
                     });
@@ -657,7 +657,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'ok') {
-                        alert('Данные успешно отправлены!');
+                        document.getElementById('notific').innerHTML="Активность была успешно создана"
                         document.getElementById('activityc_name').value = '';
                         editorInstance.setData('');
                         bl1();
