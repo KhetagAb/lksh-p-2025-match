@@ -27,7 +27,7 @@ async def root(request: Request) -> Response:
 @activities_router.get("/admin")
 async def admin_panel(request: Request, error: str = "") -> Response:
     return templates.TemplateResponse(
-        name="admin_activity_panel.html", context={"request": request, "error": error}
+        name="admin_panel.html", context={"request": request, "error": error}
     )
 
 

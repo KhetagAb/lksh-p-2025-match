@@ -175,9 +175,9 @@
 
 
 
-            <script src="ckeditor.js"></script>
+            <script src="/api/ckeditor.js"></script>
 
-            <script src="ru.js"></script>
+            <script src="/api/ru.js"></script>
 
             <script>
 
@@ -366,7 +366,7 @@
     function bl4() {
         function reco1(callback) {
             const idsect = document.getElementById('action_id_submit').innerHTML;
-            var nexturl = '/table/get_teams_by_activity_id?activity_id=';
+            var nexturl = '/api/teams?activity_id=';
             nexturl += idsect;
 
             fetch(nexturl)
@@ -642,7 +642,8 @@
     function subm(){
         var lkj=confirm('Вы уверены, что хотите сохранить актвити '+document.getElementById('activityc_name').value+'?')
         if (lkj) {
-            document.getElementById('gs_reg').action = '/table/create_new_activity'
+            //эндпоинт создания /sections/activities/create
+            document.getElementById('gs_reg').action = '/sections/activities/create'
             document.getElementById('sdfghj').value = document.getElementById('res').innerHTML;
             document.getElementById('section_name_submit1').value=document.getElementById('view_act').value;
         }
@@ -705,7 +706,8 @@
     function save_submit() {
         var lkj=confirm('Вы уверены, что хотите сохранить изменения для активити '+document.getElementById('activityc_name').value+'?')
         if (lkj) {
-            document.getElementById('gs_reg').action = '/table/edit_activity_by_activity_id?activity_id=' + document.getElementById('action_id_submit').innerHTML;
+            //эндпоинт изменения /sections/activities/update
+            document.getElementById('gs_reg').action = '/sections/activities/update';
             document.getElementById('sdfghj').value = document.getElementById('res').innerHTML;
             document.getElementById('section_name_submit1').value=document.getElementById('view_act').value;
             document.getElementById('gs_reg').submit();
@@ -777,10 +779,11 @@
         else {
 
             if (p === "2") {
+                //эндпоинт удаления /sections/activities/delete
                 const elm = document.getElementById("rasd3-d");
                 var str = "<p>Вы действительно хотите удалить активити " + document.getElementById('action_name_submit').innerHTML + " в секции " + document.getElementById('section_name_submit').innerHTML + "? Данное действие будет занесено в журнал и отменить его будет нельзя</p>"
                 str += "<button type='submit'>Да</button>";
-                document.getElementById('gs_reg').action = '/table/delete_activity_by_activity_id?activity_id=' + document.getElementById('action_id_submit').innerHTML;
+                document.getElementById('gs_reg').action = '/sections/activities/delete';
                 elm.innerHTML = str;
 
                 document.getElementById("rasd3-a").style.display = "none";
@@ -875,7 +878,7 @@
 
     //тоду
     async function m3() {
-        const jst = await fetch("/table/get_sport_sections");
+        const jst = await fetch("/api/sport_sections");
         const jsts=await jst.json();
 
 
@@ -910,7 +913,7 @@
         function get_sect() {
             function reco(callback) {
                 const idsect = but.value;
-                var nexturl = '/table/get_activity_by_sport_section?activity_id=';
+                var nexturl = '/api/activities?sport_section_id=';
                 nexturl += idsect;
 
                 fetch(nexturl)

@@ -92,7 +92,6 @@ async def register_on_section_with_table_post(
             "request": request,
             "error": error,
             "service_account_name": WEBSITE_SERVICE_ACCOUNT_NAME,
-            "username": "UU",
         },
         name="table/register_in_section.html",
     )
