@@ -17,7 +17,7 @@ type ServerInterface struct {
 	deleteActivity              *DeleteActivityHandler
 	updateActivity              *UpdateActivityHandler
 	getPlayerByTg               *GetPlayerByTgHandler
-  deletePlayerFromActivity    *DeletePlayerFromActivityHandler
+	deletePlayerFromActivity    *DeletePlayerFromActivityHandler
 	notificationRouter          *NotificationRouter
 }
 
@@ -31,6 +31,7 @@ func (s ServerInterface) GetCoreNotifications(ctx echo.Context, params server.Ge
 
 func (s ServerInterface) PostCoreNotifications(ctx echo.Context) error {
 	return s.notificationRouter.CreateNotification(ctx)
+}
 
 func (s ServerInterface) GetCoreActivityId(ctx echo.Context, id int64) error {
 	return s.getActivityByID.GetActivityByID(ctx, id)

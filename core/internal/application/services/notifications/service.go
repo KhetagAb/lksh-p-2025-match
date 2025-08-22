@@ -22,7 +22,7 @@ type (
 	}
 )
 
-func NewActivityService(notificationsRepository NotificationsRepository) *NotificationsService {
+func GetNotificationsService(notificationsRepository NotificationsRepository) *NotificationsService {
 	return &NotificationsService{repository: notificationsRepository}
 }
 

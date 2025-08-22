@@ -23,7 +23,7 @@ type (
 	NotificationRouter struct{ service NotificationService }
 )
 
-func GetNotificationService(service NotificationService) *NotificationRouter {
+func GetNotificationRouter(service NotificationService) *NotificationRouter {
 	return &NotificationRouter{service: service}
 }
 

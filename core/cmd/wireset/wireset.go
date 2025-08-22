@@ -4,6 +4,7 @@ import (
 	"match/internal/application/handlers"
 	"match/internal/application/repositories"
 	"match/internal/application/services/activities"
+	"match/internal/application/services/notifications"
 	"match/internal/application/services/players"
 	"match/internal/application/services/sports"
 	"match/internal/application/services/teams"
@@ -26,8 +27,12 @@ var All = wire.NewSet(
 	repositories.NewSportSectionsRepository,
 	repositories.NewTeamsRepository,
 	repositories.NewActivitiesRepository,
+	repositories.NewNotificationsRepository,
 
 	// Services
+	wire.Bind(new(notifications.NotificationsRepository), new(*repositories.NotificationsRepository)),
+	notifications.GetNotificationsService,
+
 	wire.Bind(new(players.PlayerRepository), new(*repositories.Players)),
 	players.NewPlayerService,
 
@@ -45,6 +50,8 @@ var All = wire.NewSet(
 	activities.NewActivityService,
 
 	// Handlers
+	wire.Bind(new(handlers.NotificationService), new(*notifications.NotificationsService)),
+	handlers.GetNotificationRouter,
 
 	wire.Bind(new(handlers.RegisterPlayerService), new(*players.PlayerService)),
 	handlers.NewRegisterPlayerHandler,
