@@ -15,6 +15,11 @@ type SportSection struct {
 	RuName string `db:"ru_name"`
 }
 
+type Notification struct {
+	TelegramID   int64  `mapstructure:"tg_id"`
+	MeetingTitle string `mapstructure:"meeting_title"`
+}
+
 type Activity struct {
 	ID             int64      `db:"id"`
 	Title          string     `db:"title"`

@@ -20,6 +20,15 @@ func (e *InvalidOperationError) Error() string {
 	return fmt.Sprintf("Error code %s: %s", e.Code, e.Message)
 }
 
+type NotificationAlreadyExists struct {
+	Code    string
+	Message string
+}
+
+func (e *NotificationAlreadyExists) Error() string {
+	return fmt.Sprintf("Error code %s: %s", e.Code, e.Message)
+}
+
 type PlayerAlreadyExists struct {
 	Code    string
 	Message string
@@ -62,7 +71,8 @@ func (e *ForbiddenOperationError) Error() string {
 }
 
 const (
-	NotFound           = "NOT_FOUND"
-	InvalidOperation   = "INVALID_OPERATION"
+	NotFound         = "NOT_FOUND"
+	InvalidOperation = "INVALID_OPERATION"
+	AlreadyExists    = "ALREADY_EXISTS"
 	ForbiddenOperation = "FORBIDDEN_OPERATION"
 )
