@@ -1,0 +1,51 @@
+$support-pic-height: 28rem;
+
+.support-container > * {
+  text-align: center;
+  margin: 0;
+  font-family: "Andika", sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--tg-theme-text-color, #1f1f1f);
+}
+
+.loader-container, .support-pic {
+  width: 100%;
+  height: $support-pic-height;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.support-container {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.h3-text {
+  transition: all 0.4s ease;
+}
+
+#copy-button {
+  background-color: rgba(0, 0, 0, 0);
+  transition: all 0.4s ease;
+  color: var(--tg-theme-accent-text-color, #1f1f1f);
+  border-radius: 0.5rem;
+  border: 0px solid black;
+}
+
+.btn {
+  margin-top: 0.7em;
+  text-decoration: none;
+  padding: 0.5em;
+  border-radius: 0.5rem;
+  background-color: var(--tg-theme-button-color);
+}

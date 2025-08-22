@@ -1,0 +1,10 @@
+@if (telegramSrv.isMobile()) {
+  <header style="background-color: var(--tg-theme-bg-color); margin-top: 2.5rem;">
+    <h2>{{ title }}</h2>
+  </header>
+}
+<main>
+  <router-outlet></router-outlet>
+</main>
+<app-menu [buttons]="menuButtons"></app-menu>
+
