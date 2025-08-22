@@ -134,7 +134,7 @@ async def make_activity_buttons(
     if sport_id is not None:
         back_button = Buttons.BACK_TO_SPORTS.inline()
         markup.add(back_button)
-    
+
     return markup
 
 
@@ -366,7 +366,7 @@ async def handle_sport_register_callback(call: types.CallbackQuery) -> None:
     log_info("Called handle_sport_register_callback.", call.message)
     await bot.answer_callback_query(call.id)
     markup = await make_sports_buttons()
-    await edit_with_ibuttons(call, "Выберите спортивную секцию:", markup)
+    await msg_with_ibuttons(call.message, "Выберите спортивную секцию:", markup)
     log_info("Finished handle_sport_register_callback successfully.", call.message)
 
 

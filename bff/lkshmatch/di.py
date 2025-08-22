@@ -80,6 +80,7 @@ def all_providers() -> list[Provider]:
         CoreClientProvider(core_host, core_port),
         MongoRepositoryProvider(),
         RestAllAdapterProvider(),
+        CoreClientProvider(core_host, core_port),
     ]
 
 
