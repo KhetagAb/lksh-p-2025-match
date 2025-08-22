@@ -2,16 +2,18 @@ package handlers
 
 import (
 	"context"
-	"github.com/labstack/echo/v4"
 	"match/internal/application/handlers/mappers"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
 	"match/internal/infra"
+	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 type (
 	UpdateActivityService interface {
-		UpdateActivity(ctx context.Context, activityID int64, title, description *string, sportSectionID, creatorID *int64) (*dto.Activity, error)
+		UpdateActivity(ctx context.Context, activityID int64, creatorID *int64, title *string, description *string, enrollDeadline *time.Time) (*dto.Activity, error)
 	}
 
 	UpdateActivityHandler struct {
@@ -42,7 +44,14 @@ func (h *UpdateActivityHandler) UpdateActivity(ectx echo.Context, id int64, para
 		return BadRequestErrorResponsef(ectx, "Invalid request body: %s", err.Error())
 	}
 
-	activity, err := h.updateActivityService.UpdateActivity(ctx, id, requestBody.Title, requestBody.Description, requestBody.SportSectionId, requestBody.CreatorId)
+	activity, err := h.updateActivityService.UpdateActivity(
+		ctx,
+		id,
+		requestBody.CreatorId,
+		requestBody.Title,
+		requestBody.Description,
+		requestBody.EnrollDeadline,
+	)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to update activity: %v", err)
 		return InternalErrorResponsef(ectx, err.Error())

@@ -154,6 +154,24 @@ paths:
         "400":
           $ref: '#/components/responses/ErrorResponse'
 
+  /core/activity/{id}:
+    get:
+      tags:
+        - "Activities"
+      summary: "Получение активности по идентификатору"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          $ref: '#/components/responses/ActivityResponse'
+        "404":
+          $ref: '#/components/responses/ErrorResponse'
+
   /core/activity/{id}/enroll:
     post:
       tags:
@@ -176,6 +194,8 @@ paths:
         "200":
           $ref: '#/components/responses/CreatedTeamResponse'
         "400":
+          $ref: '#/components/responses/ErrorResponse'
+        "403":
           $ref: '#/components/responses/ErrorResponse'
         "409":
           $ref: '#/components/responses/ErrorResponse'
@@ -331,6 +351,7 @@ components:
         - id
         - title
         - creator
+        - sport_section_id
       properties:
         id:
           type: integer
@@ -342,6 +363,12 @@ components:
           type: string
         creator:
           $ref: "#/components/schemas/Player"
+        sport_section_id:
+          type: integer
+          format: int64
+          description: Идентификатор спортивной секции
+        enroll_deadline:
+          format: date-time
 
     # Requests
     RegisterPlayerRequest:
@@ -379,6 +406,11 @@ components:
           type: integer
           format: int64
           description: Core-идентификатор создателя активности
+        enroll_deadline:
+          type: string
+          format: date-time
+          description: Время
+          example: "2025-08-20T23:20:50.52Z"
 
     UpdateActivityRequest:
       type: object
@@ -389,13 +421,13 @@ components:
         description:
           type: string
           description: Описание активности
-        sport_section_id:
-          type: integer
-          format: int64
         creator_id:
           type: integer
           format: int64
           description: Core-идентификатор создателя активности
+        enroll_deadline:
+          type: string
+          format: date-time
 
     ActivityEnrollPlayerRequest:
       type: object

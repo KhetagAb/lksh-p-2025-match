@@ -1,23 +1,30 @@
 from lkshmatch import core_client
 from lkshmatch.adapters.base import (
     CoreID,
+    InvalidParameters,
     Player,
     PlayerAdapter,
     PlayerAlreadyRegistered,
     PlayerToRegister,
-    UnknownError, InvalidParameters, )
-from lkshmatch.adapters.core.mappers.player import map_player_to_register_request, map_player_from_api
+    UnknownError,
+)
+from lkshmatch.adapters.core.mappers.player import (
+    map_player_to_register_request,
+    map_player_from_api,
+)
 from lkshmatch.core_client.api.players import get_core_player_by_tg, register_player
-from lkshmatch.core_client.models import RegisterPlayerResponse200, RegisterPlayerResponse201, \
-    GetCorePlayerByTgResponse400, GetCorePlayerByTgResponse200
+from lkshmatch.core_client.models import (
+    GetCorePlayerByTgResponse200,
+    GetCorePlayerByTgResponse400,
+    RegisterPlayerResponse200,
+    RegisterPlayerResponse201,
+)
 from lkshmatch.core_client.types import Unset, UNSET
-from lkshmatch.domain.repositories.student_repository import LKSHStudentsRepository
 
 
 class CorePlayerAdapter(PlayerAdapter):
-    def __init__(self, lksh_config: LKSHStudentsRepository, coreclient: core_client.Client):
+    def __init__(self, coreclient: core_client.Client):
         self.client = coreclient
-        self.lksh_config = lksh_config
 
     async def register_user(self, user: PlayerToRegister) -> CoreID:
         response = await register_player.asyncio(
@@ -29,19 +36,23 @@ class CorePlayerAdapter(PlayerAdapter):
             raise PlayerAlreadyRegistered("player already register")
         elif isinstance(response, RegisterPlayerResponse201):
             return response.id
-        raise UnknownError("None response")
+        raise UnknownError(f"register user return unknown response: {response}")
 
-    async def get_player_by_tg(self, tg_id: int | Unset = UNSET, tg_username: str | Unset = UNSET) -> Player:
+    async def get_player_by_tg(
+            self,
+            tg_id: int | Unset = UNSET,
+            tg_username: str | Unset = UNSET,
+    ) -> Player:
         response = await get_core_player_by_tg.asyncio(
-            client=self.client,
-            tg_id=tg_id,
-            tg_username=tg_username
+            client=self.client, tg_id=tg_id, tg_username=tg_username
         )
 
         if isinstance(response, GetCorePlayerByTgResponse400):
-            raise InvalidParameters(f"get player by tg return 400 response: {response.message}")
+            raise InvalidParameters(
+                f"get player by tg return 400 response: {response.message}"
+            )
         if not isinstance(response, GetCorePlayerByTgResponse200):
-            raise UnknownError("get player by tg  return unknown response")
+            raise UnknownError(f"get player by tg return unknown response: {response}")
 
         player = response.player
         return map_player_from_api(player)

@@ -18,7 +18,7 @@ var All = wire.NewSet(
 	infra.NewContextProvider,
 
 	infra.NewConfig,
-	infra.NewPgxPool,
+	infra.NewSqlxDB,
 
 	// Repositories
 
@@ -58,6 +58,9 @@ var All = wire.NewSet(
 	wire.Bind(new(handlers.GetActivitiesBySportSectionID), new(*activities.ActivityService)),
 	handlers.NewGetActivitiesBySportSectionIDHandler,
 
+	wire.Bind(new(handlers.GetActivityByID), new(*activities.ActivityService)),
+	handlers.NewGetActivityByIDHandler,
+
 	wire.Bind(new(handlers.EnrollPlayerInActivity), new(*activities.ActivityService)),
 	handlers.NewEnrollPlayerInActivityHandler,
 
@@ -72,6 +75,9 @@ var All = wire.NewSet(
 
 	wire.Bind(new(handlers.GetPlayerByTgService), new(*players.PlayerService)),
 	handlers.NewGetPlayerByTgHandler,
+
+	wire.Bind(new(handlers.DeletePlayerFromActivity), new(*activities.ActivityService)),
+	handlers.NewDeletePlayerFromActivityHandler,
 
 	handlers.NewServerInterface,
 

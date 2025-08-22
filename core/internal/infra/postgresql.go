@@ -1,19 +1,16 @@
 package infra
 
 import (
-	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
-func NewPgxPool(
-	ctx context.Context,
-	cfg *Config,
-) *pgxpool.Pool {
+func NewSqlxDB(cfg *Config) *sqlx.DB {
 	db := cfg.Postgres
 
 	connStr := fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s",
+		"postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		db.User,
 		db.Password,
 		db.Host,
@@ -21,23 +18,14 @@ func NewPgxPool(
 		db.Database,
 	)
 
-	poolConfig, err := pgxpool.ParseConfig(connStr)
+	sqlxDB, err := sqlx.Connect("postgres", connStr)
 	if err != nil {
-		panic(fmt.Errorf("unable to parse pool config: %w", err))
+		panic(fmt.Errorf("unable to connect to database with sqlx: %w", err))
 	}
 
-	//poolConfig.MaxConns = 10
-	//poolConfig.MaxConnLifetime = time.Hour
-	//poolConfig.MaxConnIdleTime = 30 * time.Minute
-
-	pool, err := pgxpool.NewWithConfig(ctx, poolConfig)
-	if err != nil {
-		panic(fmt.Errorf("unable to connect to database: %w", err))
+	if err := sqlxDB.Ping(); err != nil {
+		panic(fmt.Errorf("unable to ping database with sqlx: %w", err))
 	}
 
-	if err := pool.Ping(ctx); err != nil {
-		panic(fmt.Errorf("unable to ping database: %w", err))
-	}
-
-	return pool
+	return sqlxDB
 }

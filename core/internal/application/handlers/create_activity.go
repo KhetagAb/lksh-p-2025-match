@@ -2,16 +2,18 @@ package handlers
 
 import (
 	"context"
-	"github.com/labstack/echo/v4"
 	"match/internal/application/handlers/mappers"
+	"match/internal/domain/dao"
 	"match/internal/domain/dto"
 	"match/internal/generated/server"
 	"match/internal/infra"
+
+	"github.com/labstack/echo/v4"
 )
 
 type (
 	CreateActivityService interface {
-		CreateActivity(ctx context.Context, creatorID, sportSectionId int64, title, description string) (*dto.Activity, error)
+		CreateActivity(ctx context.Context, activity dao.Activity) (*dto.Activity, error)
 	}
 
 	CreateActivityHandler struct {
@@ -42,7 +44,9 @@ func (h *CreateActivityHandler) CreateActivity(ectx echo.Context, params server.
 		return BadRequestErrorResponsef(ectx, "Invalid request body: "+err.Error())
 	}
 
-	activity, err := h.createActivityService.CreateActivity(ctx, requestBody.CreatorId, requestBody.SportSectionId, requestBody.Title, *requestBody.Description)
+	activity, err := h.createActivityService.CreateActivity(ctx,
+		mappers.MapActivityFromAPI(requestBody),
+	)
 	if err != nil {
 		infra.Errorf(ctx, "Internal server error while trying to create activity: %v", err)
 		return InternalErrorResponsef(ectx, err.Error())

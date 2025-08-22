@@ -11,11 +11,13 @@ type ServerInterface struct {
 	getSportList                *GetAllSportSectionHandler
 	getTeamsByIDActivity        *GetTeamsByActivityIDHandler
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler
+	getActivityByID             *GetActivityByIDHandler
 	enrollPlayerInActivity      *EnrollPlayerInActivityHandler
 	createActivity              *CreateActivityHandler
 	deleteActivity              *DeleteActivityHandler
 	updateActivity              *UpdateActivityHandler
 	getPlayerByTg               *GetPlayerByTgHandler
+  deletePlayerFromActivity    *DeletePlayerFromActivityHandler
 	notificationRouter          *NotificationRouter
 }
 
@@ -29,11 +31,13 @@ func (s ServerInterface) GetCoreNotifications(ctx echo.Context, params server.Ge
 
 func (s ServerInterface) PostCoreNotifications(ctx echo.Context) error {
 	return s.notificationRouter.CreateNotification(ctx)
+
+func (s ServerInterface) GetCoreActivityId(ctx echo.Context, id int64) error {
+	return s.getActivityByID.GetActivityByID(ctx, id)
 }
 
 func (s ServerInterface) PostCoreActivityIdLeave(ctx echo.Context, id int64) error {
-	//TODO implement me
-	panic("implement me")
+	return s.deletePlayerFromActivity.DeletePlayerFromActivity(ctx, id)
 }
 
 func (s ServerInterface) PostCoreActivityCreate(ctx echo.Context, params server.PostCoreActivityCreateParams) error {
@@ -79,21 +83,25 @@ func NewServerInterface(
 	getSportList *GetAllSportSectionHandler,
 	getTeamsByIDActivity *GetTeamsByActivityIDHandler,
 	getActivityBySportSectionID *GetActivitiesBySportSectionIDHandler,
+	getActivityByID *GetActivityByIDHandler,
 	enrollPlayerInActivity *EnrollPlayerInActivityHandler,
 	createActivity *CreateActivityHandler,
 	deleteActivity *DeleteActivityHandler,
 	updateActivity *UpdateActivityHandler,
 	getPlayerByTg *GetPlayerByTgHandler,
+	deletePlayerFromActivity *DeletePlayerFromActivityHandler,
 ) *ServerInterface {
 	return &ServerInterface{
 		getSportList:                getSportList,
 		registerPlayer:              registerPlayer,
 		getTeamsByIDActivity:        getTeamsByIDActivity,
 		getActivityBySportSectionID: getActivityBySportSectionID,
+		getActivityByID:             getActivityByID,
 		enrollPlayerInActivity:      enrollPlayerInActivity,
 		createActivity:              createActivity,
 		deleteActivity:              deleteActivity,
 		updateActivity:              updateActivity,
 		getPlayerByTg:               getPlayerByTg,
+		deletePlayerFromActivity:    deletePlayerFromActivity,
 	}
 }

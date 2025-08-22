@@ -7,45 +7,46 @@ import (
 	"match/internal/domain/dao"
 	"match/internal/domain/services"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jmoiron/sqlx"
 )
 
-//go:embed queries/team/create.sql
-var createTeamQuery string
+var (
+	//go:embed queries/team/create.sql
+	createTeamQuery string
 
-//go:embed queries/team/get-by-id.sql
-var getTeamByIDQuery string
+	//go:embed queries/team/get-by-id.sql
+	getTeamByIDQuery string
 
-//go:embed queries/team/delete.sql
-var deleteTeamQuery string
+	//go:embed queries/team/delete.sql
+	deleteTeamByID string
 
-//go:embed queries/team/get-by-activity-id.sql
-var getTeamsByActivityIDQuery string
+	//go:embed queries/team/get-by-activity-id.sql
+	getTeamsByActivityIDQuery string
 
-//go:embed queries/team/get-players-by-team-id.sql
-var getTeamPlayersByIDQuery string
+	//go:embed queries/team/get-players-by-team-id.sql
+	getTeamPlayersByIDQuery string
 
-//go:embed queries/team/add-player-to-team.sql
-var addPlayerToTeamQuery string
+	//go:embed queries/team/add-player-to-team.sql
+	addPlayerToTeamQuery string
 
-//go:embed queries/team/get-team-by-player-and-activity.sql
-var getTeamByPlayerAndActivityQuery string
+	//go:embed queries/team/get-team-by-player-and-activity.sql
+	getTeamByPlayerAndActivityQuery string
+
+	//go:embed queries/team/delete-player-from-team-by-activity.sql
+	deletePlayerFromTeamByActivity string
+)
 
 type Teams struct {
-	pool *pgxpool.Pool
+	db *sqlx.DB
 }
 
-func NewTeamsRepository(pool *pgxpool.Pool) *Teams {
-	return &Teams{pool: pool}
+func NewTeamsRepository(db *sqlx.DB) *Teams {
+	return &Teams{db: db}
 }
 
-func (r *Teams) CreateTeam(
-	ctx context.Context,
-	name string,
-	captainID, activityID int64,
-) (*int64, error) {
+func (r *Teams) CreateTeam(ctx context.Context, name string, captainID, activityID int64) (*int64, error) {
 	var id int64
-	err := r.pool.QueryRow(ctx, createTeamQuery, name, captainID, activityID).Scan(&id)
+	err := r.db.QueryRowxContext(ctx, createTeamQuery, name, captainID, activityID).Scan(&id)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
 	}
@@ -53,86 +54,37 @@ func (r *Teams) CreateTeam(
 }
 
 func (r *Teams) GetTeamByID(ctx context.Context, id int64) (*dao.Team, error) {
-	var (
-		name       string
-		captainID  int64
-		activityID int64
-	)
-
-	err := r.pool.QueryRow(ctx, getTeamByIDQuery, id).Scan(&id, &name, &captainID, &activityID)
+	var team dao.Team
+	err := r.db.GetContext(ctx, &team, getTeamByIDQuery, id)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
 
-	return &dao.Team{
-		ID:         id,
-		Name:       name,
-		CaptainID:  captainID,
-		ActivityID: activityID,
-	}, nil
+	return &team, nil
 }
 
 func (r *Teams) GetTeamsByActivityID(ctx context.Context, activityID int64) ([]dao.Team, error) {
-	rows, err := r.pool.Query(ctx, getTeamsByActivityIDQuery, activityID)
+	var teams []dao.Team
+	err := r.db.SelectContext(ctx, &teams, getTeamsByActivityIDQuery, activityID)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
-	}
-	defer rows.Close()
-
-	teams := make([]dao.Team, 0)
-
-	for rows.Next() {
-		var team dao.Team
-		if scanErr := rows.Scan(&team.ID, &team.Name, &team.CaptainID, &team.ActivityID); scanErr != nil {
-			return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: scanErr.Error()}
-		}
-		teams = append(teams, team)
-	}
-
-	if rows.Err() != nil {
-		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: rows.Err().Error()}
 	}
 
 	return teams, nil
 }
 
 func (r *Teams) GetTeamPlayersByID(ctx context.Context, teamID int64) ([]dao.Player, error) {
-	rows, err := r.pool.Query(ctx, getTeamPlayersByIDQuery, teamID)
+	var players []dao.Player
+	err := r.db.SelectContext(ctx, &players, getTeamPlayersByIDQuery, teamID)
 	if err != nil {
 		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
-	}
-	defer rows.Close()
-
-	players := make([]dao.Player, 0)
-
-	for rows.Next() {
-		var player dao.Player
-		if scanErr := rows.Scan(&player.ID, &player.Name, &player.TgUsername, &player.TgID); scanErr != nil {
-			return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: scanErr.Error()}
-		}
-		players = append(players, player)
-	}
-
-	if rows.Err() != nil {
-		return nil, &services.InvalidOperationError{Code: services.InvalidOperation, Message: rows.Err().Error()}
 	}
 
 	return players, nil
 }
 
-func (r *Teams) DeleteTeamByID(ctx context.Context, id int64) error {
-	tag, err := r.pool.Exec(ctx, deleteTeamQuery, id)
-	if err != nil {
-		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
-	}
-	if tag.RowsAffected() != 1 {
-		return &services.NotFoundError{Code: services.NotFound, Message: "team not found"}
-	}
-	return nil
-}
-
 func (r *Teams) AddPlayerToTeam(ctx context.Context, playerID, teamID int64) error {
-	_, err := r.pool.Exec(ctx, addPlayerToTeamQuery, playerID, teamID)
+	_, err := r.db.ExecContext(ctx, addPlayerToTeamQuery, playerID, teamID)
 	if err != nil {
 		return &services.InvalidOperationError{
 			Code:    services.InvalidOperation,
@@ -143,22 +95,27 @@ func (r *Teams) AddPlayerToTeam(ctx context.Context, playerID, teamID int64) err
 }
 
 func (r *Teams) GetTeamByPlayerAndActivity(ctx context.Context, playerID, activityID int64) (*dao.Team, error) {
-	var (
-		id         int64
-		name       string
-		captainID  int64
-		activityIDResult int64
-	)
-
-	err := r.pool.QueryRow(ctx, getTeamByPlayerAndActivityQuery, playerID, activityID).Scan(&id, &name, &captainID, &activityIDResult)
+	var team dao.Team
+	err := r.db.GetContext(ctx, &team, getTeamByPlayerAndActivityQuery, playerID, activityID)
 	if err != nil {
 		return nil, &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
 	}
 
-	return &dao.Team{
-		ID:         id,
-		Name:       name,
-		CaptainID:  captainID,
-		ActivityID: activityIDResult,
-	}, nil
+	return &team, nil
+}
+
+func (r *Teams) DeletePlayerFromTeamByActivity(ctx context.Context, playerId, teamId int64) error {
+	_, err := r.db.ExecContext(ctx, deletePlayerFromTeamByActivity, playerId, teamId)
+	if err != nil {
+		return &services.NotFoundError{Code: services.NotFound, Message: err.Error()}
+	}
+	return nil
+}
+
+func (r *Teams) DeleteTeamByID(ctx context.Context, teamID int64) error {
+	_, err := r.db.ExecContext(ctx, deleteTeamByID, teamID)
+	if err != nil {
+		return &services.InvalidOperationError{Code: services.InvalidOperation, Message: err.Error()}
+	}
+	return nil
 }
