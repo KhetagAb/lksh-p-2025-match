@@ -5,6 +5,9 @@
 <p>
     {{ error }}
 </p>
+<div id="notific">
+
+</div>
 
 
 
@@ -79,10 +82,10 @@
     <button id="b3-2"  class="buttonel3-2" onclick="bl3_2()">Раздел 3: удаление активити</button>
     <button id="b3-3"  class="buttonel3-3" onclick="bl3_3()">Раздел 3: создание активити</button>
     <button id="b6"  class="buttonel6" onclick="bl6()">Раздел 3: изменение параметров активити</button>
-    <button id="b7"  onclick="save_submit()" class="buttonel7" form="gs_reg">Сохранить изменения!</button>
+    <button id="b7"  onclick="save_submit()" class="buttonel7">Сохранить изменения!</button>
 
     <button id="b4"  class="buttonel4" onclick="bl4()">Раздел 4: просмотр участников активити</button>
-    <button id="b5"  onclick="subm()" class="buttonel5" form="gs_reg">Создать активность!</button>
+    <button id="b5"  onclick="subm()" class="buttonel5">Создать активность!</button>
 
 </div>
 
@@ -640,15 +643,32 @@
     const chel = document.getElementById("resact1");
     const chel_a = document.getElementById("resact");
     function subm(){
-        var lkj=confirm('Вы уверены, что хотите сохранить актвити '+document.getElementById('activityc_name').value+'?')
+        var lkj=confirm('Вы уверены, что хотите сохранить активити '+document.getElementById('activityc_name').value+'?')
         if (lkj) {
-            //эндпоинт создания /sections/activities/create
-            document.getElementById('gs_reg').action = '/sections/activities/create'
-            document.getElementById('sdfghj').value = document.getElementById('res').innerHTML;
-            document.getElementById('section_name_submit1').value=document.getElementById('view_act').value;
-        }
-        else{
-            event.preventDefault();
+            const formd = new FormData();
+            formd.append('title', document.getElementById('activityc_name').value);
+            formd.append('description', document.getElementById('res').innerHTML);
+            formd.append('section_id', document.getElementById('view_act').value);
+
+            fetch('/sections/activities/create', {
+                method: 'POST',
+                body: formd
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        alert('Данные успешно отправлены!');
+                        document.getElementById('activityc_name').value = '';
+                        editorInstance.setData('');
+                        bl1();
+                    }
+                    else {
+                        alert('Ошибка: ' + data.error+'. Попробуйте позже!');
+                    }
+                })
+                .catch(error => {
+                    alert('Возникла ошибка. Скорее всего у вас проблемы с интернет-соединением. Попробуйте позже!');
+                });
         }
     }
 
@@ -706,14 +726,55 @@
     function save_submit() {
         var lkj=confirm('Вы уверены, что хотите сохранить изменения для активити '+document.getElementById('activityc_name').value+'?')
         if (lkj) {
-            //эндпоинт изменения /sections/activities/update
-            document.getElementById('gs_reg').action = '/sections/activities/update';
-            document.getElementById('sdfghj').value = document.getElementById('res').innerHTML;
-            document.getElementById('section_name_submit1').value=document.getElementById('view_act').value;
-            document.getElementById('gs_reg').submit();
-        } else {
-            event.preventDefault();
+            const formd = new FormData();
+            formd.append('title', document.getElementById('activityc_name').value);
+            formd.append('description', document.getElementById('res').innerHTML);
+            formd.append('section_id', document.getElementById('view_act').value);
+            formd.append('activity_id', document.getElementById('action_id_submit').innerHTML);
+
+            fetch('/sections/activities/update', {
+                method: 'POST',
+                body: formd
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'ok') {
+                        document.getElementById('notific').innerHTML="Активность была успешно изменена"
+                        document.getElementById('activityc_name').value = '';
+                        editorInstance.setData('');
+                        bl1();
+                    }
+                    else {
+                        alert('Ошибка: ' + data.error+'. Попробуйте позже!');
+                    }
+                })
+                .catch(error => {
+                    alert('Ошибка во время передачи сообщения. Скорее всего у вас проблемы с интернет-соединением. Попробуйте позже!');
+                });
         }
+    }
+
+    function deleteact() {
+        const formd = new FormData();
+        formd.append('activity_id', document.getElementById('action_id_submit').innerHTML);
+
+        fetch('/sections/activities/delete', {
+            method: 'POST',
+            body: formd
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'ok') {
+                    document.getElementById('notific').innerHTML='Активти было успешно удалено'
+                    bl1();
+                }
+                else {
+                    alert('Ошибка: ' + data.error+'. Попробуйте позже!');
+                }
+            })
+            .catch(error => {
+                alert('Ошибка во время передачи сообщения. Скорее всего у вас проблемы с интернет-соединением. Попробуйте позже!');
+            });
     }
 
     function submitf(p) {
@@ -782,7 +843,7 @@
                 //эндпоинт удаления /sections/activities/delete
                 const elm = document.getElementById("rasd3-d");
                 var str = "<p>Вы действительно хотите удалить активити " + document.getElementById('action_name_submit').innerHTML + " в секции " + document.getElementById('section_name_submit').innerHTML + "? Данное действие будет занесено в журнал и отменить его будет нельзя</p>"
-                str += "<button type='submit'>Да</button>";
+                str += "<button type='button' onclick='deleteact()'>Да</button>";
                 document.getElementById('gs_reg').action = '/sections/activities/delete';
                 elm.innerHTML = str;
 
@@ -1433,6 +1494,11 @@
     main_get();
 
 
+</script>
+<script>
+    document.getElementById('gs_reg').addEventListener('submit', function(event) {
+        event.preventDefault();
+    });
 </script>
 <a href="/">Main page</a>
 
