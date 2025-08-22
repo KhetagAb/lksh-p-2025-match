@@ -1,8 +1,7 @@
 import logging
-from typing import Annotated
 
-from fastapi import APIRouter, Form, Request, Response
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Request, Response
+from fastapi.responses import JSONResponse
 
 from lkshmatch.adapters.base import (
     ActivityAdminAdapter,
@@ -25,36 +24,41 @@ async def root(request: Request) -> Response:
 
 
 @activities_router.get("/admin")
-async def admin_panel(request: Request, error: str = "") -> Response:
+async def admin_panel(request: Request) -> Response:
     return templates.TemplateResponse(
-        name="admin_panel.html", context={"request": request, "error": error}
+        name="admin_panel.html", context={"request": request}
     )
 
 
 @activities_router.post("/sections/activities/delete")
 async def delete_activity(
     request: Request,
-    activity_id: Annotated[int, Form()],
 ) -> Response:
+    form_data = await request.form()
+    activity_id = form_data.get("activity_id", -1)
+
     cookie_token = request.cookies.get(COOKIE_NAME)
     username = get_username_from_token(cookie_token if cookie_token is not None else "")
     admin_activity_adapter = app_container.get(ActivityAdminAdapter)
     error = ""
     try:
-        await admin_activity_adapter.delete_activity(username, activity_id)
+        await admin_activity_adapter.delete_activity(username, int(activity_id))
     except BaseException as exc:
         logging.warning(exc)
         error = "Какая-то ошибка"
-    return RedirectResponse("/admin?error=" + error, status_code=303)
+        return JSONResponse({"error": error, "status": "not ok"})
+    return JSONResponse({"status": "ok"})
 
 
 @activities_router.post("/sections/activities/update")
 async def update_activity(
     request: Request,
-    title: Annotated[str, Form()],
-    description: Annotated[str, Form()],
-    sport_section_id: Annotated[int, Form()],
 ) -> Response:
+    form_data = await request.form()
+    activity_id = form_data.get("activity_id", -1)
+    description = form_data.get("description", "")
+    title = form_data.get("title", "")
+
     cookie_token = request.cookies.get(COOKIE_NAME)
     user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
     username = get_username_from_token(cookie_token if cookie_token is not None else "")
@@ -64,21 +68,24 @@ async def update_activity(
     try:
         player = await player_adapter.get_player_by_tg(tg_id=user_id)
         await admin_activity_adapter.update_activity(
-            username, title, sport_section_id, player.core_id, description
+            int(activity_id), username, title, player.core_id, description
         )
     except BaseException as exc:
         logging.warning(exc)
         error = "Какая-то ошибка"
-    return RedirectResponse("/admin?error=" + error, status_code=303)
+        return JSONResponse({"error": error, "status": "not ok"})
+    return JSONResponse({"status": "ok"})
 
 
 @activities_router.post("/sections/activities/create")
 async def create_activity(
     request: Request,
-    title: Annotated[str, Form()],
-    description: Annotated[str, Form()],
-    sport_section_id: Annotated[int, Form()],
 ) -> Response:
+    form_data = await request.form()
+    title = form_data.get("title", "")
+    description = form_data.get("description", "")
+    sport_section_id = form_data.get("sport_section_id", -1)
+
     cookie_token = request.cookies.get(COOKIE_NAME)
     user_id = get_user_id_from_token(cookie_token if cookie_token is not None else "")
     username = get_username_from_token(cookie_token if cookie_token is not None else "")
@@ -88,12 +95,13 @@ async def create_activity(
     try:
         player = await player_adapter.get_player_by_tg(tg_id=user_id)
         await admin_activity_adapter.create_activity(
-            username, title, sport_section_id, player.core_id, description
+            username, title, int(sport_section_id), player.core_id, description
         )
     except BaseException as exc:
         logging.warning(exc)
         error = "Какая-то ошибка"
-    return RedirectResponse("/admin?error=" + error, status_code=303)
+        return JSONResponse({"error": error, "status": "not ok"})
+    return JSONResponse({"status": "ok"})
 
 
 # @activities_router.get("/sections")

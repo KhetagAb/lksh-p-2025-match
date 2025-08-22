@@ -648,7 +648,7 @@
             const formd = new FormData();
             formd.append('title', document.getElementById('activityc_name').value);
             formd.append('description', document.getElementById('res').innerHTML);
-            formd.append('section_id', document.getElementById('view_act').value);
+            formd.append('sport_section_id', document.getElementById('view_act').value);
 
             fetch('/sections/activities/create', {
                 method: 'POST',
@@ -661,7 +661,17 @@
                         document.getElementById('activityc_name').value = '';
                         editorInstance.setData('');
                         bl1();
-                    }
+                        document.getElementById('b2').style.display='none'
+                        document.getElementById('b3-1').style.display='none'
+                        document.getElementById('b3-2').style.display='none'
+                        document.getElementById('b3-3').style.display='none'
+                        document.getElementById('b4').style.display='none'
+                        document.getElementById('b5').style.display='none'
+                        document.getElementById('b6').style.display='none'
+                        document.getElementById('b7').style.display='none'
+                        document.getElementById('sectionsList').value='NaN';
+                        document.getElementById('chooseSection').innerHTML='Пока Вы не выбрали секцию'
+                        }
                     else {
                         alert('Ошибка: ' + data.error+'. Попробуйте позже!');
                     }
@@ -729,7 +739,6 @@
             const formd = new FormData();
             formd.append('title', document.getElementById('activityc_name').value);
             formd.append('description', document.getElementById('res').innerHTML);
-            formd.append('section_id', document.getElementById('view_act').value);
             formd.append('activity_id', document.getElementById('action_id_submit').innerHTML);
 
             fetch('/sections/activities/update', {
@@ -743,6 +752,16 @@
                         document.getElementById('activityc_name').value = '';
                         editorInstance.setData('');
                         bl1();
+                        document.getElementById('b2').style.display='none'
+                        document.getElementById('b3-1').style.display='none'
+                        document.getElementById('b3-2').style.display='none'
+                        document.getElementById('b3-3').style.display='none'
+                        document.getElementById('b4').style.display='none'
+                        document.getElementById('b5').style.display='none'
+                        document.getElementById('b6').style.display='none'
+                        document.getElementById('b7').style.display='none'
+                        document.getElementById('sectionsList').value='NaN';
+                        document.getElementById('chooseSection').innerHTML='Пока Вы не выбрали секцию'
                     }
                     else {
                         alert('Ошибка: ' + data.error+'. Попробуйте позже!');
@@ -767,6 +786,21 @@
                 if (data.status === 'ok') {
                     document.getElementById('notific').innerHTML='Активти было успешно удалено'
                     bl1();
+                    document.getElementById('b2').style.display='none'
+                    document.getElementById('b3-1').style.display='none'
+                    document.getElementById('b3-2').style.display='none'
+                    document.getElementById('b3-3').style.display='none'
+                    document.getElementById('b4').style.display='none'
+                    document.getElementById('b5').style.display='none'
+                    document.getElementById('b6').style.display='none'
+                    document.getElementById('b7').style.display='none'
+                    document.getElementById('sectionsList').value='NaN';
+                    document.getElementById('chooseSection').innerHTML='Пока Вы не выбрали секцию'
+
+
+
+
+
                 }
                 else {
                     alert('Ошибка: ' + data.error+'. Попробуйте позже!');
@@ -835,7 +869,7 @@
 
 
 
-
+            document.getElementById('activityc_name').value=document.getElementById('activityList').value;
         }
         else {
 
