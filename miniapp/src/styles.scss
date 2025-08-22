@@ -1,0 +1,27 @@
+:root{
+  --trans: .2s ease;
+}
+
+* {
+  box-sizing: border-box
+}
+
+html, body {
+  height:100%
+}
+
+body {
+  margin:0;
+  background: var(--tg-theme-secondary-bg-color);
+  color: var(--tg-theme-text-color);
+  font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
+  transition: background var(--trans),color var(--trans);
+  display: flex;
+  justify-content: center;
+}
+
+app-root {
+  display: flex;
+  flex-direction:column;
+  align-items: center;
+}

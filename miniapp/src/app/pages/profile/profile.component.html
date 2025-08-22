@@ -1,0 +1,44 @@
+<div class="profile-container">
+  <div class="userpic-container">
+    @if (isImageLoading) {
+      <div class="loader-container">
+        <app-loader 
+          size="medium"
+          [showPulse]="false"
+        ></app-loader>
+      </div>
+    }
+
+    @if (imageLoadError) {
+      <div class="error-placeholder">
+        <svg class="user-icon" viewBox="0 0 24 24">
+          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+        </svg>
+      </div>
+    }
+
+    <img
+      class="userpic"
+      [class.loaded]="!isImageLoading"
+      [src]="user?.photo_url"
+      [alt]="user?.username ? '@' + user.username : 'User'"
+      (click)="telegram.triggerHapticFeedback('heavy')"
+      (load)="onImageLoad()"
+      (error)="onImageError()"
+      [hidden]="imageLoadError"
+    />
+  </div>
+
+  @if (user?.username) {
+    <h3 class="username">{{ '@' + user.username }}</h3>
+  }
+  @if (player?.name) {
+    <h3 class="player-name">{{ player?.name }}</h3>
+  }
+  @else if (isServerError) {
+    <h4 class="player-name server-error"> Ошибка получения данных пользователя </h4>
+  }
+  @else {
+    <h5 class="player-name"> Загрузка данных пользователя... </h5>
+  }
+</div>
