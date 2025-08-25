@@ -15,8 +15,8 @@ up:
 start:
 	docker-compose -f docker-compose.$(mode).yml up --build --force-recreate --remove-orphans
 
-stop:
-	docker-compose -f docker-compose.$(mode).yml stop
+test:
+	docker compose -f docker-compose.test.yml up --build --force-recreate --remove-orphans --abort-on-container-exit
 
 down:
 	docker-compose -f docker-compose.$(mode).yml down -v
@@ -35,5 +35,5 @@ venv:
 	uv venv --python 3.13.5
 	uv sync
 
-test:
-	uv run pytest -v
+test-local:
+	uv run pytest --verbose
