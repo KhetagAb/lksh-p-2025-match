@@ -4,12 +4,8 @@ services:
     build:
       context: ..
       dockerfile: core/test.dockerfile
-    environment:
-      APP_POSTGRES_HOST: ${POSTGRES_HOST}
-      APP_POSTGRES_USER: ${POSTGRES_USER}
-      APP_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      APP_POSTGRES_PORT: ${POSTGRES_PORT}
-      APP_POSTGRES_DATABASE: ${POSTGRES_DB}
+    env_file:
+      - .env.test
     depends_on:
       postgres:
         condition: service_healthy
@@ -27,7 +23,7 @@ services:
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
     healthcheck:
-      test: [ 'CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}' ]
+      test: [ 'CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -p ${POSTGRES_PORT}' ]
       interval: 10s
       timeout: 5s
       retries: 5

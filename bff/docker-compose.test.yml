@@ -1,0 +1,36 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE}
+    ports:
+      - "${MONGODB_PORT}:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongodb/mongo-init-scripts:/docker-entrypoint-initdb.d:ro
+
+  tests:
+    build:
+      context: ..
+      dockerfile: bff/test.dockerfile
+    container_name: tests
+    env_file:
+      - .env.test
+    depends_on:
+      - mongodb
+    networks:
+      - default
+      - match-shared-network
+    volumes:
+      - ./config.toml:/app/bff/config.toml:ro
+
+volumes:
+  mongodb_data:
+
+networks:
+  match-shared-network:
+    external: true

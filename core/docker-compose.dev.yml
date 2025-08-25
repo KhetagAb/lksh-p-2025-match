@@ -12,6 +12,8 @@ services:
       APP_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       APP_POSTGRES_PORT: ${POSTGRES_PORT}
       APP_POSTGRES_DATABASE: ${POSTGRES_DB}
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
