@@ -40,7 +40,7 @@ jobs:
           working-directory: core
 
       - name: Run tests
-        run: docker compose -f core/docker-compose.test.yml up --build --force-recreate --remove-orphans --abort-on-container-exit
+        run: cat .env.example > .env.test && docker compose -f core/docker-compose.test.yml up --build --force-recreate --remove-orphans --abort-on-container-exit
         env:
           POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
           POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
