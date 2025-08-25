@@ -90,7 +90,7 @@ jobs:
       - name: Run tests
         run: |
           docker network create match-shared-network
-          docker compose -f bff/docker-compose.test.yml up --build --force-recreate --remove-orphans --abort-on-container-exit
+          cat .env.example > .env && docker compose -f bff/docker-compose.test.yml up --build --force-recreate --remove-orphans --abort-on-container-exit
         env:
           MONGO_INITDB_ROOT_USERNAME: ${ vars.MONGODB_ROOT_USERNAME }
           MONGO_INITDB_ROOT_PASSWORD: ${ vars.MONGODB_ROOT_PASSWORD }
